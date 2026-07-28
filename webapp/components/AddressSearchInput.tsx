@@ -6,17 +6,16 @@ import { Loader2Icon, MapPinIcon, SearchIcon, XIcon } from 'lucide-react';
 import { Municipality } from '@/types/inleverpunten';
 import { cn } from '@/lib/utils';
 
-interface GeocodeResult {
-  display_name: string;
-  lat: string;
-  lon: string;
-  address?: {
-    municipality?: string;
-    city?: string;
-    town?: string;
-    village?: string;
-    county?: string;
-  };
+interface Suggestion {
+  id: string;
+  displayName: string;
+  type: string;
+}
+
+interface LookupResult {
+  displayName: string;
+  municipality: string | null;
+  coordinates: { latitude: number; longitude: number } | null;
 }
 
 interface Props {
@@ -28,47 +27,37 @@ interface Props {
   ) => void;
 }
 
-/** Match a Nominatim result to one of our municipality slugs. */
+/**
+ * Match PDOK's `gemeentenaam` to one of our slugs.
+ *
+ * Both sides come from the same register, so this is an exact comparison by
+ * design — no normalisation, no contains-matching. If it ever stops matching,
+ * the two datasets have drifted, and that is worth surfacing rather than
+ * papering over with a fuzzy fallback that silently picks the wrong gemeente.
+ */
 function resolveMunicipality(
-  result: GeocodeResult,
+  gemeentenaam: string | null,
   municipalities: Municipality[]
 ): string | null {
-  const address = result.address ?? {};
-  const candidates = [
-    address.municipality,
-    address.city,
-    address.town,
-    address.village,
-    address.county,
-  ].filter(Boolean) as string[];
-
-  for (const candidate of candidates) {
-    const needle = candidate.toLowerCase();
-    const match = municipalities.find((m) => m.name.toLowerCase() === needle);
-    if (match) return match.slug;
-  }
-
-  // Fall back to a loose contains-match; Nominatim sometimes returns a
-  // neighbourhood where we expect a municipality.
-  for (const candidate of candidates) {
-    const needle = candidate.toLowerCase();
-    const match = municipalities.find(
-      (m) => m.name.toLowerCase().includes(needle) || needle.includes(m.name.toLowerCase())
-    );
-    if (match) return match.slug;
-  }
-
-  return null;
+  if (!gemeentenaam) return null;
+  const needle = gemeentenaam.trim().toLowerCase();
+  return municipalities.find((m) => m.name.trim().toLowerCase() === needle)?.slug ?? null;
 }
 
 export default function AddressSearchInput({ municipalities, onAddressSelected }: Props) {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<GeocodeResult[]>([]);
+  const [results, setResults] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
-  const abortRef = useRef<AbortController | null>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const suggestAbortRef = useRef<AbortController | null>(null);
+  const lookupAbortRef = useRef<AbortController | null>(null);
+  // Set when a suggestion is chosen, so the resulting setQuery does not
+  // immediately fire a fresh search for the text we just filled in.
+  const suppressSearchRef = useRef(false);
 
   useEffect(() => {
     const onPointerDown = (event: MouseEvent) => {
@@ -78,18 +67,21 @@ export default function AddressSearchInput({ municipalities, onAddressSelected }
     return () => document.removeEventListener('mousedown', onPointerDown);
   }, []);
 
-  // Debounced search. Nominatim asks for at most one request per second, so we
-  // wait for a pause in typing and cancel any request still in flight.
+  // Debounced autocomplete. Any request still in flight is aborted, so a slow
+  // response for "amst" can never overwrite the results for "amsterdam".
   useEffect(() => {
+    if (suppressSearchRef.current) {
+      suppressSearchRef.current = false;
+      return;
+    }
+
     const needle = query.trim();
-    // Too short to search. Nothing to clear — `visibleResults` below derives
-    // emptiness from the query, so stale hits cannot leak through.
     if (needle.length < 3) return;
 
     const timer = setTimeout(async () => {
-      abortRef.current?.abort();
+      suggestAbortRef.current?.abort();
       const controller = new AbortController();
-      abortRef.current = controller;
+      suggestAbortRef.current = controller;
 
       setLoading(true);
       setError(null);
@@ -98,8 +90,9 @@ export default function AddressSearchInput({ municipalities, onAddressSelected }
           signal: controller.signal,
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data: GeocodeResult[] = await response.json();
-        setResults(data);
+        const data = await response.json();
+        setResults(data.results ?? []);
+        setActiveIndex(-1);
         setOpen(true);
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {
@@ -109,30 +102,82 @@ export default function AddressSearchInput({ municipalities, onAddressSelected }
       } finally {
         setLoading(false);
       }
-    }, 500);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [query]);
+
+  // Keep the highlighted option in view during keyboard navigation.
+  useEffect(() => {
+    if (activeIndex < 0) return;
+    const active = listRef.current?.children[activeIndex] as HTMLElement | undefined;
+    active?.scrollIntoView({ block: 'nearest' });
+  }, [activeIndex]);
 
   // Only surface results once the query is long enough to have produced them.
   const searchable = query.trim().length >= 3;
   const visibleResults = searchable ? results : [];
   const visibleError = searchable ? error : null;
 
-  const select = (result: GeocodeResult) => {
-    const slug = resolveMunicipality(result, municipalities);
-    if (!slug) {
-      setError('Kon dit adres niet aan een gemeente koppelen.');
-      return;
-    }
+  const select = async (suggestion: Suggestion) => {
+    lookupAbortRef.current?.abort();
+    const controller = new AbortController();
+    lookupAbortRef.current = controller;
 
-    onAddressSelected(
-      slug,
-      { latitude: parseFloat(result.lat), longitude: parseFloat(result.lon) },
-      result.display_name
-    );
-    setOpen(false);
-    setQuery(result.display_name.split(',').slice(0, 2).join(',').trim());
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/geocode?id=${encodeURIComponent(suggestion.id)}`, {
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data: LookupResult = await response.json();
+
+      if (!data.coordinates) {
+        setError('Dit resultaat heeft geen coördinaten.');
+        return;
+      }
+
+      const slug = resolveMunicipality(data.municipality, municipalities);
+      if (!slug) {
+        setError(
+          data.municipality
+            ? `Gemeente ${data.municipality} zit niet in de dataset.`
+            : 'Kon dit adres niet aan een gemeente koppelen.'
+        );
+        return;
+      }
+
+      suppressSearchRef.current = true;
+      setQuery(data.displayName);
+      setOpen(false);
+      setResults([]);
+      onAddressSelected(slug, data.coordinates, data.displayName);
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        setError('Adres ophalen mislukt. Probeer het opnieuw.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (!open || visibleResults.length === 0) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActiveIndex((i) => Math.min(i + 1, visibleResults.length - 1));
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActiveIndex((i) => Math.max(i - 1, -1));
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      const choice = visibleResults[activeIndex] ?? visibleResults[0];
+      if (choice) void select(choice);
+    } else if (event.key === 'Escape') {
+      setOpen(false);
+    }
   };
 
   return (
@@ -143,7 +188,14 @@ export default function AddressSearchInput({ municipalities, onAddressSelected }
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => visibleResults.length > 0 && setOpen(true)}
+          onKeyDown={onKeyDown}
           placeholder="Zoek een adres of postcode..."
+          autoComplete="off"
+          role="combobox"
+          aria-expanded={open}
+          aria-autocomplete="list"
+          aria-controls="adres-listbox"
+          aria-activedescendant={activeIndex >= 0 ? `adres-optie-${activeIndex}` : undefined}
           className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
         />
         {loading && <Loader2Icon className="size-4 shrink-0 animate-spin text-muted-foreground" />}
@@ -154,6 +206,7 @@ export default function AddressSearchInput({ municipalities, onAddressSelected }
               setQuery('');
               setResults([]);
               setOpen(false);
+              setError(null);
             }}
             aria-label="Zoekopdracht wissen"
             className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
@@ -168,18 +221,28 @@ export default function AddressSearchInput({ municipalities, onAddressSelected }
           {visibleError && (
             <p className="px-3 py-2.5 text-sm text-destructive">{visibleError}</p>
           )}
-          <ul className="max-h-72 overflow-y-auto py-1">
+          <ul
+            ref={listRef}
+            id="adres-listbox"
+            role="listbox"
+            className="max-h-72 overflow-y-auto py-1"
+          >
             {visibleResults.map((result, index) => (
-              <li key={`${result.lat}-${result.lon}-${index}`}>
+              <li key={result.id}>
                 <button
                   type="button"
-                  onClick={() => select(result)}
+                  id={`adres-optie-${index}`}
+                  role="option"
+                  aria-selected={index === activeIndex}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  onClick={() => void select(result)}
                   className={cn(
-                    'flex w-full items-start gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-secondary'
+                    'flex w-full items-start gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-secondary',
+                    index === activeIndex && 'bg-secondary'
                   )}
                 >
                   <MapPinIcon className="mt-0.5 size-4 shrink-0 text-primary" />
-                  <span className="line-clamp-2">{result.display_name}</span>
+                  <span className="line-clamp-2">{result.displayName}</span>
                 </button>
               </li>
             ))}
