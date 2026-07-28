@@ -19,6 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from cache_guard import safe_save  # noqa: E402
+from geocode import repair_coordinates  # noqa: E402
 from normalize import in_netherlands, make_record  # noqa: E402
 from utils import DATA_DIR, fetch_json, make_session  # noqa: E402
 
@@ -116,6 +117,8 @@ def main() -> int:
     if skipped:
         print(f"  ℹ️  Skipped {skipped} locations (inactive, out of bounds or duplicate)")
 
+    geocode_stats = repair_coordinates(session, records, "Stibat")
+
     safe_save(
         source="Stibat",
         new_locations=records,
@@ -124,6 +127,7 @@ def main() -> int:
             "source": "Stibat / Lege Batterijen",
             "url": "https://www.legebatterijen.nl/inleveren/waar-inleveren/",
             "method": f"REST radius search ({RADIUS_M / 1000:.0f} km)",
+            "geocode_repair": geocode_stats,
         },
     )
     return 0

@@ -17,6 +17,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from cache_guard import safe_save  # noqa: E402
+from geocode import repair_coordinates  # noqa: E402
 from normalize import (  # noqa: E402
     in_netherlands,
     make_record,
@@ -152,6 +153,8 @@ def main() -> int:
     automaten = sum(1 for r in records if r["puntType"] == "automaat")
     print(f"  📊 {automaten} automaten, {len(records) - automaten} balies")
 
+    geocode_stats = repair_coordinates(session, records, "Statiegeld Nederland")
+
     safe_save(
         source="Statiegeld Nederland",
         new_locations=records,
@@ -160,6 +163,7 @@ def main() -> int:
             "source": "Statiegeld Nederland (Verpact)",
             "url": "https://www.statiegeldnederland.nl/locatiewijzer",
             "method": "WFS GetFeature",
+            "geocode_repair": geocode_stats,
         },
     )
     return 0

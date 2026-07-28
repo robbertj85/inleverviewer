@@ -63,10 +63,21 @@ lives in the per-municipality files.
 **`cache_guard.safe_save` exits 2, not 1.** That is the "anomaly, previous cache
 kept" signal the workflow treats as a warning. Do not convert it into a hard failure.
 
-**Municipal recycling centres need the grid pass.** The Stichting OPEN endpoint only
-returns `municipalityServicePoint` records to queries near them — a single national
-call surfaces two of ~380. That is why `open_fetch_all.py` also queries per
-municipality centroid.
+**Municipal recycling centres need both sweeps.** The Stichting OPEN endpoint does
+not bbox-filter `municipalityServicePoint` records — it returns the handful
+*nearest the query point*. A single national call surfaces two of ~390. So
+`open_fetch_all.py` runs two sweeps and unions them: per-municipality centroid
+(catches each town's own centre, but Rotterdam's centroid is 15 km out in the port)
+and a land-clipped lattice (shape-proof, but misses centres that sit between cells —
+a cell 3 km from Helmond returns Laarbeek's instead). Dropping either sweep loses
+coverage; measured, not assumed.
+
+**Some sources ship fallback coordinates.** When their geocoder fails they drop
+unrelated addresses on one point — thirteen Statiegeld records share 51.92965/4.47834,
+including an Almere school that then geofences into Rotterdam. `geocode.py` detects
+coordinates shared by *different* addresses and re-resolves them against PDOK
+Locatieserver, cached in `data/geocode_cache.json`. Two records at the same address
+are normal (a shop with two bins) and are left alone.
 
 ## Source endpoints
 
@@ -82,7 +93,12 @@ municipality centroid.
 
 ## Deployment
 
-Vercel. `next.config.ts` declares `outputFileTracingIncludes` for the data files —
+Vercel. The project's **Root Directory must be `webapp`** — the repo root holds the
+Python pipeline and has no `package.json`, so a project left at the default root
+fails the build with "No Next.js version detected". This is a project setting in
+Vercel, not something `vercel.json` can express.
+
+`next.config.ts` declares `outputFileTracingIncludes` for the data files —
 without it the dynamic API routes 404 in production while working locally, because
 the tracer cannot see reads whose filename comes from a request parameter.
 
