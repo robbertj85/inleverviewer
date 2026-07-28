@@ -506,7 +506,10 @@ export default function Home() {
           )}
         </aside>
 
-        <main className="relative flex-1">
+        {/* `isolate` traps Leaflet's panes (z-index 400-700) in their own
+            stacking context. Without it they paint over the mobile drawer and
+            its overlay, which sit outside this element at much lower z. */}
+        <main className="relative isolate flex-1">
           <MapView
             data={data}
             filters={filters}
@@ -523,9 +526,12 @@ export default function Home() {
             </div>
           )}
 
+          {/* z-index has to clear Leaflet's panes, which sit at 400-700 and
+              share this stacking context — anything lower disappears behind
+              the map. */}
           <Button
             size="icon"
-            className="fixed bottom-20 left-4 z-20 size-12 rounded-full shadow-lg md:hidden"
+            className="fixed bottom-16 left-4 z-[900] size-12 rounded-full shadow-lg md:hidden"
             aria-label="Filters openen"
             onClick={() => setMobileSidebarOpen(true)}
           >
