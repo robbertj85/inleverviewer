@@ -1,0 +1,167 @@
+name: Update inleverpunten data
+
+on:
+  schedule:
+    # Every Monday at 02:00 UTC
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+
+# Only one data run at a time; a second run would race on the same commit.
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Boundaries only hit PDOK when the cache is empty or it is a refresh
+      # week (last week of June/December); otherwise this is a no-op read.
+      - name: Refresh municipality boundaries
+        run: python scripts/fetch_pdok_boundaries.py
+        timeout-minutes: 15
+
+      # Each source runs independently. cache_guard exits 2 when a fetch looks
+      # anomalous (zero results, or >20% fewer than the existing cache), which
+      # continue-on-error turns into a warning rather than a failed run — the
+      # previous cache stays in place and the rest of the dataset still updates.
+      - name: Fetch Statiegeld Nederland
+        id: statiegeld
+        run: python scripts/statiegeld_fetch_all.py
+        timeout-minutes: 15
+        continue-on-error: true
+
+      - name: Fetch Stibat
+        id: stibat
+        run: python scripts/stibat_fetch_all.py
+        timeout-minutes: 15
+        continue-on-error: true
+
+      - name: Fetch Stichting OPEN / Wecycle
+        id: open
+        run: python scripts/open_fetch_all.py
+        timeout-minutes: 30
+        continue-on-error: true
+
+      - name: Fetch Droppie
+        id: droppie
+        run: python scripts/droppie_fetch_all.py
+        timeout-minutes: 5
+        continue-on-error: true
+
+      - name: Fetch StatieDrive
+        id: statiedrive
+        run: python scripts/statiedrive_fetch_all.py
+        timeout-minutes: 5
+        continue-on-error: true
+
+      - name: Report source anomalies
+        id: anomalies
+        run: |
+          anomalies=""
+          [ "${{ steps.statiegeld.outcome }}"  = "failure" ] && anomalies="${anomalies}StatiegeldNederland "
+          [ "${{ steps.stibat.outcome }}"      = "failure" ] && anomalies="${anomalies}Stibat "
+          [ "${{ steps.open.outcome }}"        = "failure" ] && anomalies="${anomalies}StichtingOPEN "
+          [ "${{ steps.droppie.outcome }}"     = "failure" ] && anomalies="${anomalies}Droppie "
+          [ "${{ steps.statiedrive.outcome }}" = "failure" ] && anomalies="${anomalies}StatieDrive "
+
+          if [ -n "$anomalies" ]; then
+            echo "::warning::Data anomaly for: ${anomalies}— previous cache preserved, will retry next Monday"
+            {
+              echo "## Data anomalies"
+              echo ""
+              echo "These sources returned nothing or dropped more than 20%: **${anomalies}**"
+              echo ""
+              echo "Their existing caches were preserved. The next scheduled run retries automatically."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "list=${anomalies}" >> "$GITHUB_OUTPUT"
+        # `[ ... ] && ...` returns non-zero when the test is false, which would
+        # otherwise fail the step under `set -e`.
+        shell: bash {0}
+
+      - name: Verify at least one cache exists
+        run: |
+          if ! ls data/*_all_locations.json >/dev/null 2>&1; then
+            echo "::error::No source caches at all — refusing to regenerate an empty dataset"
+            exit 1
+          fi
+
+      - name: Generate municipality GeoJSON
+        run: |
+          python scripts/batch_generate.py
+          python scripts/create_national_overview.py
+          python scripts/create_provincial_boundaries.py
+        timeout-minutes: 30
+
+      - name: Compute statistics
+        run: python scripts/compute_statistics.py
+        timeout-minutes: 20
+
+      - name: Update totals history
+        run: python scripts/update_totals_history.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+
+          git add data/*_all_locations.json data/municipality_polygon_cache.json data/municipalities_all.json 2>/dev/null || true
+          git add webapp/public/municipalities.json 2>/dev/null || true
+          git add webapp/public/data 2>/dev/null || true
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          msg="🤖 Update inleverpunten data — $(date -u +'%Y-%m-%d %H:%M UTC')"
+          if [ -n "${{ steps.anomalies.outputs.list }}" ]; then
+            msg="${msg} (previous cache used for: ${{ steps.anomalies.outputs.list }})"
+          fi
+
+          git commit -m "$msg"
+          git pull --rebase origin main
+          git push
+
+      - name: Write run summary
+        if: always()
+        run: |
+          {
+            echo "## Run summary"
+            echo ""
+            if [ -f webapp/public/data/summary.json ]; then
+              python - <<'PY'
+          import json
+          with open("webapp/public/data/summary.json") as handle:
+              summary = json.load(handle)
+          print(f"- Municipalities: **{summary['total_municipalities']}**")
+          print(f"- Inleverpunten: **{summary['total_points']:,}**".replace(",", "."))
+          print(f"- Dropped (outside all boundaries): {summary['unassigned_points']}")
+          print("")
+          print("| Source | Points |")
+          print("|---|---|")
+          for merk, count in summary["merk_totals"].items():
+              print(f"| {merk} | {count:,} |".replace(",", "."))
+          PY
+            else
+              echo "No summary.json produced."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

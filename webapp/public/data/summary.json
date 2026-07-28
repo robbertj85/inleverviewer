@@ -1,0 +1,4154 @@
+{
+  "generated_at": "2026-07-28T09:25:50.134599Z",
+  "total_municipalities": 342,
+  "total_points": 33663,
+  "unassigned_points": 3,
+  "source_status": {
+    "StatiegeldNederland": {
+      "success": true,
+      "count": 8004
+    },
+    "StichtingOPEN": {
+      "success": true,
+      "count": 7239
+    },
+    "Stibat": {
+      "success": true,
+      "count": 18398
+    },
+    "Droppie": {
+      "success": true,
+      "count": 13
+    },
+    "StatieDrive": {
+      "success": true,
+      "count": 12
+    }
+  },
+  "merk_totals": {
+    "StatiegeldNederland": 8004,
+    "StichtingOPEN": 7236,
+    "Stibat": 18398,
+    "Droppie": 13,
+    "StatieDrive": 12
+  },
+  "results": [
+    {
+      "gemeente": "Maasdriel",
+      "slug": "maasdriel",
+      "success": true,
+      "count": 39,
+      "file_size_kb": 26.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Schagen",
+      "slug": "schagen",
+      "success": true,
+      "count": 122,
+      "file_size_kb": 68.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Eijsden-Margraten",
+      "slug": "eijsden-margraten",
+      "success": true,
+      "count": 49,
+      "file_size_kb": 35.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zwolle",
+      "slug": "zwolle",
+      "success": true,
+      "count": 263,
+      "file_size_kb": 145.9,
+      "merken": [
+        "StatieDrive",
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Echt-Susteren",
+      "slug": "echt-susteren",
+      "success": true,
+      "count": 65,
+      "file_size_kb": 43.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Lansingerland",
+      "slug": "lansingerland",
+      "success": true,
+      "count": 102,
+      "file_size_kb": 59.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Laarbeek",
+      "slug": "laarbeek",
+      "success": true,
+      "count": 46,
+      "file_size_kb": 28.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Dongen",
+      "slug": "dongen",
+      "success": true,
+      "count": 47,
+      "file_size_kb": 27.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "West Maas en Waal",
+      "slug": "west-maas-en-waal",
+      "success": true,
+      "count": 46,
+      "file_size_kb": 29.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Son en Breugel",
+      "slug": "son-en-breugel",
+      "success": true,
+      "count": 39,
+      "file_size_kb": 24.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Alphen aan den Rijn",
+      "slug": "alphen-aan-den-rijn",
+      "success": true,
+      "count": 190,
+      "file_size_kb": 106.4,
+      "merken": [
+        "StatieDrive",
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Molenlanden",
+      "slug": "molenlanden",
+      "success": true,
+      "count": 66,
+      "file_size_kb": 44.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Voorschoten",
+      "slug": "voorschoten",
+      "success": true,
+      "count": 40,
+      "file_size_kb": 23.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Bronckhorst",
+      "slug": "bronckhorst",
+      "success": true,
+      "count": 83,
+      "file_size_kb": 60.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Assen",
+      "slug": "assen",
+      "success": true,
+      "count": 154,
+      "file_size_kb": 87.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Maashorst",
+      "slug": "maashorst",
+      "success": true,
+      "count": 130,
+      "file_size_kb": 74.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Katwijk",
+      "slug": "katwijk",
+      "success": true,
+      "count": 109,
+      "file_size_kb": 60.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Castricum",
+      "slug": "castricum",
+      "success": true,
+      "count": 65,
+      "file_size_kb": 38.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zaanstad",
+      "slug": "zaanstad",
+      "success": true,
+      "count": 285,
+      "file_size_kb": 155.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Coevorden",
+      "slug": "coevorden",
+      "success": true,
+      "count": 97,
+      "file_size_kb": 57.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Oldambt",
+      "slug": "oldambt",
+      "success": true,
+      "count": 111,
+      "file_size_kb": 65.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zutphen",
+      "slug": "zutphen",
+      "success": true,
+      "count": 108,
+      "file_size_kb": 62.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Het Hogeland",
+      "slug": "het-hogeland",
+      "success": true,
+      "count": 111,
+      "file_size_kb": 71.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Wierden",
+      "slug": "wierden",
+      "success": true,
+      "count": 57,
+      "file_size_kb": 34.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Rheden",
+      "slug": "rheden",
+      "success": true,
+      "count": 99,
+      "file_size_kb": 58.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Haaksbergen",
+      "slug": "haaksbergen",
+      "success": true,
+      "count": 55,
+      "file_size_kb": 32.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Oost Gelre",
+      "slug": "oost-gelre",
+      "success": true,
+      "count": 78,
+      "file_size_kb": 48.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Veenendaal",
+      "slug": "veenendaal",
+      "success": true,
+      "count": 139,
+      "file_size_kb": 75.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Leiden",
+      "slug": "leiden",
+      "success": true,
+      "count": 202,
+      "file_size_kb": 109.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Heeze-Leende",
+      "slug": "heeze-leende",
+      "success": true,
+      "count": 33,
+      "file_size_kb": 21.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Dinkelland",
+      "slug": "dinkelland",
+      "success": true,
+      "count": 66,
+      "file_size_kb": 42.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Reimerswaal",
+      "slug": "reimerswaal",
+      "success": true,
+      "count": 42,
+      "file_size_kb": 27.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Breda",
+      "slug": "breda",
+      "success": true,
+      "count": 389,
+      "file_size_kb": 215.3,
+      "merken": [
+        "StatieDrive",
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Bernheze",
+      "slug": "bernheze",
+      "success": true,
+      "count": 55,
+      "file_size_kb": 33.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Beverwijk",
+      "slug": "beverwijk",
+      "success": true,
+      "count": 102,
+      "file_size_kb": 59.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Wijchen",
+      "slug": "wijchen",
+      "success": true,
+      "count": 77,
+      "file_size_kb": 45.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Meierijstad",
+      "slug": "meierijstad",
+      "success": true,
+      "count": 171,
+      "file_size_kb": 101.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Westland",
+      "slug": "westland",
+      "success": true,
+      "count": 196,
+      "file_size_kb": 107.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hardenberg",
+      "slug": "hardenberg",
+      "success": true,
+      "count": 171,
+      "file_size_kb": 103.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Wageningen",
+      "slug": "wageningen",
+      "success": true,
+      "count": 64,
+      "file_size_kb": 38.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "De Fryske Marren",
+      "slug": "de-fryske-marren",
+      "success": true,
+      "count": 134,
+      "file_size_kb": 79.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Sittard-Geleen",
+      "slug": "sittard-geleen",
+      "success": true,
+      "count": 176,
+      "file_size_kb": 98.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zevenaar",
+      "slug": "zevenaar",
+      "success": true,
+      "count": 86,
+      "file_size_kb": 55.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Woudenberg",
+      "slug": "woudenberg",
+      "success": true,
+      "count": 30,
+      "file_size_kb": 22.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Reusel-De Mierden",
+      "slug": "reusel-de-mierden",
+      "success": true,
+      "count": 28,
+      "file_size_kb": 17.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Almere",
+      "slug": "almere",
+      "success": true,
+      "count": 290,
+      "file_size_kb": 156.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Amersfoort",
+      "slug": "amersfoort",
+      "success": true,
+      "count": 294,
+      "file_size_kb": 162.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Oss",
+      "slug": "oss",
+      "success": true,
+      "count": 159,
+      "file_size_kb": 92.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Midden-Delfland",
+      "slug": "midden-delfland",
+      "success": true,
+      "count": 25,
+      "file_size_kb": 20.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Goeree-Overflakkee",
+      "slug": "goeree-overflakkee",
+      "success": true,
+      "count": 130,
+      "file_size_kb": 73.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hillegom",
+      "slug": "hillegom",
+      "success": true,
+      "count": 47,
+      "file_size_kb": 26.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Woerden",
+      "slug": "woerden",
+      "success": true,
+      "count": 106,
+      "file_size_kb": 61.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Mook en Middelaar",
+      "slug": "mook-en-middelaar",
+      "success": true,
+      "count": 18,
+      "file_size_kb": 12.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Cranendonck",
+      "slug": "cranendonck",
+      "success": true,
+      "count": 51,
+      "file_size_kb": 30.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Epe",
+      "slug": "epe",
+      "success": true,
+      "count": 99,
+      "file_size_kb": 56.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Montfoort",
+      "slug": "montfoort",
+      "success": true,
+      "count": 28,
+      "file_size_kb": 18.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Schouwen-Duiveland",
+      "slug": "schouwen-duiveland",
+      "success": true,
+      "count": 132,
+      "file_size_kb": 75.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Pekela",
+      "slug": "pekela",
+      "success": true,
+      "count": 23,
+      "file_size_kb": 14.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Bloemendaal",
+      "slug": "bloemendaal",
+      "success": true,
+      "count": 36,
+      "file_size_kb": 24.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Nieuwegein",
+      "slug": "nieuwegein",
+      "success": true,
+      "count": 127,
+      "file_size_kb": 70.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Beesel",
+      "slug": "beesel",
+      "success": true,
+      "count": 30,
+      "file_size_kb": 19.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Roosendaal",
+      "slug": "roosendaal",
+      "success": true,
+      "count": 147,
+      "file_size_kb": 82.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Putten",
+      "slug": "putten",
+      "success": true,
+      "count": 58,
+      "file_size_kb": 35.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Tubbergen",
+      "slug": "tubbergen",
+      "success": true,
+      "count": 45,
+      "file_size_kb": 28.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Culemborg",
+      "slug": "culemborg",
+      "success": true,
+      "count": 57,
+      "file_size_kb": 32.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Harlingen",
+      "slug": "harlingen",
+      "success": true,
+      "count": 44,
+      "file_size_kb": 28.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Oegstgeest",
+      "slug": "oegstgeest",
+      "success": true,
+      "count": 40,
+      "file_size_kb": 24.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Eersel",
+      "slug": "eersel",
+      "success": true,
+      "count": 41,
+      "file_size_kb": 28.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Drechterland",
+      "slug": "drechterland",
+      "success": true,
+      "count": 22,
+      "file_size_kb": 14.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Heerenveen",
+      "slug": "heerenveen",
+      "success": true,
+      "count": 103,
+      "file_size_kb": 62.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Oostzaan",
+      "slug": "oostzaan",
+      "success": true,
+      "count": 17,
+      "file_size_kb": 11.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Tynaarlo",
+      "slug": "tynaarlo",
+      "success": true,
+      "count": 64,
+      "file_size_kb": 46.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Ede",
+      "slug": "ede",
+      "success": true,
+      "count": 234,
+      "file_size_kb": 131.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Voorst",
+      "slug": "voorst",
+      "success": true,
+      "count": 52,
+      "file_size_kb": 37.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Ommen",
+      "slug": "ommen",
+      "success": true,
+      "count": 45,
+      "file_size_kb": 30.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zandvoort",
+      "slug": "zandvoort",
+      "success": true,
+      "count": 32,
+      "file_size_kb": 17.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zundert",
+      "slug": "zundert",
+      "success": true,
+      "count": 47,
+      "file_size_kb": 30.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Utrecht",
+      "slug": "utrecht",
+      "success": true,
+      "count": 568,
+      "file_size_kb": 310.7,
+      "merken": [
+        "Droppie",
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Enkhuizen",
+      "slug": "enkhuizen",
+      "success": true,
+      "count": 39,
+      "file_size_kb": 22.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "De Bilt",
+      "slug": "de-bilt",
+      "success": true,
+      "count": 79,
+      "file_size_kb": 45.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hendrik-Ido-Ambacht",
+      "slug": "hendrik-ido-ambacht",
+      "success": true,
+      "count": 49,
+      "file_size_kb": 28.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Enschede",
+      "slug": "enschede",
+      "success": true,
+      "count": 331,
+      "file_size_kb": 184.4,
+      "merken": [
+        "StatieDrive",
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Tholen",
+      "slug": "tholen",
+      "success": true,
+      "count": 56,
+      "file_size_kb": 36.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Losser",
+      "slug": "losser",
+      "success": true,
+      "count": 44,
+      "file_size_kb": 28.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Heerde",
+      "slug": "heerde",
+      "success": true,
+      "count": 52,
+      "file_size_kb": 30.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Maasgouw",
+      "slug": "maasgouw",
+      "success": true,
+      "count": 37,
+      "file_size_kb": 25.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hollands Kroon",
+      "slug": "hollands-kroon",
+      "success": true,
+      "count": 120,
+      "file_size_kb": 67.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Eemnes",
+      "slug": "eemnes",
+      "success": true,
+      "count": 20,
+      "file_size_kb": 13.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Waddinxveen",
+      "slug": "waddinxveen",
+      "success": true,
+      "count": 45,
+      "file_size_kb": 27.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Nijkerk",
+      "slug": "nijkerk",
+      "success": true,
+      "count": 89,
+      "file_size_kb": 53.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Baarle-Nassau",
+      "slug": "baarle-nassau",
+      "success": true,
+      "count": 26,
+      "file_size_kb": 40.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Aalsmeer",
+      "slug": "aalsmeer",
+      "success": true,
+      "count": 67,
+      "file_size_kb": 38.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Baarn",
+      "slug": "baarn",
+      "success": true,
+      "count": 48,
+      "file_size_kb": 28.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Nissewaard",
+      "slug": "nissewaard",
+      "success": true,
+      "count": 139,
+      "file_size_kb": 79.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Bodegraven-Reeuwijk",
+      "slug": "bodegraven-reeuwijk",
+      "success": true,
+      "count": 63,
+      "file_size_kb": 39.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Lelystad",
+      "slug": "lelystad",
+      "success": true,
+      "count": 125,
+      "file_size_kb": 69.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Raalte",
+      "slug": "raalte",
+      "success": true,
+      "count": 94,
+      "file_size_kb": 55.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Altena",
+      "slug": "altena",
+      "success": true,
+      "count": 130,
+      "file_size_kb": 75.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Overbetuwe",
+      "slug": "overbetuwe",
+      "success": true,
+      "count": 98,
+      "file_size_kb": 58.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Oldenzaal",
+      "slug": "oldenzaal",
+      "success": true,
+      "count": 77,
+      "file_size_kb": 44.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Heusden",
+      "slug": "heusden",
+      "success": true,
+      "count": 63,
+      "file_size_kb": 37.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Achtkarspelen",
+      "slug": "achtkarspelen",
+      "success": true,
+      "count": 67,
+      "file_size_kb": 43.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hoeksche Waard",
+      "slug": "hoeksche-waard",
+      "success": true,
+      "count": 163,
+      "file_size_kb": 93.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Buren",
+      "slug": "buren",
+      "success": true,
+      "count": 51,
+      "file_size_kb": 35.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Westerveld",
+      "slug": "westerveld",
+      "success": true,
+      "count": 47,
+      "file_size_kb": 34.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Oisterwijk",
+      "slug": "oisterwijk",
+      "success": true,
+      "count": 71,
+      "file_size_kb": 45.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Wormerland",
+      "slug": "wormerland",
+      "success": true,
+      "count": 17,
+      "file_size_kb": 12.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Borne",
+      "slug": "borne",
+      "success": true,
+      "count": 40,
+      "file_size_kb": 24.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Utrechtse Heuvelrug",
+      "slug": "utrechtse-heuvelrug",
+      "success": true,
+      "count": 88,
+      "file_size_kb": 53.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zeewolde",
+      "slug": "zeewolde",
+      "success": true,
+      "count": 53,
+      "file_size_kb": 31.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Stede Broec",
+      "slug": "stede-broec",
+      "success": true,
+      "count": 51,
+      "file_size_kb": 28.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Westervoort",
+      "slug": "westervoort",
+      "success": true,
+      "count": 23,
+      "file_size_kb": 14.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Waadhoeke",
+      "slug": "waadhoeke",
+      "success": true,
+      "count": 98,
+      "file_size_kb": 66.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Koggenland",
+      "slug": "koggenland",
+      "success": true,
+      "count": 43,
+      "file_size_kb": 28.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Sint-Michielsgestel",
+      "slug": "sint-michielsgestel",
+      "success": true,
+      "count": 44,
+      "file_size_kb": 31.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Beekdaelen",
+      "slug": "beekdaelen",
+      "success": true,
+      "count": 56,
+      "file_size_kb": 39.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Bergeijk",
+      "slug": "bergeijk",
+      "success": true,
+      "count": 46,
+      "file_size_kb": 30.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Krimpenerwaard",
+      "slug": "krimpenerwaard",
+      "success": true,
+      "count": 97,
+      "file_size_kb": 58.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Veere",
+      "slug": "veere",
+      "success": true,
+      "count": 92,
+      "file_size_kb": 56.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Aa en Hunze",
+      "slug": "aa-en-hunze",
+      "success": true,
+      "count": 61,
+      "file_size_kb": 40.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Ouder-Amstel",
+      "slug": "ouder-amstel",
+      "success": true,
+      "count": 33,
+      "file_size_kb": 23.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zwartewaterland",
+      "slug": "zwartewaterland",
+      "success": true,
+      "count": 43,
+      "file_size_kb": 28.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Doesburg",
+      "slug": "doesburg",
+      "success": true,
+      "count": 30,
+      "file_size_kb": 19.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Stadskanaal",
+      "slug": "stadskanaal",
+      "success": true,
+      "count": 96,
+      "file_size_kb": 55.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hardinxveld-Giessendam",
+      "slug": "hardinxveld-giessendam",
+      "success": true,
+      "count": 32,
+      "file_size_kb": 19.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Deurne",
+      "slug": "deurne",
+      "success": true,
+      "count": 75,
+      "file_size_kb": 44.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Beek",
+      "slug": "beek",
+      "success": true,
+      "count": 42,
+      "file_size_kb": 25.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Terneuzen",
+      "slug": "terneuzen",
+      "success": true,
+      "count": 137,
+      "file_size_kb": 80.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Capelle aan den IJssel",
+      "slug": "capelle-aan-den-ijssel",
+      "success": true,
+      "count": 98,
+      "file_size_kb": 57.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Westerwolde",
+      "slug": "westerwolde",
+      "success": true,
+      "count": 60,
+      "file_size_kb": 39.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Tytsjerksteradiel",
+      "slug": "tytsjerksteradiel",
+      "success": true,
+      "count": 70,
+      "file_size_kb": 44.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Amsterdam",
+      "slug": "amsterdam",
+      "success": true,
+      "count": 1394,
+      "file_size_kb": 762.3,
+      "merken": [
+        "Droppie",
+        "StatieDrive",
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Pijnacker-Nootdorp",
+      "slug": "pijnacker-nootdorp",
+      "success": true,
+      "count": 82,
+      "file_size_kb": 47.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Nijmegen",
+      "slug": "nijmegen",
+      "success": true,
+      "count": 329,
+      "file_size_kb": 180.9,
+      "merken": [
+        "StatieDrive",
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Lopik",
+      "slug": "lopik",
+      "success": true,
+      "count": 23,
+      "file_size_kb": 15.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Sliedrecht",
+      "slug": "sliedrecht",
+      "success": true,
+      "count": 48,
+      "file_size_kb": 26.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Voerendaal",
+      "slug": "voerendaal",
+      "success": true,
+      "count": 16,
+      "file_size_kb": 13.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Nieuwkoop",
+      "slug": "nieuwkoop",
+      "success": true,
+      "count": 56,
+      "file_size_kb": 35.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Dalfsen",
+      "slug": "dalfsen",
+      "success": true,
+      "count": 71,
+      "file_size_kb": 44.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Bladel",
+      "slug": "bladel",
+      "success": true,
+      "count": 48,
+      "file_size_kb": 28.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Landgraaf",
+      "slug": "landgraaf",
+      "success": true,
+      "count": 65,
+      "file_size_kb": 38.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Tiel",
+      "slug": "tiel",
+      "success": true,
+      "count": 97,
+      "file_size_kb": 55.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Noordwijk",
+      "slug": "noordwijk",
+      "success": true,
+      "count": 104,
+      "file_size_kb": 57.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Ooststellingwerf",
+      "slug": "ooststellingwerf",
+      "success": true,
+      "count": 71,
+      "file_size_kb": 40.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Meppel",
+      "slug": "meppel",
+      "success": true,
+      "count": 87,
+      "file_size_kb": 53.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Laren",
+      "slug": "laren",
+      "success": true,
+      "count": 17,
+      "file_size_kb": 9.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Gennep",
+      "slug": "gennep",
+      "success": true,
+      "count": 46,
+      "file_size_kb": 28.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Barendrecht",
+      "slug": "barendrecht",
+      "success": true,
+      "count": 84,
+      "file_size_kb": 47.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Rhenen",
+      "slug": "rhenen",
+      "success": true,
+      "count": 39,
+      "file_size_kb": 23.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Beuningen",
+      "slug": "beuningen",
+      "success": true,
+      "count": 45,
+      "file_size_kb": 27.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Noordoostpolder",
+      "slug": "noordoostpolder",
+      "success": true,
+      "count": 120,
+      "file_size_kb": 69.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Súdwest-Fryslân",
+      "slug": "sudwest-fryslan",
+      "success": true,
+      "count": 226,
+      "file_size_kb": 134.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Arnhem",
+      "slug": "arnhem",
+      "success": true,
+      "count": 343,
+      "file_size_kb": 186.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Midden-Drenthe",
+      "slug": "midden-drenthe",
+      "success": true,
+      "count": 89,
+      "file_size_kb": 53.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Purmerend",
+      "slug": "purmerend",
+      "success": true,
+      "count": 149,
+      "file_size_kb": 85.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Blaricum",
+      "slug": "blaricum",
+      "success": true,
+      "count": 14,
+      "file_size_kb": 9.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Middelburg",
+      "slug": "middelburg",
+      "success": true,
+      "count": 109,
+      "file_size_kb": 62.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hof van Twente",
+      "slug": "hof-van-twente",
+      "success": true,
+      "count": 80,
+      "file_size_kb": 50.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Smallingerland",
+      "slug": "smallingerland",
+      "success": true,
+      "count": 119,
+      "file_size_kb": 68.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Groningen",
+      "slug": "groningen",
+      "success": true,
+      "count": 443,
+      "file_size_kb": 250.4,
+      "merken": [
+        "StatieDrive",
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Oldebroek",
+      "slug": "oldebroek",
+      "success": true,
+      "count": 56,
+      "file_size_kb": 34.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Nederweert",
+      "slug": "nederweert",
+      "success": true,
+      "count": 34,
+      "file_size_kb": 21.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Boxtel",
+      "slug": "boxtel",
+      "success": true,
+      "count": 68,
+      "file_size_kb": 42.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Vlieland",
+      "slug": "vlieland",
+      "success": true,
+      "count": 10,
+      "file_size_kb": 6.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Gooise Meren",
+      "slug": "gooise-meren",
+      "success": true,
+      "count": 120,
+      "file_size_kb": 69.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Kampen",
+      "slug": "kampen",
+      "success": true,
+      "count": 102,
+      "file_size_kb": 57.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Druten",
+      "slug": "druten",
+      "success": true,
+      "count": 42,
+      "file_size_kb": 25.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Lochem",
+      "slug": "lochem",
+      "success": true,
+      "count": 69,
+      "file_size_kb": 50.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Dronten",
+      "slug": "dronten",
+      "success": true,
+      "count": 103,
+      "file_size_kb": 59.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "De Ronde Venen",
+      "slug": "de-ronde-venen",
+      "success": true,
+      "count": 92,
+      "file_size_kb": 55.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Drimmelen",
+      "slug": "drimmelen",
+      "success": true,
+      "count": 45,
+      "file_size_kb": 29.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Helmond",
+      "slug": "helmond",
+      "success": true,
+      "count": 158,
+      "file_size_kb": 87.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Kaag en Braassem",
+      "slug": "kaag-en-braassem",
+      "success": true,
+      "count": 38,
+      "file_size_kb": 24.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Twenterand",
+      "slug": "twenterand",
+      "success": true,
+      "count": 78,
+      "file_size_kb": 50.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Woensdrecht",
+      "slug": "woensdrecht",
+      "success": true,
+      "count": 58,
+      "file_size_kb": 35.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Brunssum",
+      "slug": "brunssum",
+      "success": true,
+      "count": 50,
+      "file_size_kb": 28.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Loon op Zand",
+      "slug": "loon-op-zand",
+      "success": true,
+      "count": 49,
+      "file_size_kb": 28.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Lingewaard",
+      "slug": "lingewaard",
+      "success": true,
+      "count": 82,
+      "file_size_kb": 48.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Valkenburg aan de Geul",
+      "slug": "valkenburg-aan-de-geul",
+      "success": true,
+      "count": 40,
+      "file_size_kb": 28.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zeist",
+      "slug": "zeist",
+      "success": true,
+      "count": 109,
+      "file_size_kb": 60.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Opmeer",
+      "slug": "opmeer",
+      "success": true,
+      "count": 27,
+      "file_size_kb": 17.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Leiderdorp",
+      "slug": "leiderdorp",
+      "success": true,
+      "count": 49,
+      "file_size_kb": 28.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Kerkrade",
+      "slug": "kerkrade",
+      "success": true,
+      "count": 83,
+      "file_size_kb": 49.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Doetinchem",
+      "slug": "doetinchem",
+      "success": true,
+      "count": 148,
+      "file_size_kb": 88.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hoogeveen",
+      "slug": "hoogeveen",
+      "success": true,
+      "count": 135,
+      "file_size_kb": 76.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Waalre",
+      "slug": "waalre",
+      "success": true,
+      "count": 21,
+      "file_size_kb": 16.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Vaals",
+      "slug": "vaals",
+      "success": true,
+      "count": 27,
+      "file_size_kb": 20.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Bunschoten",
+      "slug": "bunschoten",
+      "success": true,
+      "count": 41,
+      "file_size_kb": 24.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Weert",
+      "slug": "weert",
+      "success": true,
+      "count": 101,
+      "file_size_kb": 57.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Ridderkerk",
+      "slug": "ridderkerk",
+      "success": true,
+      "count": 83,
+      "file_size_kb": 45.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zwijndrecht",
+      "slug": "zwijndrecht",
+      "success": true,
+      "count": 77,
+      "file_size_kb": 43.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Berg en Dal",
+      "slug": "berg-en-dal",
+      "success": true,
+      "count": 72,
+      "file_size_kb": 46.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Elburg",
+      "slug": "elburg",
+      "success": true,
+      "count": 46,
+      "file_size_kb": 27.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Brummen",
+      "slug": "brummen",
+      "success": true,
+      "count": 50,
+      "file_size_kb": 33.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Horst aan de Maas",
+      "slug": "horst-aan-de-maas",
+      "success": true,
+      "count": 75,
+      "file_size_kb": 46.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Rucphen",
+      "slug": "rucphen",
+      "success": true,
+      "count": 48,
+      "file_size_kb": 31.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Dordrecht",
+      "slug": "dordrecht",
+      "success": true,
+      "count": 192,
+      "file_size_kb": 106.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Asten",
+      "slug": "asten",
+      "success": true,
+      "count": 39,
+      "file_size_kb": 24.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Maastricht",
+      "slug": "maastricht",
+      "success": true,
+      "count": 226,
+      "file_size_kb": 128.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Land van Cuijk",
+      "slug": "land-van-cuijk",
+      "success": true,
+      "count": 197,
+      "file_size_kb": 108.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Someren",
+      "slug": "someren",
+      "success": true,
+      "count": 45,
+      "file_size_kb": 26.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Urk",
+      "slug": "urk",
+      "success": true,
+      "count": 32,
+      "file_size_kb": 18.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Gilze en Rijen",
+      "slug": "gilze-en-rijen",
+      "success": true,
+      "count": 51,
+      "file_size_kb": 33.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Steenbergen",
+      "slug": "steenbergen",
+      "success": true,
+      "count": 56,
+      "file_size_kb": 34.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Krimpen aan den IJssel",
+      "slug": "krimpen-aan-den-ijssel",
+      "success": true,
+      "count": 48,
+      "file_size_kb": 28.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Gorinchem",
+      "slug": "gorinchem",
+      "success": true,
+      "count": 94,
+      "file_size_kb": 52.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Ameland",
+      "slug": "ameland",
+      "success": true,
+      "count": 34,
+      "file_size_kb": 19.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Wijk bij Duurstede",
+      "slug": "wijk-bij-duurstede",
+      "success": true,
+      "count": 30,
+      "file_size_kb": 19.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Wijdemeren",
+      "slug": "wijdemeren",
+      "success": true,
+      "count": 34,
+      "file_size_kb": 26.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Deventer",
+      "slug": "deventer",
+      "success": true,
+      "count": 192,
+      "file_size_kb": 110.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Voorne aan Zee",
+      "slug": "voorne-aan-zee",
+      "success": true,
+      "count": 142,
+      "file_size_kb": 79.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Noord-Beveland",
+      "slug": "noord-beveland",
+      "success": true,
+      "count": 29,
+      "file_size_kb": 21.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hattem",
+      "slug": "hattem",
+      "success": true,
+      "count": 18,
+      "file_size_kb": 12.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zaltbommel",
+      "slug": "zaltbommel",
+      "success": true,
+      "count": 73,
+      "file_size_kb": 45.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Montferland",
+      "slug": "montferland",
+      "success": true,
+      "count": 73,
+      "file_size_kb": 48.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Alkmaar",
+      "slug": "alkmaar",
+      "success": true,
+      "count": 236,
+      "file_size_kb": 132.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Peel en Maas",
+      "slug": "peel-en-maas",
+      "success": true,
+      "count": 94,
+      "file_size_kb": 52.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Sluis",
+      "slug": "sluis",
+      "success": true,
+      "count": 100,
+      "file_size_kb": 61.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Westerkwartier",
+      "slug": "westerkwartier",
+      "success": true,
+      "count": 152,
+      "file_size_kb": 92.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zoetermeer",
+      "slug": "zoetermeer",
+      "success": true,
+      "count": 182,
+      "file_size_kb": 99.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Borger-Odoorn",
+      "slug": "borger-odoorn",
+      "success": true,
+      "count": 54,
+      "file_size_kb": 32.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Bergen (L)",
+      "slug": "bergen-l",
+      "success": true,
+      "count": 35,
+      "file_size_kb": 23.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Albrandswaard",
+      "slug": "albrandswaard",
+      "success": true,
+      "count": 35,
+      "file_size_kb": 22.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Best",
+      "slug": "best",
+      "success": true,
+      "count": 63,
+      "file_size_kb": 35.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Oirschot",
+      "slug": "oirschot",
+      "success": true,
+      "count": 34,
+      "file_size_kb": 24.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Vijfheerenlanden",
+      "slug": "vijfheerenlanden",
+      "success": true,
+      "count": 113,
+      "file_size_kb": 66.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Uitgeest",
+      "slug": "uitgeest",
+      "success": true,
+      "count": 24,
+      "file_size_kb": 17.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Heerlen",
+      "slug": "heerlen",
+      "success": true,
+      "count": 168,
+      "file_size_kb": 94.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Olst-Wijhe",
+      "slug": "olst-wijhe",
+      "success": true,
+      "count": 26,
+      "file_size_kb": 22.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Ermelo",
+      "slug": "ermelo",
+      "success": true,
+      "count": 60,
+      "file_size_kb": 35.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Terschelling",
+      "slug": "terschelling",
+      "success": true,
+      "count": 36,
+      "file_size_kb": 20.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Vlaardingen",
+      "slug": "vlaardingen",
+      "success": true,
+      "count": 107,
+      "file_size_kb": 59.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Neder-Betuwe",
+      "slug": "neder-betuwe",
+      "success": true,
+      "count": 49,
+      "file_size_kb": 34.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Soest",
+      "slug": "soest",
+      "success": true,
+      "count": 87,
+      "file_size_kb": 48.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hilvarenbeek",
+      "slug": "hilvarenbeek",
+      "success": true,
+      "count": 35,
+      "file_size_kb": 23.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Berkelland",
+      "slug": "berkelland",
+      "success": true,
+      "count": 98,
+      "file_size_kb": 66.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Medemblik",
+      "slug": "medemblik",
+      "success": true,
+      "count": 92,
+      "file_size_kb": 53.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Teylingen",
+      "slug": "teylingen",
+      "success": true,
+      "count": 59,
+      "file_size_kb": 37.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Rozendaal",
+      "slug": "rozendaal",
+      "success": true,
+      "count": 2,
+      "file_size_kb": 3.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat"
+      ]
+    },
+    {
+      "gemeente": "Dijk en Waard",
+      "slug": "dijk-en-waard",
+      "success": true,
+      "count": 169,
+      "file_size_kb": 96.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Landsmeer",
+      "slug": "landsmeer",
+      "success": true,
+      "count": 16,
+      "file_size_kb": 11.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Eemsdelta",
+      "slug": "eemsdelta",
+      "success": true,
+      "count": 115,
+      "file_size_kb": 71.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Venlo",
+      "slug": "venlo",
+      "success": true,
+      "count": 199,
+      "file_size_kb": 111.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Tilburg",
+      "slug": "tilburg",
+      "success": true,
+      "count": 379,
+      "file_size_kb": 210.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "De Wolden",
+      "slug": "de-wolden",
+      "success": true,
+      "count": 59,
+      "file_size_kb": 51.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Moerdijk",
+      "slug": "moerdijk",
+      "success": true,
+      "count": 76,
+      "file_size_kb": 46.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Midden-Groningen",
+      "slug": "midden-groningen",
+      "success": true,
+      "count": 116,
+      "file_size_kb": 72.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Halderberge",
+      "slug": "halderberge",
+      "success": true,
+      "count": 61,
+      "file_size_kb": 38.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Scherpenzeel",
+      "slug": "scherpenzeel",
+      "success": true,
+      "count": 28,
+      "file_size_kb": 18.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Dantumadiel",
+      "slug": "dantumadiel",
+      "success": true,
+      "count": 39,
+      "file_size_kb": 27.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Oude IJsselstreek",
+      "slug": "oude-ijsselstreek",
+      "success": true,
+      "count": 78,
+      "file_size_kb": 55.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Opsterland",
+      "slug": "opsterland",
+      "success": true,
+      "count": 64,
+      "file_size_kb": 42.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Harderwijk",
+      "slug": "harderwijk",
+      "success": true,
+      "count": 105,
+      "file_size_kb": 57.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Venray",
+      "slug": "venray",
+      "success": true,
+      "count": 87,
+      "file_size_kb": 50.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Noordenveld",
+      "slug": "noordenveld",
+      "success": true,
+      "count": 71,
+      "file_size_kb": 43.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Nuenen, Gerwen en Nederwetten",
+      "slug": "nuenen-gerwen-en-nederwetten",
+      "success": true,
+      "count": 47,
+      "file_size_kb": 30.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Maassluis",
+      "slug": "maassluis",
+      "success": true,
+      "count": 61,
+      "file_size_kb": 34.1,
+      "merken": [
+        "StatieDrive",
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hilversum",
+      "slug": "hilversum",
+      "success": true,
+      "count": 161,
+      "file_size_kb": 89.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Renswoude",
+      "slug": "renswoude",
+      "success": true,
+      "count": 14,
+      "file_size_kb": 10.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Heumen",
+      "slug": "heumen",
+      "success": true,
+      "count": 34,
+      "file_size_kb": 21.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Leudal",
+      "slug": "leudal",
+      "success": true,
+      "count": 73,
+      "file_size_kb": 47.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Uithoorn",
+      "slug": "uithoorn",
+      "success": true,
+      "count": 49,
+      "file_size_kb": 29.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Heiloo",
+      "slug": "heiloo",
+      "success": true,
+      "count": 47,
+      "file_size_kb": 28.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Texel",
+      "slug": "texel",
+      "success": true,
+      "count": 80,
+      "file_size_kb": 42.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Aalten",
+      "slug": "aalten",
+      "success": true,
+      "count": 63,
+      "file_size_kb": 41.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Vlissingen",
+      "slug": "vlissingen",
+      "success": true,
+      "count": 92,
+      "file_size_kb": 57.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Renkum",
+      "slug": "renkum",
+      "success": true,
+      "count": 61,
+      "file_size_kb": 37.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Papendrecht",
+      "slug": "papendrecht",
+      "success": true,
+      "count": 54,
+      "file_size_kb": 30.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Edam-Volendam",
+      "slug": "edam-volendam",
+      "success": true,
+      "count": 65,
+      "file_size_kb": 37.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Wassenaar",
+      "slug": "wassenaar",
+      "success": true,
+      "count": 42,
+      "file_size_kb": 24.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Emmen",
+      "slug": "emmen",
+      "success": true,
+      "count": 267,
+      "file_size_kb": 147.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Weststellingwerf",
+      "slug": "weststellingwerf",
+      "success": true,
+      "count": 69,
+      "file_size_kb": 45.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "West Betuwe",
+      "slug": "west-betuwe",
+      "success": true,
+      "count": 111,
+      "file_size_kb": 69.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "'s-Gravenhage",
+      "slug": "s-gravenhage",
+      "success": true,
+      "count": 717,
+      "file_size_kb": 393.8,
+      "merken": [
+        "Droppie",
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Etten-Leur",
+      "slug": "etten-leur",
+      "success": true,
+      "count": 85,
+      "file_size_kb": 49.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Apeldoorn",
+      "slug": "apeldoorn",
+      "success": true,
+      "count": 315,
+      "file_size_kb": 177.2,
+      "merken": [
+        "StatieDrive",
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Staphorst",
+      "slug": "staphorst",
+      "success": true,
+      "count": 39,
+      "file_size_kb": 31.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Gemert-Bakel",
+      "slug": "gemert-bakel",
+      "success": true,
+      "count": 61,
+      "file_size_kb": 35.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Oudewater",
+      "slug": "oudewater",
+      "success": true,
+      "count": 18,
+      "file_size_kb": 12.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Waalwijk",
+      "slug": "waalwijk",
+      "success": true,
+      "count": 102,
+      "file_size_kb": 57.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Waterland",
+      "slug": "waterland",
+      "success": true,
+      "count": 17,
+      "file_size_kb": 12.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Valkenswaard",
+      "slug": "valkenswaard",
+      "success": true,
+      "count": 62,
+      "file_size_kb": 39.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Noardeast-Fryslân",
+      "slug": "noardeast-fryslan",
+      "success": true,
+      "count": 121,
+      "file_size_kb": 75.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Roerdalen",
+      "slug": "roerdalen",
+      "success": true,
+      "count": 46,
+      "file_size_kb": 35.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Roermond",
+      "slug": "roermond",
+      "success": true,
+      "count": 133,
+      "file_size_kb": 75.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Bergen op Zoom",
+      "slug": "bergen-op-zoom",
+      "success": true,
+      "count": 146,
+      "file_size_kb": 82.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Nunspeet",
+      "slug": "nunspeet",
+      "success": true,
+      "count": 76,
+      "file_size_kb": 44.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Schiedam",
+      "slug": "schiedam",
+      "success": true,
+      "count": 104,
+      "file_size_kb": 58.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Rijssen-Holten",
+      "slug": "rijssen-holten",
+      "success": true,
+      "count": 93,
+      "file_size_kb": 53.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Steenwijkerland",
+      "slug": "steenwijkerland",
+      "success": true,
+      "count": 104,
+      "file_size_kb": 65.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Geertruidenberg",
+      "slug": "geertruidenberg",
+      "success": true,
+      "count": 46,
+      "file_size_kb": 27.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Alphen-Chaam",
+      "slug": "alphen-chaam",
+      "success": true,
+      "count": 29,
+      "file_size_kb": 25.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Oosterhout",
+      "slug": "oosterhout",
+      "success": true,
+      "count": 115,
+      "file_size_kb": 66.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Gouda",
+      "slug": "gouda",
+      "success": true,
+      "count": 143,
+      "file_size_kb": 79.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Stein",
+      "slug": "stein",
+      "success": true,
+      "count": 47,
+      "file_size_kb": 29.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Almelo",
+      "slug": "almelo",
+      "success": true,
+      "count": 159,
+      "file_size_kb": 90.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Houten",
+      "slug": "houten",
+      "success": true,
+      "count": 82,
+      "file_size_kb": 46.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Kapelle",
+      "slug": "kapelle",
+      "success": true,
+      "count": 42,
+      "file_size_kb": 27.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Goirle",
+      "slug": "goirle",
+      "success": true,
+      "count": 33,
+      "file_size_kb": 23.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Bergen (NH)",
+      "slug": "bergen-nh",
+      "success": true,
+      "count": 70,
+      "file_size_kb": 42.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Vught",
+      "slug": "vught",
+      "success": true,
+      "count": 60,
+      "file_size_kb": 37.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Meerssen",
+      "slug": "meerssen",
+      "success": true,
+      "count": 33,
+      "file_size_kb": 24.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Borsele",
+      "slug": "borsele",
+      "success": true,
+      "count": 34,
+      "file_size_kb": 22.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Barneveld",
+      "slug": "barneveld",
+      "success": true,
+      "count": 149,
+      "file_size_kb": 89.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Geldrop-Mierlo",
+      "slug": "geldrop-mierlo",
+      "success": true,
+      "count": 68,
+      "file_size_kb": 39.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Rotterdam",
+      "slug": "rotterdam",
+      "success": true,
+      "count": 998,
+      "file_size_kb": 548.5,
+      "merken": [
+        "Droppie",
+        "StatieDrive",
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "IJsselstein",
+      "slug": "ijsselstein",
+      "success": true,
+      "count": 55,
+      "file_size_kb": 31.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "'s-Hertogenbosch",
+      "slug": "s-hertogenbosch",
+      "success": true,
+      "count": 311,
+      "file_size_kb": 176.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Stichtse Vecht",
+      "slug": "stichtse-vecht",
+      "success": true,
+      "count": 120,
+      "file_size_kb": 73.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Winterswijk",
+      "slug": "winterswijk",
+      "success": true,
+      "count": 81,
+      "file_size_kb": 48.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Huizen",
+      "slug": "huizen",
+      "success": true,
+      "count": 71,
+      "file_size_kb": 40.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Duiven",
+      "slug": "duiven",
+      "success": true,
+      "count": 49,
+      "file_size_kb": 29.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Haarlemmermeer",
+      "slug": "haarlemmermeer",
+      "success": true,
+      "count": 259,
+      "file_size_kb": 142.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Bunnik",
+      "slug": "bunnik",
+      "success": true,
+      "count": 26,
+      "file_size_kb": 19.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zuidplas",
+      "slug": "zuidplas",
+      "success": true,
+      "count": 66,
+      "file_size_kb": 42.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Den Helder",
+      "slug": "den-helder",
+      "success": true,
+      "count": 127,
+      "file_size_kb": 68.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Veldhoven",
+      "slug": "veldhoven",
+      "success": true,
+      "count": 86,
+      "file_size_kb": 51.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Goes",
+      "slug": "goes",
+      "success": true,
+      "count": 103,
+      "file_size_kb": 60.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Diemen",
+      "slug": "diemen",
+      "success": true,
+      "count": 45,
+      "file_size_kb": 25.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Simpelveld",
+      "slug": "simpelveld",
+      "success": true,
+      "count": 17,
+      "file_size_kb": 12.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Heemskerk",
+      "slug": "heemskerk",
+      "success": true,
+      "count": 78,
+      "file_size_kb": 46.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Alblasserdam",
+      "slug": "alblasserdam",
+      "success": true,
+      "count": 39,
+      "file_size_kb": 22.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hengelo (O)",
+      "slug": "hengelo-o",
+      "success": true,
+      "count": 184,
+      "file_size_kb": 104.4,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hellendoorn",
+      "slug": "hellendoorn",
+      "success": true,
+      "count": 92,
+      "file_size_kb": 54.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Zoeterwoude",
+      "slug": "zoeterwoude",
+      "success": true,
+      "count": 26,
+      "file_size_kb": 16.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hulst",
+      "slug": "hulst",
+      "success": true,
+      "count": 64,
+      "file_size_kb": 38.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Delft",
+      "slug": "delft",
+      "success": true,
+      "count": 173,
+      "file_size_kb": 97.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Rijswijk",
+      "slug": "rijswijk",
+      "success": true,
+      "count": 87,
+      "file_size_kb": 49.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Boekel",
+      "slug": "boekel",
+      "success": true,
+      "count": 26,
+      "file_size_kb": 16.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Heemstede",
+      "slug": "heemstede",
+      "success": true,
+      "count": 56,
+      "file_size_kb": 31.7,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Amstelveen",
+      "slug": "amstelveen",
+      "success": true,
+      "count": 139,
+      "file_size_kb": 78.0,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Veendam",
+      "slug": "veendam",
+      "success": true,
+      "count": 64,
+      "file_size_kb": 35.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Gulpen-Wittem",
+      "slug": "gulpen-wittem",
+      "success": true,
+      "count": 31,
+      "file_size_kb": 25.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Leusden",
+      "slug": "leusden",
+      "success": true,
+      "count": 54,
+      "file_size_kb": 34.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Lisse",
+      "slug": "lisse",
+      "success": true,
+      "count": 52,
+      "file_size_kb": 29.2,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Leeuwarden",
+      "slug": "leeuwarden",
+      "success": true,
+      "count": 293,
+      "file_size_kb": 172.8,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Eindhoven",
+      "slug": "eindhoven",
+      "success": true,
+      "count": 434,
+      "file_size_kb": 242.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Schiermonnikoog",
+      "slug": "schiermonnikoog",
+      "success": true,
+      "count": 9,
+      "file_size_kb": 6.5,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Velsen",
+      "slug": "velsen",
+      "success": true,
+      "count": 112,
+      "file_size_kb": 63.3,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Haarlem",
+      "slug": "haarlem",
+      "success": true,
+      "count": 286,
+      "file_size_kb": 155.6,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Hoorn",
+      "slug": "hoorn",
+      "success": true,
+      "count": 152,
+      "file_size_kb": 83.9,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    },
+    {
+      "gemeente": "Leidschendam-Voorburg",
+      "slug": "leidschendam-voorburg",
+      "success": true,
+      "count": 108,
+      "file_size_kb": 61.1,
+      "merken": [
+        "StatiegeldNederland",
+        "Stibat",
+        "StichtingOPEN"
+      ]
+    }
+  ]
+}

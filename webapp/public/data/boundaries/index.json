@@ -1,0 +1,91 @@
+{
+  "generated_at": "2026-07-28T09:25:19.421799Z",
+  "total_provinces": 12,
+  "total_boundaries": 342,
+  "provinces": [
+    {
+      "provincie": "Drenthe",
+      "slug": "drenthe",
+      "file": "provincie-drenthe.geojson",
+      "boundaries": 12,
+      "size_kb": 52.3
+    },
+    {
+      "provincie": "Flevoland",
+      "slug": "flevoland",
+      "file": "provincie-flevoland.geojson",
+      "boundaries": 6,
+      "size_kb": 13.7
+    },
+    {
+      "provincie": "Fryslân",
+      "slug": "fryslan",
+      "file": "provincie-fryslan.geojson",
+      "boundaries": 18,
+      "size_kb": 74.1
+    },
+    {
+      "provincie": "Gelderland",
+      "slug": "gelderland",
+      "file": "provincie-gelderland.geojson",
+      "boundaries": 51,
+      "size_kb": 179.1
+    },
+    {
+      "provincie": "Groningen",
+      "slug": "groningen",
+      "file": "provincie-groningen.geojson",
+      "boundaries": 10,
+      "size_kb": 47.4
+    },
+    {
+      "provincie": "Limburg",
+      "slug": "limburg",
+      "file": "provincie-limburg.geojson",
+      "boundaries": 31,
+      "size_kb": 97.2
+    },
+    {
+      "provincie": "Noord-Brabant",
+      "slug": "noord-brabant",
+      "file": "provincie-noord-brabant.geojson",
+      "boundaries": 56,
+      "size_kb": 178.4
+    },
+    {
+      "provincie": "Noord-Holland",
+      "slug": "noord-holland",
+      "file": "provincie-noord-holland.geojson",
+      "boundaries": 44,
+      "size_kb": 94.3
+    },
+    {
+      "provincie": "Overijssel",
+      "slug": "overijssel",
+      "file": "provincie-overijssel.geojson",
+      "boundaries": 25,
+      "size_kb": 91.7
+    },
+    {
+      "provincie": "Utrecht",
+      "slug": "utrecht",
+      "file": "provincie-utrecht.geojson",
+      "boundaries": 26,
+      "size_kb": 63.4
+    },
+    {
+      "provincie": "Zeeland",
+      "slug": "zeeland",
+      "file": "provincie-zeeland.geojson",
+      "boundaries": 13,
+      "size_kb": 42.9
+    },
+    {
+      "provincie": "Zuid-Holland",
+      "slug": "zuid-holland",
+      "file": "provincie-zuid-holland.geojson",
+      "boundaries": 50,
+      "size_kb": 105.2
+    }
+  ]
+}

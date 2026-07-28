@@ -1,0 +1,181 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "leaflet/dist/leaflet.css";
+@import "leaflet.markercluster/dist/MarkerCluster.css";
+@import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+
+/*
+ * Warm green palette. Yellow-leaning rather than blue-leaning, so the map
+ * reads as "recycling" without tipping into the cold teal that every waste
+ * brand already uses.
+ */
+:root {
+  --green-50: #f4f8ee;
+  --green-100: #e6f0d8;
+  --green-200: #cfe2b4;
+  --green-300: #b0ce87;
+  --green-400: #8fb75c;
+  --green-500: #6f9c3c;
+  --green-600: #57802d;
+  --green-700: #436325;
+  --green-800: #374f21;
+  --green-900: #2f431f;
+
+  /* Series colours for markers, legends and charts — a validated categorical
+     ramp, assigned in ALL_MERKEN order. Not the house green: five green/orange
+     brand tints are indistinguishable under red-green colour blindness. See
+     the note on MERK_COLORS in types/inleverpunten.ts. */
+  --merk-statiegeld: #2a78d6;
+  --merk-open: #eb6834;
+  --merk-droppie: #1baf7a;
+  --merk-stibat: #eda100;
+  --merk-statiedrive: #e87ba4;
+
+  --radius: 0.625rem;
+
+  --background: #ffffff;
+  --foreground: #1c2417;
+  --card: #ffffff;
+  --card-foreground: #1c2417;
+  --popover: #ffffff;
+  --popover-foreground: #1c2417;
+  --primary: var(--green-600);
+  --primary-foreground: #ffffff;
+  --secondary: var(--green-50);
+  --secondary-foreground: var(--green-900);
+  --muted: #f4f5f2;
+  --muted-foreground: #63705a;
+  --accent: var(--green-100);
+  --accent-foreground: var(--green-900);
+  --destructive: #c0392b;
+  --border: #e2e6dd;
+  --input: #e2e6dd;
+  --ring: var(--green-500);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-green-50: var(--green-50);
+  --color-green-100: var(--green-100);
+  --color-green-200: var(--green-200);
+  --color-green-300: var(--green-300);
+  --color-green-400: var(--green-400);
+  --color-green-500: var(--green-500);
+  --color-green-600: var(--green-600);
+  --color-green-700: var(--green-700);
+  --color-green-800: var(--green-800);
+  --color-green-900: var(--green-900);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--foreground);
+  }
+}
+
+/* Hide scrollbars on horizontally scrolling tab strips */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Leaflet */
+.leaflet-container {
+  font: inherit;
+  background: #f6f7f4;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius);
+}
+
+.leaflet-popup-content {
+  margin: 0.75rem 0.9rem;
+  line-height: 1.45;
+}
+
+/* Marker clusters in the warm green palette */
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+  background-color: color-mix(in srgb, var(--green-400) 45%, transparent);
+}
+
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+  background-color: var(--green-600);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Mobile ergonomics */
+@media (max-width: 768px) {
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: color-mix(in srgb, var(--green-500) 20%, transparent);
+  }
+
+  /* Stop iOS zooming in when a field takes focus */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  .leaflet-popup-content-wrapper {
+    max-width: 85vw;
+  }
+}
+
+/* Respect notched phones */
+@supports (padding: max(0px)) {
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

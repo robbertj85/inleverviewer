@@ -1,0 +1,326 @@
+openapi: 3.0.3
+
+info:
+  title: Inleverpunten API
+  version: "1.0.0"
+  description: |
+    Publieke, read-only API met inleverpunten in Nederland: statiegeld,
+    batterijen, elektrische apparaten en gemeentelijke milieustraten.
+
+    De data komt uit vijf publieke bronnen en wordt elke maandagnacht
+    ververst. Elk punt is via de officiële gemeentegrenzen van het Kadaster
+    (PDOK) aan een gemeente toegewezen.
+
+    ## Gebruik
+
+    Geen sleutel nodig. Er geldt een limiet van 30 requests per uur per
+    IP-adres op de gemeente-endpoint en 60 per uur op de lijst-endpoint.
+    Antwoorden mogen een uur gecached worden.
+
+    ## Bronvermelding
+
+    Bij hergebruik graag vermelden: Statiegeld Nederland (Verpact),
+    Stichting OPEN / Wecycle, Stibat, Droppie, StatieDrive, en
+    gemeentegrenzen © Kadaster / PDOK.
+
+  contact:
+    name: Inleverpuntenviewer
+    url: https://github.com/robbertj85/inleverviewer
+  license:
+    name: Data uit publieke bronnen — zie bronvermelding
+    url: https://github.com/robbertj85/inleverviewer
+
+servers:
+  - url: /
+    description: Deze deployment
+
+tags:
+  - name: Gemeenten
+    description: Gemeentelijke inleverpuntendata
+
+paths:
+  /api/v1/municipalities:
+    get:
+      tags: [Gemeenten]
+      summary: Lijst alle gemeenten
+      description: |
+        Geeft alle 342 Nederlandse gemeenten met slug, CBS-code, provincie,
+        inwonertal en het huidige aantal inleverpunten.
+      operationId: listMunicipalities
+      responses:
+        "200":
+          description: Lijst met gemeenten
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 342
+                  municipalities:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/MunicipalityIndexEntry"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/v1/municipality/{identifier}:
+    get:
+      tags: [Gemeenten]
+      summary: Inleverpunten van één gemeente
+      description: |
+        Geeft alle inleverpunten van een gemeente als GeoJSON
+        `FeatureCollection`, plus een `boundary`-feature met de gemeentegrens.
+
+        De identifier accepteert een slug (`zwolle`), een naam (`Zwolle`) of
+        een CBS-code (`GM0193`). Veelgebruikte varianten zoals `den-bosch` en
+        `Den Haag` worden herkend.
+      operationId: getMunicipality
+      parameters:
+        - name: identifier
+          in: path
+          required: true
+          description: Slug, naam of CBS-code van de gemeente
+          schema:
+            type: string
+          examples:
+            slug:
+              value: zwolle
+            naam:
+              value: Amsterdam
+            cbsCode:
+              value: GM0193
+      responses:
+        "200":
+          description: GeoJSON FeatureCollection
+          headers:
+            X-Municipality-Name:
+              schema: { type: string }
+              description: URL-encoded naam van de gevonden gemeente
+            X-Municipality-Slug:
+              schema: { type: string }
+            X-Municipality-Code:
+              schema: { type: string }
+              description: CBS-code, of `N/A`
+          content:
+            application/geo+json:
+              schema:
+                $ref: "#/components/schemas/FeatureCollection"
+        "400":
+          description: Ontbrekende identifier
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "404":
+          description: Gemeente of databestand niet gevonden
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/download:
+    get:
+      tags: [Gemeenten]
+      summary: Download als GeoJSON of CSV
+      description: |
+        Downloadvariant van de gemeente-endpoint, met een
+        `Content-Disposition`-header zodat de browser het bestand opslaat.
+        Limiet: 10 downloads per uur per IP-adres.
+      operationId: downloadMunicipality
+      parameters:
+        - name: slug
+          in: query
+          required: true
+          schema: { type: string, pattern: "^[a-z0-9-]+$" }
+          example: zwolle
+        - name: format
+          in: query
+          required: true
+          schema: { type: string, enum: [json, csv] }
+      responses:
+        "200":
+          description: Bestand
+          content:
+            application/geo+json:
+              schema: { $ref: "#/components/schemas/FeatureCollection" }
+            text/csv:
+              schema: { type: string }
+        "400":
+          description: Ongeldige of ontbrekende parameters
+        "404":
+          description: Gemeente niet gevonden
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+components:
+  responses:
+    RateLimited:
+      description: Te veel requests
+      headers:
+        Retry-After:
+          schema: { type: integer }
+          description: Seconden tot de limiet reset
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+        message: { type: string }
+        hint: { type: string }
+
+    MunicipalityIndexEntry:
+      type: object
+      properties:
+        name: { type: string, example: Zwolle }
+        slug: { type: string, example: zwolle }
+        province: { type: string, example: Overijssel }
+        population: { type: integer, example: 133000 }
+        code:
+          type: string
+          nullable: true
+          example: GM0193
+        total_points:
+          type: integer
+          nullable: true
+          example: 263
+        url: { type: string, example: /api/v1/municipality/zwolle }
+
+    Merk:
+      type: string
+      description: De bron waar het punt vandaan komt
+      enum:
+        - StatiegeldNederland
+        - StichtingOPEN
+        - Stibat
+        - Droppie
+        - StatieDrive
+
+    Materiaal:
+      type: string
+      description: Wat je op deze locatie kunt inleveren
+      enum:
+        - pet-groot
+        - pet-klein
+        - blik
+        - glas
+        - krat
+        - batterijen
+        - elektro-klein
+        - elektro-middel
+        - elektro-groot
+        - lampen
+        - tl-buizen
+        - armaturen
+
+    PuntCategorie:
+      type: string
+      description: Soort inleverpunt
+      enum: [automaat, balie, inzamelbak, milieustraat]
+
+    Uitbetaling:
+      type: string
+      description: Manier waarop statiegeld wordt uitgekeerd
+      enum: [bonnetje, donatie, tikkie, droppie, retourpinnen, contant]
+
+    InleverpuntProperties:
+      type: object
+      required: [type, locatieNaam, merk, puntType, materialen, latitude, longitude, bronId]
+      properties:
+        type: { type: string, enum: [inleverpunt] }
+        locatieNaam: { type: string, example: Albert Heijn }
+        straatNaam: { type: string, example: Deventerstraatweg }
+        straatNr: { type: string, example: "22" }
+        postcode: { type: string, example: "8012 AH" }
+        plaats: { type: string, example: Zwolle }
+        merk: { $ref: "#/components/schemas/Merk" }
+        puntType: { $ref: "#/components/schemas/PuntCategorie" }
+        materialen:
+          type: array
+          items: { $ref: "#/components/schemas/Materiaal" }
+        uitbetaling:
+          type: array
+          items: { $ref: "#/components/schemas/Uitbetaling" }
+        vrijToegankelijk:
+          type: boolean
+          description: Of het punt zonder aankoop of afspraak bereikbaar is
+        gemeenteBeperking:
+          type: array
+          nullable: true
+          description: |
+            Gemeenten waarvan de inwoners hier terechtkunnen. Alleen gevuld bij
+            milieustraten; `null` betekent geen beperking bekend.
+          items: { type: string }
+        openingstijden:
+          nullable: true
+          description: Per dag (`ma` t/m `zo`), of één vrije tekst
+          oneOf:
+            - type: string
+            - type: object
+              additionalProperties: { type: string }
+        latitude: { type: number, format: double, example: 52.5002206 }
+        longitude: { type: number, format: double, example: 6.1059804 }
+        bronId:
+          type: string
+          description: Stabiele sleutel binnen de bron
+        gemeente:
+          type: string
+          description: Alleen aanwezig in het landelijke (verkorte) bestand
+
+    BoundaryProperties:
+      type: object
+      properties:
+        type: { type: string, enum: [boundary] }
+        gemeente: { type: string }
+        slug: { type: string }
+        code: { type: string, nullable: true }
+        provincie: { type: string }
+
+    Feature:
+      type: object
+      properties:
+        type: { type: string, enum: [Feature] }
+        geometry:
+          type: object
+          properties:
+            type: { type: string, enum: [Point, Polygon, MultiPolygon] }
+            coordinates:
+              description: GeoJSON-coördinaten, WGS84, lengtegraad eerst
+        properties:
+          oneOf:
+            - $ref: "#/components/schemas/InleverpuntProperties"
+            - $ref: "#/components/schemas/BoundaryProperties"
+
+    Metadata:
+      type: object
+      properties:
+        gemeente: { type: string, example: Zwolle }
+        slug: { type: string, example: zwolle }
+        generated_at: { type: string, format: date-time }
+        total_points: { type: integer, example: 263 }
+        merken:
+          type: array
+          items: { $ref: "#/components/schemas/Merk" }
+        bounds:
+          type: array
+          description: "[minLon, minLat, maxLon, maxLat]"
+          items: { type: number }
+        reduced:
+          type: boolean
+          description: |
+            Alleen `true` in het landelijke bestand, waar adres-, openingstijd-
+            en uitbetalingsvelden zijn weggelaten om het bestand klein te houden.
+
+    FeatureCollection:
+      type: object
+      properties:
+        type: { type: string, enum: [FeatureCollection] }
+        metadata: { $ref: "#/components/schemas/Metadata" }
+        features:
+          type: array
+          items: { $ref: "#/components/schemas/Feature" }
