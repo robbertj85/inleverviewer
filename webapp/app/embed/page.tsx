@@ -96,7 +96,7 @@ function EmbedContent() {
           href={`/?gemeente=${urlSlug}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="shrink-0 text-[11px] font-medium text-primary hover:underline"
+          className="-my-1.5 flex min-h-9 shrink-0 items-center px-1 text-[11px] font-medium text-primary hover:underline"
         >
           Open in Inleverpuntenviewer
         </a>

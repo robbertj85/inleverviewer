@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowDownIcon, ArrowUpIcon, DownloadIcon } from 'lucide-react';
+import { ArrowDownIcon, ArrowUpIcon, DownloadIcon, MoveHorizontalIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -55,13 +55,13 @@ function SortHeader({
 
   return (
     <th
-      className={cn('whitespace-nowrap px-2 py-2 text-right font-medium', className)}
+      className={cn('whitespace-nowrap px-2 py-1 text-right font-medium', className)}
       aria-sort={active ? (ascending ? 'ascending' : 'descending') : 'none'}
     >
       <button
         type="button"
         onClick={() => onSort(sortKey)}
-        className="inline-flex items-center gap-1 hover:text-primary"
+        className="inline-flex min-h-9 items-center gap-1 py-2 hover:text-primary"
       >
         {swatch && (
           <span
@@ -190,15 +190,24 @@ export default function DataMatrixClient({
         </div>
       </div>
 
+      {/* On a phone the number columns sit off-screen, and a table that scrolls
+          with no affordance reads as a table with no data. */}
+      <p className="flex items-center gap-1.5 text-xs text-muted-foreground lg:hidden">
+        <MoveHorizontalIcon className="size-3.5 shrink-0" />
+        Veeg horizontaal om alle bronnen te zien — de gemeentenaam blijft staan.
+      </p>
+
       <div className="overflow-x-auto rounded-xl border border-border bg-card">
         <table className="w-full min-w-[54rem] text-sm">
-          <thead className="sticky top-0 border-b border-border bg-secondary text-xs text-muted-foreground">
+          <thead className="sticky top-0 z-20 border-b border-border bg-secondary text-xs text-muted-foreground">
             <tr>
-              <th className="whitespace-nowrap px-3 py-2 text-left font-medium">
+              {/* Sticky so the municipality stays readable while scrolling the
+                  numbers sideways. */}
+              <th className="sticky left-0 z-30 w-36 min-w-36 max-w-36 whitespace-nowrap bg-secondary px-3 py-1 text-left font-medium">
                 <button
                   type="button"
                   onClick={() => sortBy('gemeente')}
-                  className="inline-flex items-center gap-1 hover:text-primary"
+                  className="inline-flex min-h-9 items-center gap-1 py-2 hover:text-primary"
                 >
                   Gemeente
                   {sortKey === 'gemeente' &&
@@ -240,7 +249,9 @@ export default function DataMatrixClient({
 
           <tbody className="divide-y divide-border">
             <tr className="bg-[var(--green-50)] font-semibold">
-              <td className="px-3 py-2">Nederland</td>
+              <td className="sticky left-0 z-10 w-36 min-w-36 max-w-36 bg-[var(--green-50)] px-3 py-2">
+                Nederland
+              </td>
               {merken.map((merk) => (
                 <td key={merk} className="px-2 py-2 text-right tabular-nums">
                   {(totals[merk] ?? 0).toLocaleString('nl-NL')}
@@ -253,15 +264,17 @@ export default function DataMatrixClient({
             </tr>
 
             {filtered.map((row) => (
-              <tr key={row.slug} className="transition-colors hover:bg-secondary">
-                <td className="px-3 py-1.5">
+              <tr key={row.slug} className="group transition-colors hover:bg-secondary">
+                <td className="sticky left-0 z-10 w-36 min-w-36 max-w-36 bg-card px-3 py-1 group-hover:bg-secondary">
                   <Link
                     href={`/?gemeente=${row.slug}`}
-                    className="font-medium hover:text-primary hover:underline"
+                    className="flex min-h-9 flex-col justify-center hover:text-primary"
                   >
-                    {row.gemeente}
+                    <span className="truncate font-medium">{row.gemeente}</span>
+                    <span className="truncate text-xs font-normal text-muted-foreground">
+                      {row.provincie}
+                    </span>
                   </Link>
-                  <span className="ml-1.5 text-xs text-muted-foreground">{row.provincie}</span>
                 </td>
                 {merken.map((merk) => {
                   const value = row.merken[merk] ?? 0;

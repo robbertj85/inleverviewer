@@ -82,10 +82,11 @@ function ToggleRow({
   swatch?: string;
   id: string;
 }) {
+  // The checkbox itself is 16px, but the whole label is the hit area.
   return (
     <label
       htmlFor={id}
-      className="flex cursor-pointer items-center gap-2 rounded-md px-1 py-1 transition-colors hover:bg-secondary"
+      className="flex min-h-9 cursor-pointer items-center gap-2 rounded-md px-1 py-1.5 transition-colors hover:bg-secondary"
     >
       <Checkbox
         id={id}
@@ -109,7 +110,10 @@ function ToggleRow({
   );
 }
 
-/** Small "alles / geen" control so a 12-item list stays workable. */
+/** Small "alles / geen" control so a 12-item list stays workable.
+ *
+ * The labels are deliberately tiny, but the hit areas are not — padding brings
+ * each button to a comfortable touch target without changing how it looks. */
 function SelectAll({
   onAll,
   onNone,
@@ -117,13 +121,16 @@ function SelectAll({
   onAll: () => void;
   onNone: () => void;
 }) {
+  const className =
+    'inline-flex min-h-9 min-w-9 items-center justify-center px-1.5 hover:text-primary hover:underline';
+
   return (
-    <span className="flex shrink-0 items-center gap-1 text-[11px] text-muted-foreground">
-      <button type="button" onClick={onAll} className="hover:text-primary hover:underline">
+    <span className="-my-1.5 flex shrink-0 items-center text-[11px] text-muted-foreground">
+      <button type="button" onClick={onAll} className={className}>
         alles
       </button>
       <span aria-hidden>·</span>
-      <button type="button" onClick={onNone} className="hover:text-primary hover:underline">
+      <button type="button" onClick={onNone} className={className}>
         geen
       </button>
     </span>

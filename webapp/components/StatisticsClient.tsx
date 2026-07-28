@@ -456,11 +456,11 @@ export default function StatisticsClient({ statistics }: { statistics: Statistic
                     <td className="px-2 py-1.5 text-right tabular-nums text-muted-foreground">
                       {index + 1}
                     </td>
-                    <td className="px-2 py-1.5">
+                    <td className="px-2 py-0.5">
                       <button
                         type="button"
                         onClick={() => setSelectedSlug(row.slug)}
-                        className="font-medium hover:text-primary hover:underline"
+                        className="flex min-h-9 w-full items-center text-left font-medium hover:text-primary hover:underline"
                       >
                         {row.label}
                       </button>

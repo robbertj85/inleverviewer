@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -21,6 +22,13 @@ const TABS = [
 
 export default function DataExportLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const activeTabRef = useRef<HTMLAnchorElement>(null);
+
+  // The tab strip scrolls on narrow phones, where the last tab starts
+  // off-screen. Without this, landing on /updates shows no active tab at all.
+  useEffect(() => {
+    activeTabRef.current?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }, [pathname]);
 
   return (
     <div className="min-h-screen bg-muted">
@@ -35,9 +43,11 @@ export default function DataExportLayout({ children }: { children: React.ReactNo
                 Download de data, vergelijk gemeenten en bekijk de updatestatus.
               </p>
             </div>
+            {/* -mr-2 keeps the enlarged hit area from pushing the layout */}
             <Link
               href="/"
-              className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+              aria-label="Terug naar kaart"
+              className="-mr-2 flex min-h-11 shrink-0 items-center gap-1.5 px-2 text-sm font-medium text-primary hover:underline"
             >
               <ArrowLeftIcon className="size-4" />
               <span className="hidden sm:inline">Terug naar kaart</span>
@@ -52,8 +62,9 @@ export default function DataExportLayout({ children }: { children: React.ReactNo
                 <Link
                   key={tab.href}
                   href={tab.href}
+                  ref={active ? activeTabRef : undefined}
                   className={cn(
-                    'flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors',
+                    'flex min-h-11 shrink-0 items-center gap-1.5 border-b-2 px-2.5 py-2 text-sm font-medium transition-colors sm:px-3',
                     active
                       ? 'border-primary text-primary'
                       : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
