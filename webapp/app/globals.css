@@ -115,6 +115,27 @@
   background: #f6f7f4;
 }
 
+/*
+ * Dark basemaps: the pale container colour above shows through every tile gap
+ * and during panning, which reads as flashing on a dark map.
+ */
+.leaflet-container.basemap-dark {
+  background: #1a1d1b;
+}
+
+/*
+ * "BRT donker" is the grijs style put through an inverting filter — PDOK
+ * serves no dark topographic style. The hue rotation puts water and greens
+ * back on the right side of the wheel after the inversion; without it the
+ * whole country turns orange.
+ *
+ * Scoped to the tile layer's own container, so markers, coverage rings and
+ * popups (separate panes) are untouched.
+ */
+.basemap-inverted {
+  filter: invert(1) hue-rotate(180deg) brightness(0.88) contrast(0.95) saturate(0.75);
+}
+
 .leaflet-popup-content-wrapper {
   border-radius: var(--radius);
 }

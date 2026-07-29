@@ -45,6 +45,8 @@ import {
   getPointColor,
   isInleverpunt,
 } from '@/types/inleverpunten';
+import { DEFAULT_BASEMAP_ID, MAX_ZOOM, getBasemap } from '@/lib/basemaps';
+import { cn } from '@/lib/utils';
 
 // Above this many points a merged coverage union costs more than it is worth,
 // so we fall back to per-point circles (or nothing, in simple mode).
@@ -70,6 +72,8 @@ interface MapProps {
   searchLocationMarker?: { latitude: number; longitude: number } | null;
   highlightedPoints?: Set<string> | null;
   onTilesLoading?: (loading: boolean) => void;
+  /** Id from `lib/basemaps`; falls back to Voyager when unknown. */
+  basemapId?: string;
 }
 
 /** Stable identity for a point, used for highlighting and React keys. */
@@ -143,6 +147,25 @@ function ZoomWatcher({ onZoom }: { onZoom: (zoom: number) => void }) {
       map.off('zoomend', handler);
     };
   }, [map, onZoom]);
+
+  return null;
+}
+
+/**
+ * Mark the container as dark while a dark basemap is active.
+ *
+ * Done imperatively because MapContainer captures its `className` at mount and
+ * ignores later changes; without this the pale container colour flashes
+ * through every tile gap on a dark map.
+ */
+function DarkContainer({ dark }: { dark: boolean }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const element = map.getContainer();
+    element.classList.toggle('basemap-dark', dark);
+    return () => element.classList.remove('basemap-dark');
+  }, [map, dark]);
 
   return null;
 }
@@ -357,8 +380,10 @@ export default function MapView({
   searchLocationMarker,
   highlightedPoints,
   onTilesLoading,
+  basemapId = DEFAULT_BASEMAP_ID,
 }: MapProps) {
   const [zoom, setZoom] = useState(NL_ZOOM);
+  const basemap = getBasemap(basemapId);
 
   // ---- Filtering -------------------------------------------------------
   const { points, boundaries } = useMemo(() => {
@@ -502,16 +527,24 @@ export default function MapView({
     <MapContainer
       center={NL_CENTER}
       zoom={NL_ZOOM}
+      maxZoom={MAX_ZOOM}
       className="h-full w-full"
       preferCanvas={simple}
       scrollWheelZoom
     >
+      {/* Keyed on the id so switching replaces the layer outright: Leaflet
+          reads url, subdomains and className once, at construction. */}
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>-bijdragers'
-        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-        maxZoom={19}
+        key={basemap.id}
+        attribution={basemap.attribution}
+        url={basemap.url}
+        subdomains={basemap.subdomains ?? 'abc'}
+        maxZoom={MAX_ZOOM}
+        maxNativeZoom={basemap.maxNativeZoom}
+        className={cn(basemap.inverted && 'basemap-inverted')}
       />
 
+      <DarkContainer dark={Boolean(basemap.dark)} />
       <FitBounds data={data} />
       <FlyToTarget coordinates={targetCoordinates} onDone={onZoomedToTarget} />
       <ZoomWatcher onZoom={setZoom} />

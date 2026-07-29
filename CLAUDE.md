@@ -60,6 +60,13 @@ from the cache. Do not simplify the cache.
 opening hours and payout fields (`"reduced": true` in its metadata). Full detail
 lives in the per-municipality files.
 
+**A new basemap needs its host in the CSP.** `webapp/lib/basemaps.ts` lists the
+background maps; `img-src` in `next.config.ts` lists the hosts they may load from.
+Add one without the other and the map goes blank with a console-only complaint —
+which is what the "elke achtergrondkaart laadt tegels" test in `tests/smoke.spec.ts`
+is there to catch. PDOK serves no dark topographic style, so "BRT donker" is the
+grijs style put through an inverting CSS filter rather than its own URL.
+
 **`cache_guard.safe_save` exits 2, not 1.** That is the "anomaly, previous cache
 kept" signal the workflow treats as a warning. Do not convert it into a hard failure.
 

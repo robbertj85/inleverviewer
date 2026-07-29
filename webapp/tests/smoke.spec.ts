@@ -82,6 +82,48 @@ test.describe('Kaartpagina', () => {
 
     expect(blocked, `CSP blokkeerde resources:\n${blocked.join('\n')}`).toEqual([]);
   });
+
+  /**
+   * One host per basemap, and every one of them has to be in `img-src`.
+   *
+   * Asserted on `naturalWidth` rather than on visibility: a tile the CSP
+   * refused is still an <img> of the right size in the DOM, so it looks
+   * perfectly visible to Playwright while showing nothing at all.
+   */
+  test('elke achtergrondkaart laadt tegels', async ({ page }) => {
+    const blocked: string[] = [];
+    page.on('console', (message) => {
+      if (/Content Security Policy/i.test(message.text())) blocked.push(message.text());
+    });
+
+    await page.goto('/', { waitUntil: 'networkidle' });
+
+    const basemaps = [
+      { label: 'Voyager', host: 'basemaps.cartocdn.com' },
+      { label: 'Licht', host: 'basemaps.cartocdn.com' },
+      { label: 'Donker', host: 'basemaps.cartocdn.com' },
+      { label: 'OpenStreetMap', host: 'tile.openstreetmap.org' },
+      { label: 'BRT topografisch', host: 'service.pdok.nl' },
+      { label: 'BRT donker', host: 'service.pdok.nl' },
+    ];
+
+    for (const basemap of basemaps) {
+      // The list lives behind the floating button and closes on each pick.
+      await page.getByRole('button', { name: /^Achtergrondkaart:/ }).click();
+      await page.getByRole('radio', { name: basemap.label, exact: true }).click();
+
+      const tile = page.locator(`.leaflet-tile-pane img[src*="${basemap.host}"]`).first();
+      await expect
+        .poll(
+          async () =>
+            tile.evaluate((img) => (img as HTMLImageElement).naturalWidth).catch(() => 0),
+          { message: `Geen tegel geladen voor ${basemap.label}`, timeout: 20_000 }
+        )
+        .toBeGreaterThan(0);
+    }
+
+    expect(blocked, `CSP blokkeerde tegels:\n${blocked.join('\n')}`).toEqual([]);
+  });
 });
 
 test.describe('Adreszoeker', () => {

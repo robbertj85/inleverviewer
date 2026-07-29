@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import {
@@ -16,6 +16,7 @@ import {
 
 import AboutModal from '@/components/AboutModal';
 import AddressSearchInput from '@/components/AddressSearchInput';
+import BasemapSwitcher from '@/components/BasemapSwitcher';
 import FilterPanel from '@/components/FilterPanel';
 import MunicipalitySelector from '@/components/MunicipalitySelector';
 import NearestPointsFinder from '@/components/NearestPointsFinder';
@@ -35,6 +36,12 @@ import {
   isInleverpunt,
 } from '@/types/inleverpunten';
 import { BoundaryLoadProgress, loadProvincialBoundaries } from '@/utils/boundaryLoader';
+import {
+  getBasemapSnapshot,
+  getServerBasemapSnapshot,
+  setStoredBasemap,
+  subscribeBasemap,
+} from '@/lib/basemapStore';
 import { cn } from '@/lib/utils';
 
 const MapView = dynamic(() => import('@/components/Map'), {
@@ -77,6 +84,12 @@ export default function Home() {
   const [loadedSlug, setLoadedSlug] = useState<string | null>(null);
   const [tilesLoading, setTilesLoading] = useState(false);
   const loading = selected !== '' && loadedSlug !== selected;
+
+  const basemapId = useSyncExternalStore(
+    subscribeBasemap,
+    getBasemapSnapshot,
+    getServerBasemapSnapshot
+  );
 
   const [showAbout, setShowAbout] = useState(false);
   const [showShare, setShowShare] = useState(false);
@@ -509,7 +522,7 @@ export default function Home() {
         {/* `isolate` traps Leaflet's panes (z-index 400-700) in their own
             stacking context. Without it they paint over the mobile drawer and
             its overlay, which sit outside this element at much lower z. */}
-        <main className="relative isolate flex-1">
+        <main className="relative isolate min-w-0 flex-1">
           <MapView
             data={data}
             filters={filters}
@@ -518,25 +531,16 @@ export default function Home() {
             searchLocationMarker={searchLocationMarker}
             highlightedPoints={highlightedPoints}
             onTilesLoading={setTilesLoading}
+            basemapId={basemapId}
           />
+
+          <BasemapSwitcher value={basemapId} onChange={setStoredBasemap} />
 
           {(loading || tilesLoading) && (
             <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-background/50">
               <span className="text-sm font-medium text-muted-foreground">Laden...</span>
             </div>
           )}
-
-          {/* z-index has to clear Leaflet's panes, which sit at 400-700 and
-              share this stacking context — anything lower disappears behind
-              the map. */}
-          <Button
-            size="icon"
-            className="fixed bottom-16 left-4 z-[900] size-12 rounded-full shadow-lg md:hidden"
-            aria-label="Filters openen"
-            onClick={() => setMobileSidebarOpen(true)}
-          >
-            <FilterIcon className="size-5" />
-          </Button>
 
           <NearestPointsFinder
             isOpen={nearestOpen}
@@ -553,6 +557,18 @@ export default function Home() {
             onPointSelect={setTargetCoordinates}
             initialSearch={lastAddressSearch}
           />
+
+          {/* z-index has to clear Leaflet's panes, which sit at 400-700 and
+              share this stacking context — anything lower disappears behind
+              the map. */}
+          <Button
+            size="icon"
+            className="fixed bottom-16 left-4 z-[900] size-12 rounded-full shadow-lg md:hidden"
+            aria-label="Filters openen"
+            onClick={() => setMobileSidebarOpen(true)}
+          >
+            <FilterIcon className="size-5" />
+          </Button>
         </main>
       </div>
 

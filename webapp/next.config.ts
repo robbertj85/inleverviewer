@@ -26,7 +26,9 @@ const nextConfig: NextConfig = {
     /*
      * Every origin the app actually talks to, and nothing else:
      *  - cdn.redoc.ly    the API docs bundle (script only, /api/v1/docs)
-     *  - cartocdn.com    basemap tiles; markers are divIcons, so no icon CDN
+     *  - cartocdn.com, tile.openstreetmap.org, service.pdok.nl
+     *                    basemap tiles, one host per entry in lib/basemaps.ts;
+     *                    markers are divIcons, so no icon CDN
      *  - va.vercel-scripts.com  Vercel Analytics
      * The OpenAPI spec and the fonts are same-origin (next/font self-hosts).
      *
@@ -39,7 +41,7 @@ const nextConfig: NextConfig = {
     const sharedCsp = [
       "default-src 'self'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.basemaps.cartocdn.com",
+      "img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://tile.openstreetmap.org https://service.pdok.nl",
       "font-src 'self' data:",
       "connect-src 'self' https://va.vercel-scripts.com",
       // Redoc runs its search indexer in a blob worker.
