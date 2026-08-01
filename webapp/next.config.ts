@@ -20,6 +20,17 @@ const nextConfig: NextConfig = {
       './public/municipalities.json',
       './public/data/summary.json',
     ],
+    // The analysis tabs are server components that read their dataset with
+    // fs.readFile. The tracer follows literal paths fine, but these files are
+    // large enough that leaving them out is tempting — don't: without an entry
+    // here the page 404s in production while working locally, the same way the
+    // dynamic API routes do.
+    '/data-export/bereik': ['./public/data/population_coverage.json'],
+    '/data-export/schatting': ['./public/data/pc4_stats.json'],
+    '/data-export/suggesties': ['./public/data/placement_suggestions.json'],
+    '/data-export/netwerkplanner': [
+      './public/data/inleverpunt_network/index.json',
+    ],
   },
 
   async headers() {
