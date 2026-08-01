@@ -33,3 +33,17 @@ blob-report/
 
 # Large generated artefacts that are rebuilt from cache
 webapp/public/data/nederland-boundaries.geojson
+
+# Analysis inputs: large raw downloads, all regenerable via their fetch script.
+# The derived per-PC4 / per-municipality artefacts they feed ARE committed.
+data/cbs/*.gpkg
+data/cbs/*.zip
+data/cbs/*.xlsx
+data/ov/*.json
+data/ov/*.zip
+data/analysis_points.geojson
+
+# Nationwide POI layers are inputs to split_pois_by_municipality.py only —
+# 40 MB, of which bushaltes alone is 20 MB. The per-municipality bundles the
+# webapp actually loads are committed, as is poi/index.json.
+webapp/public/data/poi/*.geojson

@@ -1,0 +1,58 @@
+{
+  "aa-en-hunze": {
+    "gemeente": "Aa en Hunze",
+    "population_total": 22545,
+    "candidates": 32,
+    "has_combi": true,
+    "generated_at": "2026-08-01T12:03:11+00:00"
+  },
+  "amsterdam": {
+    "gemeente": "Amsterdam",
+    "population_total": 924630,
+    "candidates": 2034,
+    "has_combi": true,
+    "generated_at": "2026-08-01T12:03:19+00:00"
+  },
+  "apeldoorn": {
+    "gemeente": "Apeldoorn",
+    "population_total": 162470,
+    "candidates": 287,
+    "has_combi": true,
+    "generated_at": "2026-08-01T12:03:12+00:00"
+  },
+  "rotterdam": {
+    "gemeente": "Rotterdam",
+    "population_total": 667540,
+    "candidates": 860,
+    "has_combi": true,
+    "generated_at": "2026-08-01T12:03:14+00:00"
+  },
+  "s-gravenhage": {
+    "gemeente": "'s-Gravenhage",
+    "population_total": 564185,
+    "candidates": 936,
+    "has_combi": true,
+    "generated_at": "2026-08-01T12:03:14+00:00"
+  },
+  "sudwest-fryslan": {
+    "gemeente": "Súdwest-Fryslân",
+    "population_total": 83365,
+    "candidates": 108,
+    "has_combi": true,
+    "generated_at": "2026-08-01T12:03:11+00:00"
+  },
+  "utrecht": {
+    "gemeente": "Utrecht",
+    "population_total": 372270,
+    "candidates": 1287,
+    "has_combi": true,
+    "generated_at": "2026-08-01T12:03:14+00:00"
+  },
+  "zwolle": {
+    "gemeente": "Zwolle",
+    "population_total": 130375,
+    "candidates": 104,
+    "has_combi": true,
+    "generated_at": "2026-08-01T12:03:11+00:00"
+  }
+}
