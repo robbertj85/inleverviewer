@@ -9,7 +9,7 @@ the GeoJSON output, the webapp types — speaks only this vocabulary.
 from __future__ import annotations
 
 import re
-from typing import Any
+from typing import Any, Iterable
 
 # --------------------------------------------------------------------------
 # Vocabulary
@@ -72,6 +72,68 @@ CATEGORIE_LABELS = {
     "inzamelbak": "Inzamelbak",
     "milieustraat": "Milieustraat",
 }
+
+# --------------------------------------------------------------------------
+# Analysis subsets
+# --------------------------------------------------------------------------
+#
+# The coverage, regression and network-planning layers all slice the point set
+# the same way, along two independent axes. A point belongs to `alles`, to
+# exactly one punttype, and to zero or more material streams — a supermarket
+# machine that takes PET and cans is `statiegeld` only, a milieustraat is
+# usually all three.
+#
+# Deliberately not crossed (no `statiegeld × automaat`): 36 combinations where
+# most cells stay empty. Use the map filters for that.
+#
+# Keep in sync with SUBSETS in webapp/types/analyse.ts.
+
+MATERIAAL_STROMEN = {
+    "statiegeld": ("pet-groot", "pet-klein", "blik", "glas", "krat"),
+    "batterijen": ("batterijen", "lampen", "tl-buizen", "armaturen"),
+    "elektro": ("elektro-klein", "elektro-middel", "elektro-groot"),
+}
+
+SUBSETS = (
+    "alles",
+    # material-stream axis
+    "statiegeld", "batterijen", "elektro",
+    # facility-type axis
+    "automaat", "balie", "inzamelbak", "milieustraat",
+)
+
+SUBSET_LABELS = {
+    "alles": "Alle inleverpunten",
+    "statiegeld": "Statiegeld",
+    "batterijen": "Batterijen & lampen",
+    "elektro": "Elektrische apparaten",
+    "automaat": "Inleverautomaat",
+    "balie": "Balie / winkel",
+    "inzamelbak": "Inzamelbak",
+    "milieustraat": "Milieustraat",
+}
+
+SUBSET_AXES = {
+    "materiaal": ("alles", "statiegeld", "batterijen", "elektro"),
+    "punttype": ("alles", "automaat", "balie", "inzamelbak", "milieustraat"),
+}
+
+
+def subsets_of(punt_type: str, materialen: Iterable[str]) -> list[str]:
+    """Which analysis subsets does this point belong to?
+
+    Always includes 'alles'. Adds the punttype when it is a known category, and
+    every material stream the point serves at least one material of.
+    """
+    found = ["alles"]
+    if punt_type in PUNT_CATEGORIEEN:
+        found.append(punt_type)
+    materials = set(materialen or ())
+    for stream, members in MATERIAAL_STROMEN.items():
+        if materials.intersection(members):
+            found.append(stream)
+    return found
+
 
 # How do you get paid back?
 UITBETALING_LABELS = {

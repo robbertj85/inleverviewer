@@ -1,0 +1,202 @@
+{
+  "categories": [
+    {
+      "slug": "ns_station",
+      "label": "NS-stations",
+      "group": "ov",
+      "color": "#FFC900",
+      "icon": "train",
+      "count": 889,
+      "file": "poi/ns_station.geojson"
+    },
+    {
+      "slug": "metro_station",
+      "label": "Metrostations",
+      "group": "ov",
+      "color": "#E2231A",
+      "icon": "metro",
+      "count": 395,
+      "file": "poi/metro_station.geojson"
+    },
+    {
+      "slug": "tram_halte",
+      "label": "Tramhaltes",
+      "group": "ov",
+      "color": "#0073B7",
+      "icon": "tram",
+      "count": 4794,
+      "file": "poi/tram_halte.geojson"
+    },
+    {
+      "slug": "bus_halte",
+      "label": "Bushaltes",
+      "group": "ov",
+      "color": "#1F8A4C",
+      "icon": "bus",
+      "count": 113926,
+      "file": "poi/bus_halte.geojson"
+    },
+    {
+      "slug": "ov_knooppunt",
+      "label": "OV-knooppunten",
+      "group": "ov",
+      "color": "#6B46C1",
+      "icon": "transit",
+      "count": 2383,
+      "file": "poi/ov_knooppunt.geojson"
+    },
+    {
+      "slug": "milieustraat",
+      "label": "Milieustraten",
+      "group": "afval",
+      "color": "#0F766E",
+      "icon": "recycling",
+      "count": 1342,
+      "file": "poi/milieustraat.geojson"
+    },
+    {
+      "slug": "glasbak",
+      "label": "Glas- & textielcontainers",
+      "group": "afval",
+      "color": "#14B8A6",
+      "icon": "container",
+      "count": 48094,
+      "file": "poi/glasbak.geojson"
+    },
+    {
+      "slug": "gemeentehuis",
+      "label": "Gemeentehuizen",
+      "group": "publiek",
+      "color": "#B45309",
+      "icon": "townhall",
+      "count": 1248,
+      "file": "poi/gemeentehuis.geojson"
+    },
+    {
+      "slug": "stadsdeelkantoor",
+      "label": "Stadsdeelkantoren",
+      "group": "publiek",
+      "color": "#92400E",
+      "icon": "district",
+      "count": 7,
+      "file": "poi/stadsdeelkantoor.geojson"
+    },
+    {
+      "slug": "bibliotheek",
+      "label": "Bibliotheken",
+      "group": "publiek",
+      "color": "#4338CA",
+      "icon": "library",
+      "count": 2355,
+      "file": "poi/bibliotheek.geojson"
+    },
+    {
+      "slug": "ziekenhuis",
+      "label": "Ziekenhuizen",
+      "group": "publiek",
+      "color": "#DC2626",
+      "icon": "hospital",
+      "count": 631,
+      "file": "poi/ziekenhuis.geojson"
+    },
+    {
+      "slug": "universiteit",
+      "label": "Universiteiten",
+      "group": "onderwijs",
+      "color": "#7C3AED",
+      "icon": "university",
+      "count": 796,
+      "file": "poi/universiteit.geojson"
+    },
+    {
+      "slug": "hogeschool",
+      "label": "Hogescholen",
+      "group": "onderwijs",
+      "color": "#A855F7",
+      "icon": "college",
+      "count": 1034,
+      "file": "poi/hogeschool.geojson"
+    },
+    {
+      "slug": "middelbare_school",
+      "label": "Middelbare scholen",
+      "group": "onderwijs",
+      "color": "#C026D3",
+      "icon": "school",
+      "count": 1266,
+      "file": "poi/middelbare_school.geojson"
+    },
+    {
+      "slug": "sportveld",
+      "label": "Sportcomplexen",
+      "group": "voorzieningen",
+      "color": "#16A34A",
+      "icon": "sport",
+      "count": 8495,
+      "file": "poi/sportveld.geojson"
+    },
+    {
+      "slug": "winkelcentrum",
+      "label": "Winkelcentra",
+      "group": "voorzieningen",
+      "color": "#EA580C",
+      "icon": "mall",
+      "count": 596,
+      "file": "poi/winkelcentrum.geojson"
+    },
+    {
+      "slug": "supermarkt",
+      "label": "Supermarkten",
+      "group": "voorzieningen",
+      "color": "#DB2777",
+      "icon": "supermarket",
+      "count": 11037,
+      "file": "poi/supermarkt.geojson"
+    },
+    {
+      "slug": "bouwmarkt",
+      "label": "Bouwmarkten",
+      "group": "voorzieningen",
+      "color": "#F97316",
+      "icon": "hardware",
+      "count": 3964,
+      "file": "poi/bouwmarkt.geojson"
+    },
+    {
+      "slug": "drogisterij",
+      "label": "Drogisterijen",
+      "group": "voorzieningen",
+      "color": "#0D9488",
+      "icon": "chemist",
+      "count": 3156,
+      "file": "poi/drogisterij.geojson"
+    },
+    {
+      "slug": "fietsenstalling",
+      "label": "Fietsenstallingen (overdekt)",
+      "group": "voorzieningen",
+      "color": "#0891B2",
+      "icon": "bike",
+      "count": 11578,
+      "file": "poi/fietsenstalling.geojson"
+    },
+    {
+      "slug": "parkeergarage",
+      "label": "Parkeergarages",
+      "group": "voorzieningen",
+      "color": "#475569",
+      "icon": "garage",
+      "count": 5278,
+      "file": "poi/parkeergarage.geojson"
+    },
+    {
+      "slug": "p_and_r",
+      "label": "P+R-locaties",
+      "group": "voorzieningen",
+      "color": "#0EA5E9",
+      "icon": "pr",
+      "count": 1185,
+      "file": "poi/p_and_r.geojson"
+    }
+  ]
+}
