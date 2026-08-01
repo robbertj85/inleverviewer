@@ -48,6 +48,37 @@ Waarvan ~380 gemeentelijke milieustraten en recyclingstations.
 - **Data matrix** en **statistieken** per gemeente, inclusief dekkingsgraad
 - **Embed** — iframe-weergave voor gebruik op andere sites
 
+#### Analyselagen (beta)
+
+Vijf tabbladen die op de gemeten dataset een model leggen. Ze zijn als beta
+gemarkeerd omdat ze schattingen tonen, geen tellingen.
+
+- **Schatting inleverpunten** — hoeveel punten zou je per postcodegebied
+  verwachten op grond van inwonertal, oppervlakte en CBS-kenmerken, en waar wijkt
+  de werkelijkheid daarvan af? Statiegeld, batterijen en elektro zijn apart
+  gemodelleerd. Elk model rapporteert zowel R² op de trainingsset als een
+  5-voudig gekruisvalideerde R²; alleen de tweede zegt iets over generalisatie.
+  Inclusief een regressie die je in de browser zelf samenstelt.
+- **Bereik inwoners** — percentage inwoners binnen 300/400/500 m van een
+  inleverpunt, per gemeente en per PC4. Teller én noemer komen uit het
+  CBS-vierkantstatistiekraster van 100 m, dus lege ruimte telt niet mee als
+  onbereikte bevolking. Acht subsets langs twee assen: materiaalstroom en
+  punttype. Milieustraten tellen alleen mee voor de gemeenten die ze mogen
+  gebruiken.
+- **Publieke POI's** — kandidaat-gastheren uit OpenStreetMap (supermarkt,
+  bouwmarkt, drogisterij, milieustraat, OV, publieke gebouwen), met de bestaande
+  inleverpunten eroverheen zodat zichtbaar is welke locaties er al één hebben.
+- **Plaatsingsadvies** — welke postcodegebieden verdienen als eerste een extra
+  punt, en waar precies. Prioriteit uit vier gewogen z-scores; concrete plekken
+  uit de bewoonde witte vlekken, gesnapt naar een gastheer die de stroom aankan.
+- **Netwerkplanner** — greedy set-cover over de kandidaat-locaties: schuif het
+  aantal nieuwe punten omhoog en kijk de witte vlekken dicht lopen. De
+  **combi-modus** rekent er het pakketpuntennetwerk bij en zoekt locaties die
+  beide tegelijk kunnen zijn, met een synergie-index per locatie.
+
+De gemeente-gebonden lagen (POI's, plaatsingsadvies, netwerkplanner) zijn eerst
+voor een pilotset van acht gemeenten gegenereerd; de PC4-lagen zijn landelijk.
+
 ### Installatie
 
 ```bash
@@ -103,6 +134,40 @@ python main.py --gemeente Zwolle
 python main.py --gemeente Amsterdam --format csv --output amsterdam.csv
 ```
 
+#### Analyselagen
+
+Deze draaien op dezelfde GeoJSON's plus drie externe datasets: het CBS
+100 m-vierkantstatistiekraster, de PC4-polygonen en OpenStreetMap-POI's. De
+eerste twee stappen zijn eenmalig en de resultaten worden gecached.
+
+```bash
+# Eenmalige inputs (groot, gitignored, regenereerbaar)
+python scripts/fetch_pois.py                        # Overpass, ~10 min voor alles
+python scripts/split_pois_by_municipality.py --only pilot
+
+# 1. Analysebestand: de per-gemeente GeoJSON's samengevoegd, mét
+#    gemeenteBeperking (die het landelijke bestand bewust weglaat)
+python scripts/build_analysis_points.py
+
+# 2. Bereik van inwoners (landelijk, ~40 s)
+python scripts/compute_population_coverage.py
+
+# 3. PC4-tabel en regressiemodellen (landelijk)
+python scripts/build_pc4_stats.py
+python scripts/fit_pc4_model.py
+
+# 4. Plaatsingsadvies en netwerkplanner (per gemeente)
+python scripts/suggest_placements.py --only pilot
+python scripts/plan_inleverpunt_network.py --only pilot
+
+# Landelijk uitrollen: vervang --only pilot door --only all
+```
+
+De combi-modus van de netwerkplanner leest
+`data/pakketpunten_snapshot.geojson`, een momentopname van de
+convenant-pakketpuntenviewer. Verversen betekent dat bestand opnieuw kopiëren;
+de datum in de metadata wordt in de UI getoond.
+
 ---
 
 ## Architectuur
@@ -145,7 +210,19 @@ Elk inleverpunt is een GeoJSON-`Feature` met deze eigenschappen:
 | `openingstijden` | per dag of als vrije tekst, waar de bron ze levert |
 
 De vocabulaire staat in `normalize.py` (Python) en `webapp/types/inleverpunten.ts`
-(TypeScript); die twee horen gelijk te lopen.
+(TypeScript); die twee horen gelijk te lopen. Hetzelfde geldt voor de
+analyse-subsets: `SUBSETS` in `normalize.py` tegenover `SUBSETS` in
+`webapp/types/analyse.ts`.
+
+De analyselagen slicen de puntenset langs twee onafhankelijke assen:
+
+| As | Waarden |
+|---|---|
+| Materiaalstroom | `statiegeld` (PET, blik, glas, krat), `batterijen` (batterijen, lampen, TL, armaturen), `elektro` (klein, middel, groot) |
+| Punttype | `automaat`, `balie`, `inzamelbak`, `milieustraat` |
+
+Een punt hoort altijd bij `alles`, bij precies één punttype en bij nul tot drie
+materiaalstromen. De assen worden bewust niet gekruist.
 
 Het landelijke bestand (`nederland.geojson`) is bewust *verkort*: adres-,
 openingstijd- en uitbetalingsvelden ontbreken om de download klein te houden. Dat
@@ -204,3 +281,26 @@ Databronnen:
 - Punten van verschillende bronnen op hetzelfde adres blijven aparte features. Gebruik
   het filter 'alleen gedeelde locaties' om die plekken te vinden.
 - Dekkingscirkels zijn hemelsbreed: niet gecorrigeerd voor looproutes, water of hoogte.
+
+Voor de analyselagen komt daar bij:
+
+- De **capaciteitscijfers** in de netwerkplanner zijn expliciete aannames, geen
+  gepubliceerde kentallen. Er bestaat geen openbaar cijfer voor inleveringen per
+  inwoner per jaar per stroom; de UI labelt ze als aanname en noemt de registers
+  die nog geraadpleegd moeten worden (Afvalfonds Verpakkingen, Stichting OPEN,
+  Stibat).
+- De **pakketpuntendata** in de combi-modus is een momentopname uit een andere
+  repository, geen live koppeling. De datum staat in de UI.
+- De **POI's** komen uit OpenStreetMap en zijn dus zo compleet als de
+  vrijwilligers in dat gebied. Bus- en tramhaltes staan standaard uit als
+  kandidaat: ze vormen veruit het dichtste raster en zouden het greedy-resultaat
+  domineren, terwijl er geen statiegeldautomaat of balie op past.
+- Het **regressiemodel** verklaart 30–60% van de variantie, afhankelijk van de
+  stroom. Elektro is met R²(cv) ≈ 0,29 het zwakst: milieustraten volgen
+  gemeentelijk beleid, niet de demografie. Vergelijk modellen op de
+  cross-validatiescore, niet op R² van de trainingsset.
+- Het **plaatsingsadvies** snapt ongeveer de helft van de voorstellen naar een
+  echte gastheer. Dat is geen fout: een witte vlek ligt per definitie ≥400 m van
+  de bestaande punten in die stroom, en voor statiegeld zíjn dat de supermarkten.
+  Waar geen gastheer binnen loopafstand ligt, staat dat erbij — dat vraagt om een
+  zelfstandige unit.
