@@ -9,10 +9,12 @@ Two components that meet at a GeoJSON file:
 - **Python backend** — fetches inleverpunten from five public sources, assigns each
   point to a municipality by spatial join, and writes one GeoJSON per municipality.
 - **Next.js webapp** (`webapp/`) — interactive Leaflet map, filters, statistics,
-  data export and a read-only API.
+  data export, five analysis tabs and a read-only API.
 
-Sister project: `../pakketpunten` (Pakketpuntenviewer). Same principles, different
-domain. Patterns worth reusing generally live there first.
+Sister projects: `../pakketpunten` (Pakketpuntenviewer) and
+`../pakketpunten-analyse` (the convenant variant, which the analysis tabs were
+ported from). Same principles, different domain. Patterns worth reusing
+generally live there first.
 
 ## Commands
 
@@ -25,11 +27,24 @@ python scripts/batch_generate.py --only zwolle  # fast iteration on one municipa
 python scripts/create_national_overview.py
 python scripts/compute_statistics.py
 
+# Analysis layers, in this order — each reads what the previous one wrote
+python scripts/build_analysis_points.py             # consolidates the per-muni files
+python scripts/compute_population_coverage.py       # → population_coverage.json (~40 s)
+python scripts/build_pc4_stats.py                   # → pc4_stats.json
+python scripts/fit_pc4_model.py                     # adds predictions + model metadata
+python scripts/suggest_placements.py --only pilot   # → placement_suggestions.json
+python scripts/plan_inleverpunt_network.py --only pilot   # → inleverpunt_network/
+
+# One-off inputs (slow, cached, gitignored)
+python scripts/fetch_pois.py                        # Overpass, ~10 min for everything
+python scripts/split_pois_by_municipality.py --only pilot
+
 # Webapp
 cd webapp
 npm run dev
 npm run build     # runs TypeScript; must be clean
 npm run lint      # must be clean
+npm test          # Playwright; must be clean
 ```
 
 ## Things that will bite you
@@ -38,6 +53,61 @@ npm run lint      # must be clean
 categories for the backend; `webapp/types/inleverpunten.ts` mirrors them. Adding a
 material to one without the other silently drops points from the filters —
 `make_record` deliberately discards unknown terms rather than passing them through.
+The same applies to the analysis subsets: `SUBSETS` in `normalize.py` against
+`SUBSETS` in `webapp/types/analyse.ts`, asserted by the first test in
+`tests/analyse.spec.ts`.
+
+**Milieustraten are not open to everyone.** `gemeenteBeperking` lists which
+municipalities' residents may use a recycling centre. `compute_population_coverage.py`
+therefore builds them a separate buffer union per permitted municipality instead
+of letting them join the national one — counting a Rotterdam milieustraat as
+serving everyone within 400 m would overstate reach in exactly the places where
+reach is thinnest. `analysis.GEMEENTE_ALIASES` maps the pre-merger names the
+sources still publish ("Boxmeer", "Weesp") onto current slugs; an unmapped name
+silently shrinks a catchment.
+
+**The national file cannot feed the analysis layers.** `nederland.geojson` is
+reduced on purpose and drops `gemeenteBeperking` along with the address fields.
+`build_analysis_points.py` rebuilds a full-detail national set from the
+per-municipality files into `data/analysis_points.geojson` (gitignored,
+regenerable) — that is what every analysis script reads.
+
+**Bus stops swamp the network planner.** Zwolle's POI bundle has 302 bus stops
+against 41 supermarkets, so stops form by far the densest even grid of
+candidates and a greedy that only maximises population within R picks almost
+nothing else. `TYPE_META[...]["standaard_actief"]` is `False` for `bus_halte`
+and `tram_halte` for that reason; `--types alle` brings them back for
+comparison. Before this filter the top six picks in Zwolle were all bus stops.
+
+**Compare models on `r2_cv_mean`, never on `r2`.** In-sample R² cannot fall when
+you add a feature, so a feature set chosen on it is chosen by its size.
+`fit_pc4_model.py` reports both, and the 5-fold cross-validated score is what the
+UI ranks on. It earns its keep: the "extended" feature set (income + SES-WOA)
+scores *worse* on CV than the two-variable base model for every stream.
+
+**Regression targets are per material stream.** One model over "all
+inleverpunten" averages supermarket deposit machines against ~390 municipal
+recycling centres and predicts neither. `fit_pc4_model.py` fits `statiegeld`,
+`batterijen` and `elektro` separately, plus the total as a fourth target.
+
+**The capacity model is assumptions, not data.** There is no published figure
+for returns per inhabitant per year per stream. `CAPACITY_DEFAULTS` in
+`plan_inleverpunt_network.py` carries `status: "aanname"`, a null `bron` per
+number and a list of registers still to consult, and the UI labels it as such.
+Do not quietly promote these to facts.
+
+**Pakketpunten data is a snapshot, not a feed.** `data/pakketpunten_snapshot.geojson`
+is a copy of `nederland.geojson` from `../pakketpunten-analyse`, carrying a
+`snapshot_date` in its metadata. The combi mode of the network planner reads it;
+the UI states the date. Refreshing means copying the file again.
+
+**Slugs come from one place.** `utils.slugify`, and for POI bundles straight off
+the `slug` field in the provincial boundary files. The sister project derives
+bundle filenames with a second, subtly different function, which disagrees with
+`municipalities.json` on parenthesised and accented names — Bergen (L.), Bergen
+(NH.), Noardeast-Fryslân and Súdwest-Fryslân ended up with bundles its network
+planner could never find, and the only symptom was a skip line in a 342-line
+log. `analysis.assert_poi_bundles_exist` fails loudly instead.
 
 **CRS discipline.** WGS84 (EPSG:4326) for APIs, GeoJSON and the map; RD New
 (EPSG:28992) for anything in metres. Buffering or measuring in degrees is wrong
@@ -107,7 +177,9 @@ Vercel, not something `vercel.json` can express.
 
 `next.config.ts` declares `outputFileTracingIncludes` for the data files —
 without it the dynamic API routes 404 in production while working locally, because
-the tracer cannot see reads whose filename comes from a request parameter.
+the tracer cannot see reads whose filename comes from a request parameter. The
+four analysis pages that read a dataset server-side have their own entries there
+for the same reason.
 
 `NEXT_PUBLIC_SITE_URL` drives canonical URLs, OG tags and embed snippets. Set it
 when a custom domain is attached.
