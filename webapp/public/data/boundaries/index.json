@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-28T09:25:19.421799Z",
+  "generated_at": "2026-08-08T19:45:23.623192Z",
   "total_provinces": 12,
   "total_boundaries": 342,
   "provinces": [
@@ -50,7 +50,7 @@
       "slug": "noord-brabant",
       "file": "provincie-noord-brabant.geojson",
       "boundaries": 56,
-      "size_kb": 178.4
+      "size_kb": 178.3
     },
     {
       "provincie": "Noord-Holland",
