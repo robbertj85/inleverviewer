@@ -21,10 +21,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
           cache: 'pip'
@@ -123,9 +123,15 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
 
-          git add data/*_all_locations.json data/municipality_polygon_cache.json data/municipalities_all.json 2>/dev/null || true
-          git add webapp/public/municipalities.json 2>/dev/null || true
-          git add webapp/public/data 2>/dev/null || true
+          # Stage the whole output surface rather than a hand-kept file list.
+          # The checkout starts clean, so anything changed under these two trees
+          # was written by this run, and .gitignore keeps the regenerable bulk
+          # (analysis_points, nederland-boundaries, the national POI layers) out.
+          # An enumerated list silently missed data/geocode_cache.json — which
+          # the fetch scripts rewrite every run — and the leftover unstaged
+          # change made `git pull --rebase` abort with exit 128 after the commit
+          # had already been made.
+          git add -A -- data webapp/public
 
           if git diff --staged --quiet; then
             echo "No changes to commit"
@@ -138,8 +144,25 @@ jobs:
           fi
 
           git commit -m "$msg"
-          git pull --rebase origin main
-          git push
+
+          # --autostash so a stray unstaged file outside those trees can never
+          # block the rebase again, and a retry so a push that loses a race with
+          # another commit on main rebases and tries again instead of failing.
+          pushed=""
+          for attempt in 1 2 3; do
+            if git pull --rebase --autostash origin main && git push; then
+              pushed="yes"
+              break
+            fi
+            git rebase --abort 2>/dev/null || true
+            echo "::warning::Push attempt ${attempt} failed; retrying"
+            sleep 10
+          done
+
+          if [ -z "$pushed" ]; then
+            echo "::error::Could not push the data update after 3 attempts"
+            exit 1
+          fi
 
       - name: Write run summary
         if: always()
