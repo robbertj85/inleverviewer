@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-08-08T19:45:12.276026Z",
+  "generated_at": "2026-08-10T03:59:13.840938Z",
   "total_municipalities": 342,
-  "total_points": 33953,
+  "total_points": 33957,
   "unassigned_points": 3,
   "source_status": {
     "StatiegeldNederland": {
@@ -14,11 +14,11 @@
     },
     "Stibat": {
       "success": true,
-      "count": 18398
+      "count": 18401
     },
     "Droppie": {
       "success": true,
-      "count": 13
+      "count": 14
     },
     "StatieDrive": {
       "success": true,
@@ -28,8 +28,8 @@
   "merk_totals": {
     "StatiegeldNederland": 8280,
     "StichtingOPEN": 7250,
-    "Stibat": 18398,
-    "Droppie": 13,
+    "Stibat": 18401,
+    "Droppie": 14,
     "StatieDrive": 12
   },
   "results": [
@@ -267,8 +267,8 @@
       "gemeente": "Coevorden",
       "slug": "coevorden",
       "success": true,
-      "count": 98,
-      "file_size_kb": 58.0,
+      "count": 99,
+      "file_size_kb": 58.5,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -375,8 +375,8 @@
       "gemeente": "Leiden",
       "slug": "leiden",
       "success": true,
-      "count": 203,
-      "file_size_kb": 110.6,
+      "count": 204,
+      "file_size_kb": 111.1,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -580,8 +580,8 @@
       "gemeente": "Almere",
       "slug": "almere",
       "success": true,
-      "count": 292,
-      "file_size_kb": 158.1,
+      "count": 291,
+      "file_size_kb": 157.7,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -904,8 +904,8 @@
       "gemeente": "Ede",
       "slug": "ede",
       "success": true,
-      "count": 234,
-      "file_size_kb": 131.1,
+      "count": 233,
+      "file_size_kb": 130.6,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -964,8 +964,8 @@
       "gemeente": "Utrecht",
       "slug": "utrecht",
       "success": true,
-      "count": 598,
-      "file_size_kb": 329.7,
+      "count": 599,
+      "file_size_kb": 330.3,
       "merken": [
         "Droppie",
         "StatiegeldNederland",
@@ -1013,8 +1013,8 @@
       "gemeente": "Enschede",
       "slug": "enschede",
       "success": true,
-      "count": 331,
-      "file_size_kb": 184.4,
+      "count": 332,
+      "file_size_kb": 184.9,
       "merken": [
         "StatieDrive",
         "StatiegeldNederland",
@@ -1386,8 +1386,8 @@
       "gemeente": "Waadhoeke",
       "slug": "waadhoeke",
       "success": true,
-      "count": 98,
-      "file_size_kb": 66.5,
+      "count": 99,
+      "file_size_kb": 67.0,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -1614,8 +1614,8 @@
       "gemeente": "Amsterdam",
       "slug": "amsterdam",
       "success": true,
-      "count": 1429,
-      "file_size_kb": 784.5,
+      "count": 1428,
+      "file_size_kb": 784.0,
       "merken": [
         "Droppie",
         "StatieDrive",
@@ -1809,8 +1809,8 @@
       "gemeente": "Barendrecht",
       "slug": "barendrecht",
       "success": true,
-      "count": 85,
-      "file_size_kb": 47.8,
+      "count": 84,
+      "file_size_kb": 47.3,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -1978,8 +1978,8 @@
       "gemeente": "Nederweert",
       "slug": "nederweert",
       "success": true,
-      "count": 34,
-      "file_size_kb": 21.4,
+      "count": 35,
+      "file_size_kb": 21.9,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -2075,7 +2075,7 @@
       "slug": "de-ronde-venen",
       "success": true,
       "count": 92,
-      "file_size_kb": 55.9,
+      "file_size_kb": 56.0,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -2182,8 +2182,8 @@
       "gemeente": "Valkenburg aan de Geul",
       "slug": "valkenburg-aan-de-geul",
       "success": true,
-      "count": 40,
-      "file_size_kb": 28.3,
+      "count": 41,
+      "file_size_kb": 28.8,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -2386,8 +2386,8 @@
       "gemeente": "Rucphen",
       "slug": "rucphen",
       "success": true,
-      "count": 48,
-      "file_size_kb": 31.0,
+      "count": 47,
+      "file_size_kb": 30.5,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -2961,8 +2961,8 @@
       "gemeente": "Tilburg",
       "slug": "tilburg",
       "success": true,
-      "count": 386,
-      "file_size_kb": 215.2,
+      "count": 387,
+      "file_size_kb": 215.7,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -3202,8 +3202,8 @@
       "gemeente": "Texel",
       "slug": "texel",
       "success": true,
-      "count": 81,
-      "file_size_kb": 43.4,
+      "count": 82,
+      "file_size_kb": 43.9,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -3322,8 +3322,8 @@
       "gemeente": "'s-Gravenhage",
       "slug": "s-gravenhage",
       "success": true,
-      "count": 725,
-      "file_size_kb": 398.7,
+      "count": 726,
+      "file_size_kb": 399.2,
       "merken": [
         "Droppie",
         "StatiegeldNederland",
@@ -3347,8 +3347,8 @@
       "gemeente": "Apeldoorn",
       "slug": "apeldoorn",
       "success": true,
-      "count": 316,
-      "file_size_kb": 177.8,
+      "count": 315,
+      "file_size_kb": 177.3,
       "merken": [
         "StatieDrive",
         "StatiegeldNederland",
@@ -3672,8 +3672,8 @@
       "gemeente": "Borsele",
       "slug": "borsele",
       "success": true,
-      "count": 35,
-      "file_size_kb": 23.2,
+      "count": 34,
+      "file_size_kb": 22.7,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -4046,8 +4046,8 @@
       "gemeente": "Leusden",
       "slug": "leusden",
       "success": true,
-      "count": 54,
-      "file_size_kb": 34.5,
+      "count": 55,
+      "file_size_kb": 35.0,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
