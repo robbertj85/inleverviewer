@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-28T08:12:23.776787Z",
+  "generated_at": "2026-10-05T08:04:16.847375Z",
   "total_municipalities": 342,
-  "total_points": 33979,
+  "total_points": 33991,
   "unassigned_points": 3,
   "source_status": {
     "StatiegeldNederland": {
@@ -10,11 +10,11 @@
     },
     "StichtingOPEN": {
       "success": true,
-      "count": 7250
+      "count": 7253
     },
     "Stibat": {
       "success": true,
-      "count": 17872
+      "count": 17881
     },
     "Droppie": {
       "success": true,
@@ -27,8 +27,8 @@
   },
   "merk_totals": {
     "StatiegeldNederland": 8833,
-    "StichtingOPEN": 7247,
-    "Stibat": 17872,
+    "StichtingOPEN": 7250,
+    "Stibat": 17881,
     "Droppie": 14,
     "StatieDrive": 13
   },
@@ -37,8 +37,8 @@
       "gemeente": "Maasdriel",
       "slug": "maasdriel",
       "success": true,
-      "count": 40,
-      "file_size_kb": 26.9,
+      "count": 41,
+      "file_size_kb": 27.4,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -73,8 +73,8 @@
       "gemeente": "Zwolle",
       "slug": "zwolle",
       "success": true,
-      "count": 266,
-      "file_size_kb": 148.1,
+      "count": 267,
+      "file_size_kb": 148.6,
       "merken": [
         "StatieDrive",
         "StatiegeldNederland",
@@ -98,8 +98,8 @@
       "gemeente": "Lansingerland",
       "slug": "lansingerland",
       "success": true,
-      "count": 100,
-      "file_size_kb": 59.0,
+      "count": 101,
+      "file_size_kb": 59.5,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -207,8 +207,8 @@
       "gemeente": "Assen",
       "slug": "assen",
       "success": true,
-      "count": 153,
-      "file_size_kb": 87.4,
+      "count": 154,
+      "file_size_kb": 88.0,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -351,8 +351,8 @@
       "gemeente": "Oost Gelre",
       "slug": "oost-gelre",
       "success": true,
-      "count": 77,
-      "file_size_kb": 47.5,
+      "count": 78,
+      "file_size_kb": 48.0,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -363,8 +363,8 @@
       "gemeente": "Veenendaal",
       "slug": "veenendaal",
       "success": true,
-      "count": 136,
-      "file_size_kb": 74.5,
+      "count": 137,
+      "file_size_kb": 74.9,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -484,8 +484,8 @@
       "gemeente": "Westland",
       "slug": "westland",
       "success": true,
-      "count": 199,
-      "file_size_kb": 109.6,
+      "count": 200,
+      "file_size_kb": 110.1,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -580,8 +580,8 @@
       "gemeente": "Almere",
       "slug": "almere",
       "success": true,
-      "count": 289,
-      "file_size_kb": 157.6,
+      "count": 290,
+      "file_size_kb": 158.1,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -712,8 +712,8 @@
       "gemeente": "Schouwen-Duiveland",
       "slug": "schouwen-duiveland",
       "success": true,
-      "count": 133,
-      "file_size_kb": 76.3,
+      "count": 134,
+      "file_size_kb": 76.8,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -748,8 +748,8 @@
       "gemeente": "Nieuwegein",
       "slug": "nieuwegein",
       "success": true,
-      "count": 127,
-      "file_size_kb": 71.4,
+      "count": 126,
+      "file_size_kb": 70.9,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -1182,8 +1182,8 @@
       "gemeente": "Lelystad",
       "slug": "lelystad",
       "success": true,
-      "count": 128,
-      "file_size_kb": 71.6,
+      "count": 129,
+      "file_size_kb": 72.1,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -1206,8 +1206,8 @@
       "gemeente": "Altena",
       "slug": "altena",
       "success": true,
-      "count": 127,
-      "file_size_kb": 73.8,
+      "count": 126,
+      "file_size_kb": 73.4,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -1482,8 +1482,8 @@
       "gemeente": "Ouder-Amstel",
       "slug": "ouder-amstel",
       "success": true,
-      "count": 32,
-      "file_size_kb": 23.6,
+      "count": 33,
+      "file_size_kb": 24.0,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -1614,8 +1614,8 @@
       "gemeente": "Amsterdam",
       "slug": "amsterdam",
       "success": true,
-      "count": 1405,
-      "file_size_kb": 771.8,
+      "count": 1403,
+      "file_size_kb": 770.8,
       "merken": [
         "Droppie",
         "StatieDrive",
@@ -1640,8 +1640,8 @@
       "gemeente": "Nijmegen",
       "slug": "nijmegen",
       "success": true,
-      "count": 336,
-      "file_size_kb": 185.0,
+      "count": 335,
+      "file_size_kb": 184.5,
       "merken": [
         "StatieDrive",
         "StatiegeldNederland",
@@ -1857,8 +1857,8 @@
       "gemeente": "Súdwest-Fryslân",
       "slug": "sudwest-fryslan",
       "success": true,
-      "count": 224,
-      "file_size_kb": 134.0,
+      "count": 226,
+      "file_size_kb": 135.0,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -2434,8 +2434,8 @@
       "gemeente": "Land van Cuijk",
       "slug": "land-van-cuijk",
       "success": true,
-      "count": 202,
-      "file_size_kb": 111.4,
+      "count": 201,
+      "file_size_kb": 110.9,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -2937,8 +2937,8 @@
       "gemeente": "Eemsdelta",
       "slug": "eemsdelta",
       "success": true,
-      "count": 113,
-      "file_size_kb": 70.3,
+      "count": 114,
+      "file_size_kb": 70.8,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -3347,8 +3347,8 @@
       "gemeente": "Apeldoorn",
       "slug": "apeldoorn",
       "success": true,
-      "count": 319,
-      "file_size_kb": 181.5,
+      "count": 320,
+      "file_size_kb": 182.0,
       "merken": [
         "StatieDrive",
         "StatiegeldNederland",
@@ -3902,8 +3902,8 @@
       "gemeente": "Alblasserdam",
       "slug": "alblasserdam",
       "success": true,
-      "count": 39,
-      "file_size_kb": 22.4,
+      "count": 40,
+      "file_size_kb": 23.0,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -4010,8 +4010,8 @@
       "gemeente": "Amstelveen",
       "slug": "amstelveen",
       "success": true,
-      "count": 137,
-      "file_size_kb": 77.6,
+      "count": 138,
+      "file_size_kb": 78.1,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
@@ -4106,8 +4106,8 @@
       "gemeente": "Velsen",
       "slug": "velsen",
       "success": true,
-      "count": 135,
-      "file_size_kb": 78.0,
+      "count": 136,
+      "file_size_kb": 78.5,
       "merken": [
         "StatiegeldNederland",
         "Stibat",
