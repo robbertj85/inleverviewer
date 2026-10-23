@@ -1,8 +1,8 @@
 import fs from 'fs';
-import path from 'path';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { checkRateLimit, clientIp } from '@/lib/rateLimit';
+import { dataFile, publicFile } from '@/lib/dataPaths';
 
 /**
  * GET /api/v1/municipality/{identifier}
@@ -13,7 +13,7 @@ import { checkRateLimit, clientIp } from '@/lib/rateLimit';
  * would fail far too often.
  */
 
-const RATE_LIMIT = 30;
+const RATE_LIMIT = 120;
 const RATE_WINDOW_MS = 60 * 60 * 1000;
 
 const CORS_HEADERS = {
@@ -130,7 +130,7 @@ export async function GET(
     });
   }
 
-  const indexPath = path.join(process.cwd(), 'public', 'municipalities.json');
+  const indexPath = publicFile('municipalities.json');
   if (!fs.existsSync(indexPath)) {
     return jsonError(500, { error: 'Municipality index not available' });
   }
@@ -146,12 +146,7 @@ export async function GET(
     });
   }
 
-  const filePath = path.join(
-    process.cwd(),
-    'public',
-    'data',
-    `${municipality.slug}.geojson`
-  );
+  const filePath = dataFile(`${municipality.slug}.geojson`);
 
   if (!fs.existsSync(filePath)) {
     return jsonError(404, {

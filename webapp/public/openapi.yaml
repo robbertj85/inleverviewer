@@ -13,8 +13,8 @@ info:
 
     ## Gebruik
 
-    Geen sleutel nodig. Er geldt een limiet van 30 requests per uur per
-    IP-adres op de gemeente-endpoint en 60 per uur op de lijst-endpoint.
+    Geen sleutel nodig. Er geldt een limiet van 120 requests per uur per
+    IP-adres op de gemeente-endpoint en 240 per uur op de lijst-endpoint.
     Antwoorden mogen een uur gecached worden.
 
     ## Bronvermelding
@@ -31,7 +31,7 @@ info:
     url: https://github.com/robbertj85/inleverviewer
 
 servers:
-  - url: /
+  - url: ./
     description: Deze deployment
 
 tags:

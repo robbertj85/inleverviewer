@@ -19,8 +19,6 @@ import { SUBSETS, type Subset } from '../types/analyse';
 const DATA_DIR = path.join(__dirname, '..', 'public', 'data');
 
 const IGNORED_ERRORS = [
-  /_vercel\/insights/i,
-  /vercel.*analytics/i,
   /basemaps\.cartocdn\.com/i,
   /favicon/i,
   /Failed to load resource/i,

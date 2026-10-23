@@ -33,6 +33,7 @@ import {
   subscribeMunicipality,
 } from '@/lib/municipalityStore';
 import { nlInt, nlNum, nlPct } from '@/types/analyse';
+import { withBase } from '@/lib/basePath';
 
 const NetworkPlannerMap = dynamic(
   () => import('@/components/analyse/NetworkPlannerMap'),
@@ -114,11 +115,11 @@ export default function NetworkPlanner({
     setStoredMunicipality(slug);
 
     Promise.all([
-      fetch(`/data/inleverpunt_network/${slug}.json`).then((r) => {
+      fetch(withBase(`/data/inleverpunt_network/${slug}.json`)).then((r) => {
         if (!r.ok) throw new Error('network');
         return r.json();
       }),
-      fetch(`/data/${slug}.geojson`)
+      fetch(withBase(`/data/${slug}.geojson`))
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null),
     ])

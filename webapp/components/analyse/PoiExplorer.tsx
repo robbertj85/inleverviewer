@@ -21,6 +21,7 @@ import {
 import { cn } from '@/lib/utils';
 import { MERK_COLORS, type Merk } from '@/types/inleverpunten';
 import { nlInt } from '@/types/analyse';
+import { withBase } from '@/lib/basePath';
 
 interface CategoryMeta {
   slug: string;
@@ -124,8 +125,8 @@ export default function PoiExplorer() {
   useEffect(() => {
     let cancelled = false;
     Promise.all([
-      fetch('/data/poi/index.json').then((r) => r.json()),
-      fetch('/data/poi/by-municipality/index.json').then((r) => r.json()),
+      fetch(withBase('/data/poi/index.json')).then((r) => r.json()),
+      fetch(withBase('/data/poi/by-municipality/index.json')).then((r) => r.json()),
     ])
       .then(([catIndex, muni]) => {
         if (cancelled) return;
@@ -161,7 +162,7 @@ export default function PoiExplorer() {
     setStoredMunicipality(slug);
 
     Promise.all([
-      fetch(`/data/poi/by-municipality/${slug}.geojson`).then((r) => {
+      fetch(withBase(`/data/poi/by-municipality/${slug}.geojson`)).then((r) => {
         if (!r.ok) throw new Error('bundle');
         return r.json();
       }),
@@ -169,7 +170,7 @@ export default function PoiExplorer() {
       // candidate locations already have one. This replaces the carrier
       // pain-point overlay from the sister project, which has no counterpart
       // in this domain.
-      fetch(`/data/${slug}.geojson`)
+      fetch(withBase(`/data/${slug}.geojson`))
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null),
     ])

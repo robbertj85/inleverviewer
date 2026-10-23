@@ -13,16 +13,12 @@ import { test, expect, type ConsoleMessage } from '@playwright/test';
 /**
  * Errors that say nothing about our code.
  *
- * Vercel Analytics loads /_vercel/insights/script.js, which only exists once
- * deployed. Locally it 404s to an HTML page, which the browser reports twice:
- * once as a bare "Failed to load resource ... 404" with no URL in the text, and
- * once as "Refused to execute script ... MIME type". Neither names our code, so
- * both have to be matched loosely here — the precise assertions live in the
- * response and CSP checks below, which match on URL rather than on prose.
+ * A failed basemap tile (offline, or the CDN rate-limiting a CI runner) is
+ * reported as a bare "Failed to load resource ... 404" with no URL in the
+ * text, so it has to be matched loosely here — the precise assertions live in
+ * the response and CSP checks below, which match on URL rather than on prose.
  */
 const IGNORED_ERRORS = [
-  /_vercel\/insights/i,
-  /vercel.*analytics/i,
   /basemaps\.cartocdn\.com/i,
   /favicon/i,
   /Failed to load resource/i,
@@ -52,7 +48,6 @@ test.describe('Kaartpagina', () => {
     const failedRequests: string[] = [];
     page.on('response', (response) => {
       if (response.status() < 400) return;
-      if (response.url().includes('/_vercel/')) return;
       failedRequests.push(`${response.status()} ${response.url()}`);
     });
 
@@ -73,8 +68,7 @@ test.describe('Kaartpagina', () => {
     page.on('console', (message) => {
       const text = message.text();
       // Match the CSP wording specifically. A bare "Refused to execute" is not
-      // enough: the browser uses the same opening for a MIME-type refusal, and
-      // Vercel Analytics 404ing to an HTML page triggers exactly that locally.
+      // enough: the browser uses the same opening for a MIME-type refusal.
       if (/Content Security Policy/i.test(text)) blocked.push(text);
     });
 

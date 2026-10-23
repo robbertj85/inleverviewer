@@ -1,8 +1,12 @@
 import fs from 'fs/promises';
-import path from 'path';
 
 import DataMatrixClient, { MatrixRow } from '@/components/DataMatrixClient';
 import { ALL_MERKEN, Merk } from '@/types/inleverpunten';
+import { dataFile } from '@/lib/dataPaths';
+
+// Read from disk per request: the worker rewrites the data weekly without a
+// rebuild, and the Docker build has no data to prerender from.
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Data matrix — Inleverpuntenviewer',
@@ -38,7 +42,7 @@ async function loadMatrix(): Promise<{
   grandTotal: number;
   generatedAt: string | null;
 }> {
-  const statsPath = path.join(process.cwd(), 'public', 'data', 'statistics.json');
+  const statsPath = dataFile('statistics.json');
 
   try {
     const stats: StatisticsFile = JSON.parse(await fs.readFile(statsPath, 'utf-8'));

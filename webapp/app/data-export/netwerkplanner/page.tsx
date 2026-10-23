@@ -1,8 +1,12 @@
 import { promises as fs } from 'fs';
-import path from 'path';
 
 import NetworkPlanner from '@/components/analyse/NetworkPlanner';
 import type { NetworkIndexEntry } from '@/lib/inleverpuntNetwork';
+import { dataFile } from '@/lib/dataPaths';
+
+// Read from disk per request: the worker rewrites the data weekly without a
+// rebuild, and the Docker build has no data to prerender from.
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Netwerkplanner — Inleverpunten',
@@ -12,9 +16,7 @@ export const metadata = {
 
 async function getIndex(): Promise<Record<string, NetworkIndexEntry> | null> {
   try {
-    const file = path.join(
-      process.cwd(), 'public', 'data', 'inleverpunt_network', 'index.json'
-    );
+    const file = dataFile('inleverpunt_network', 'index.json');
     return JSON.parse(await fs.readFile(file, 'utf-8'));
   } catch {
     return null;

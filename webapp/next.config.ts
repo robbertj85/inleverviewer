@@ -1,37 +1,20 @@
 import type { NextConfig } from 'next';
 
+// Served under a path prefix behind the reverse proxy (see deploy/), e.g.
+// NEXT_PUBLIC_BASE_PATH=/inleverpuntenviewer. Empty for local dev.
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || undefined;
+
+// Optional self-hosted Umami analytics: allow its origin in the CSP.
+const UMAMI_ORIGIN = process.env.NEXT_PUBLIC_UMAMI_SRC
+  ? new URL(process.env.NEXT_PUBLIC_UMAMI_SRC).origin
+  : '';
+
 const nextConfig: NextConfig = {
-  /*
-   * The API and download routes read GeoJSON straight off disk at request
-   * time. Next's dependency tracer cannot see those reads (the filename is
-   * built from a request parameter), so the data has to be declared here or
-   * the routes 404 on Vercel while working fine locally.
-   *
-   * Scoped per route so the ~32 MB of GeoJSON only lands in the two functions
-   * that actually need it.
-   */
-  outputFileTracingIncludes: {
-    '/api/download': ['./public/data/**/*.geojson'],
-    '/api/v1/municipality/[identifier]': [
-      './public/data/**/*.geojson',
-      './public/municipalities.json',
-    ],
-    '/api/v1/municipalities': [
-      './public/municipalities.json',
-      './public/data/summary.json',
-    ],
-    // The analysis tabs are server components that read their dataset with
-    // fs.readFile. The tracer follows literal paths fine, but these files are
-    // large enough that leaving them out is tempting — don't: without an entry
-    // here the page 404s in production while working locally, the same way the
-    // dynamic API routes do.
-    '/data-export/bereik': ['./public/data/population_coverage.json'],
-    '/data-export/schatting': ['./public/data/pc4_stats.json'],
-    '/data-export/suggesties': ['./public/data/placement_suggestions.json'],
-    '/data-export/netwerkplanner': [
-      './public/data/inleverpunt_network/index.json',
-    ],
-  },
+  basePath,
+  // Self-contained server bundle for the Docker image (deploy/Dockerfile.web).
+  // The data is not in it: server code reads it from INLEVER_PUBLIC_DIR (see
+  // lib/dataPaths.ts) and nginx serves /data/* straight off the volume.
+  output: 'standalone',
 
   async headers() {
     /*
@@ -40,21 +23,20 @@ const nextConfig: NextConfig = {
      *  - cartocdn.com, tile.openstreetmap.org, service.pdok.nl
      *                    basemap tiles, one host per entry in lib/basemaps.ts;
      *                    markers are divIcons, so no icon CDN
-     *  - va.vercel-scripts.com  Vercel Analytics
+     *  - the Umami origin, only when NEXT_PUBLIC_UMAMI_SRC is set
      * The OpenAPI spec and the fonts are same-origin (next/font self-hosts).
      *
      * 'unsafe-inline' and 'unsafe-eval' are Next's and Redoc's requirements,
      * not ours. Dropping them means moving to a nonce-based policy.
      */
-    const scriptSrc =
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.redoc.ly https://va.vercel-scripts.com";
+    const scriptSrc = `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.redoc.ly ${UMAMI_ORIGIN}`;
 
     const sharedCsp = [
       "default-src 'self'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://tile.openstreetmap.org https://service.pdok.nl",
       "font-src 'self' data:",
-      "connect-src 'self' https://va.vercel-scripts.com",
+      `connect-src 'self' ${UMAMI_ORIGIN}`,
       // Redoc runs its search indexer in a blob worker.
       "worker-src 'self' blob:",
       "child-src 'self' blob:",
@@ -67,6 +49,15 @@ const nextConfig: NextConfig = {
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
       { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+    ];
+
+    const pageHeaders = [
+      ...securityHeaders,
+      { key: 'X-Frame-Options', value: 'DENY' },
+      {
+        key: 'Content-Security-Policy',
+        value: [...sharedCsp, scriptSrc, "frame-ancestors 'none'"].join('; '),
+      },
     ];
 
     return [
@@ -102,23 +93,17 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               ...sharedCsp,
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+              `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${UMAMI_ORIGIN}`,
               'frame-ancestors *',
             ].join('; '),
           },
         ],
       },
-      {
-        source: '/((?!embed).*)',
-        headers: [
-          ...securityHeaders,
-          { key: 'X-Frame-Options', value: 'DENY' },
-          {
-            key: 'Content-Security-Policy',
-            value: [...sharedCsp, scriptSrc, "frame-ancestors 'none'"].join('; '),
-          },
-        ],
-      },
+      { source: '/((?!embed).*)', headers: pageHeaders },
+      // Under a basePath the pattern above becomes "/inleverpuntenviewer/(...)"
+      // and no longer matches the bare root, which would then go out with no
+      // CSP or frame protection at all.
+      ...(basePath ? [{ source: '/', headers: pageHeaders }] : []),
     ];
   },
 };

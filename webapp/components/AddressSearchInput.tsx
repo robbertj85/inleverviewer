@@ -5,6 +5,7 @@ import { Loader2Icon, MapPinIcon, SearchIcon, XIcon } from 'lucide-react';
 
 import { Municipality } from '@/types/inleverpunten';
 import { cn } from '@/lib/utils';
+import { withBase } from '@/lib/basePath';
 
 interface Suggestion {
   id: string;
@@ -86,7 +87,7 @@ export default function AddressSearchInput({ municipalities, onAddressSelected }
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`/api/geocode?q=${encodeURIComponent(needle)}`, {
+        const response = await fetch(withBase(`/api/geocode?q=${encodeURIComponent(needle)}`), {
           signal: controller.signal,
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -127,7 +128,7 @@ export default function AddressSearchInput({ municipalities, onAddressSelected }
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/geocode?id=${encodeURIComponent(suggestion.id)}`, {
+      const response = await fetch(withBase(`/api/geocode?id=${encodeURIComponent(suggestion.id)}`), {
         signal: controller.signal,
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);

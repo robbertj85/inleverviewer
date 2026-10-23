@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { BASE_PATH } from '@/lib/basePath';
 
 interface Props {
   isOpen: boolean;
@@ -78,8 +79,8 @@ export default function ShareModal({
   // 'nederland' is exposed as 'alle-gemeenten' in URLs — it reads better and
   // matches the convention used by the pakketpunten viewer.
   const urlSlug = municipality === 'nederland' ? 'alle-gemeenten' : municipality;
-  const shareUrl = `${origin}/?gemeente=${urlSlug}`;
-  const embedUrl = `${origin}/embed?gemeente=${urlSlug}`;
+  const shareUrl = `${origin}${BASE_PATH || '/'}?gemeente=${urlSlug}`;
+  const embedUrl = `${origin}${BASE_PATH}/embed?gemeente=${urlSlug}`;
   const embedCode = `<iframe src="${embedUrl}" width="100%" height="600" style="border:0;border-radius:12px" loading="lazy" title="Inleverpunten ${municipalityName}"></iframe>`;
 
   return (

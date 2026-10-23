@@ -1,5 +1,4 @@
 import { promises as fs } from 'fs';
-import path from 'path';
 
 import RegressionReport, {
   type RegressionPayload,
@@ -7,6 +6,11 @@ import RegressionReport, {
 } from '@/components/analyse/RegressionReport';
 import { FEATURE_DEFS } from '@/lib/regressionFeatures';
 import type { ModelTarget, Pc4StatsPayload } from '@/types/analyse';
+import { dataFile } from '@/lib/dataPaths';
+
+// Read from disk per request: the worker rewrites the data weekly without a
+// rebuild, and the Docker build has no data to prerender from.
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Schatting inleverpunten — Inleverpunten',
@@ -33,7 +37,7 @@ function round(value: unknown, digits = 2): number | null {
 async function getPayload(): Promise<RegressionPayload | null> {
   let stats: Pc4StatsPayload;
   try {
-    const file = path.join(process.cwd(), 'public', 'data', 'pc4_stats.json');
+    const file = dataFile('pc4_stats.json');
     stats = JSON.parse(await fs.readFile(file, 'utf-8')) as Pc4StatsPayload;
   } catch {
     return null;

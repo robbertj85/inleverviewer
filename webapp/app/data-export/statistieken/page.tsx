@@ -1,7 +1,11 @@
 import fs from 'fs/promises';
-import path from 'path';
 
 import StatisticsClient, { StatisticsPayload } from '@/components/StatisticsClient';
+import { dataFile } from '@/lib/dataPaths';
+
+// Read from disk per request: the worker rewrites the data weekly without a
+// rebuild, and the Docker build has no data to prerender from.
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Statistieken — Inleverpuntenviewer',
@@ -11,7 +15,7 @@ export const metadata = {
 
 async function loadStatistics(): Promise<StatisticsPayload | null> {
   try {
-    const filePath = path.join(process.cwd(), 'public', 'data', 'statistics.json');
+    const filePath = dataFile('statistics.json');
     return JSON.parse(await fs.readFile(filePath, 'utf-8'));
   } catch {
     return null;

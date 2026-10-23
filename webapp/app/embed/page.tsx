@@ -11,6 +11,7 @@ import {
   Filters,
   InleverpuntData,
 } from '@/types/inleverpunten';
+import { withBase } from '@/lib/basePath';
 
 const MapView = dynamic(() => import('@/components/Map'), {
   ssr: false,
@@ -60,7 +61,7 @@ function EmbedContent() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`/data/${gemeente}.geojson`)
+    fetch(withBase(`/data/${gemeente}.geojson`))
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Municipality } from '@/types/inleverpunten';
+import { withBase } from '@/lib/basePath';
 
 type Status = { kind: 'ok' | 'warn' | 'error'; message: string } | null;
 
@@ -18,13 +19,13 @@ export default function DownloadsPage() {
   const [totals, setTotals] = useState<{ points: number; municipalities: number } | null>(null);
 
   useEffect(() => {
-    fetch('/municipalities.json')
+    fetch(withBase('/municipalities.json'))
       .then((res) => res.json())
       .then(setMunicipalities)
       .catch((error) => console.error('Kon gemeentelijst niet laden:', error));
 
     // The batch summary is cheaper to read than the 11 MB national GeoJSON.
-    fetch('/data/summary.json')
+    fetch(withBase('/data/summary.json'))
       .then((res) => res.json())
       .then((summary) =>
         setTotals({
@@ -53,7 +54,7 @@ export default function DownloadsPage() {
     setStatus(null);
 
     try {
-      const response = await fetch(`/api/download?slug=${slug}&format=${format}`);
+      const response = await fetch(withBase(`/api/download?slug=${slug}&format=${format}`));
 
       if (response.status === 429) {
         setStatus({
@@ -207,7 +208,7 @@ export default function DownloadsPage() {
           <p className="font-medium">Downloadlimiet en hergebruik</p>
           <p className="mt-1 text-muted-foreground">
             Maximaal 10 downloads per uur per IP-adres. Dezelfde data is ook beschikbaar via de{' '}
-            <a href="/api/v1/docs" className="text-primary hover:underline">
+            <a href={withBase('/api/v1/docs')} className="text-primary hover:underline">
               API
             </a>
             . Vermeld bij hergebruik de oorspronkelijke bronnen: Statiegeld Nederland (Verpact),

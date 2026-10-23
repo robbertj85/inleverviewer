@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import { withBase } from '@/lib/basePath';
 
 export const metadata: Metadata = {
   title: 'API-documentatie — Inleverpunten API',
@@ -28,7 +29,7 @@ export default function ApiDocsPage() {
       {/* Redoc renders the spec into this custom element once its bundle loads. */}
       <div
         dangerouslySetInnerHTML={{
-          __html: `<redoc spec-url="/openapi.yaml" theme='${theme}' expand-responses="200" required-props-first="true" hide-download-button="false"></redoc>`,
+          __html: `<redoc spec-url="${withBase('/openapi.yaml')}" theme='${theme}' expand-responses="200" required-props-first="true" hide-download-button="false"></redoc>`,
         }}
       />
       <Script

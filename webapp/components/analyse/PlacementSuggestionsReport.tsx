@@ -18,6 +18,7 @@ import {
   subscribeMunicipality,
 } from '@/lib/municipalityStore';
 import { nlInt, nlNum, nlPct } from '@/types/analyse';
+import { withBase } from '@/lib/basePath';
 
 const SuggestionMap = dynamic(() => import('@/components/analyse/SuggestionMap'), {
   ssr: false,
@@ -174,7 +175,7 @@ export default function PlacementSuggestionsReport({
     if (!slug) return;
     setStoredMunicipality(slug);
     let cancelled = false;
-    fetch(`/data/${slug}.geojson`)
+    fetch(withBase(`/data/${slug}.geojson`))
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (cancelled) return;

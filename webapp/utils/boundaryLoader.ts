@@ -7,6 +7,7 @@
  */
 
 import { InleverpuntFeature } from '@/types/inleverpunten';
+import { withBase } from '@/lib/basePath';
 
 export interface BoundaryLoadProgress {
   loaded: number;
@@ -36,8 +37,8 @@ export interface LoadedBoundaries {
   };
 }
 
-const INDEX_URL = '/data/boundaries/index.json';
-const BASE_URL = '/data/boundaries';
+const INDEX_URL = withBase('/data/boundaries/index.json');
+const BASE_URL = withBase('/data/boundaries');
 
 export async function loadProvincialBoundaries(
   onProgress?: (progress: BoundaryLoadProgress) => void

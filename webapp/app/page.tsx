@@ -43,6 +43,7 @@ import {
   subscribeBasemap,
 } from '@/lib/basemapStore';
 import { cn } from '@/lib/utils';
+import { withBase } from '@/lib/basePath';
 
 const MapView = dynamic(() => import('@/components/Map'), {
   ssr: false,
@@ -120,7 +121,7 @@ export default function Home() {
 
   // ---- Load the municipality index -------------------------------------
   useEffect(() => {
-    fetch('/municipalities.json')
+    fetch(withBase('/municipalities.json'))
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -168,7 +169,7 @@ export default function Home() {
 
     let cancelled = false;
 
-    fetch(`/data/${selected}.geojson`)
+    fetch(withBase(`/data/${selected}.geojson`))
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();

@@ -1,9 +1,13 @@
 import { promises as fs } from 'fs';
-import path from 'path';
 
 import PlacementSuggestionsReport, {
   type PlacementSuggestionsPayload,
 } from '@/components/analyse/PlacementSuggestionsReport';
+import { dataFile } from '@/lib/dataPaths';
+
+// Read from disk per request: the worker rewrites the data weekly without a
+// rebuild, and the Docker build has no data to prerender from.
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Plaatsingsadvies — Inleverpunten',
@@ -13,9 +17,7 @@ export const metadata = {
 
 async function getPayload(): Promise<PlacementSuggestionsPayload | null> {
   try {
-    const file = path.join(
-      process.cwd(), 'public', 'data', 'placement_suggestions.json'
-    );
+    const file = dataFile('placement_suggestions.json');
     return JSON.parse(await fs.readFile(file, 'utf-8')) as PlacementSuggestionsPayload;
   } catch {
     return null;

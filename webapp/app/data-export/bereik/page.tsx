@@ -1,8 +1,12 @@
 import { promises as fs } from 'fs';
-import path from 'path';
 
 import PopulationReachReport from '@/components/analyse/PopulationReachReport';
 import type { PopulationCoveragePayload } from '@/types/analyse';
+import { dataFile } from '@/lib/dataPaths';
+
+// Read from disk per request: the worker rewrites the data weekly without a
+// rebuild, and the Docker build has no data to prerender from.
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Bereik inwoners — Inleverpunten',
@@ -12,7 +16,7 @@ export const metadata = {
 
 async function getPayload(): Promise<PopulationCoveragePayload | null> {
   try {
-    const file = path.join(process.cwd(), 'public', 'data', 'population_coverage.json');
+    const file = dataFile('population_coverage.json');
     return JSON.parse(await fs.readFile(file, 'utf-8')) as PopulationCoveragePayload;
   } catch {
     return null;

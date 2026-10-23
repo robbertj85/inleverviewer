@@ -1,8 +1,8 @@
 import fs from 'fs';
-import path from 'path';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { checkRateLimit, clientIp } from '@/lib/rateLimit';
+import { dataFile } from '@/lib/dataPaths';
 
 const RATE_LIMIT = 10;
 const RATE_WINDOW_MS = 60 * 60 * 1000;
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse('Ongeldige gemeente-slug', { status: 400 });
   }
 
-  const filePath = path.join(process.cwd(), 'public', 'data', `${slug}.geojson`);
+  const filePath = dataFile(`${slug}.geojson`);
 
   if (!fs.existsSync(filePath)) {
     return new NextResponse('Gemeente niet gevonden', { status: 404 });

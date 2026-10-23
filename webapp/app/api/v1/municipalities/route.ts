@@ -1,8 +1,9 @@
 import fs from 'fs';
-import path from 'path';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { checkRateLimit, clientIp } from '@/lib/rateLimit';
+import { dataFile, publicFile } from '@/lib/dataPaths';
+import { withBase } from '@/lib/basePath';
 
 /**
  * GET /api/v1/municipalities
@@ -12,7 +13,7 @@ import { checkRateLimit, clientIp } from '@/lib/rateLimit';
  * endpoint.
  */
 
-const RATE_LIMIT = 60;
+const RATE_LIMIT = 240;
 const RATE_WINDOW_MS = 60 * 60 * 1000;
 
 const CORS_HEADERS = {
@@ -51,8 +52,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const publicDir = path.join(process.cwd(), 'public');
-  const indexPath = path.join(publicDir, 'municipalities.json');
+  const indexPath = publicFile('municipalities.json');
 
   if (!fs.existsSync(indexPath)) {
     return NextResponse.json(
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
 
   // Point counts come from the batch summary; missing summary is not fatal.
   const counts = new Map<string, number>();
-  const summaryPath = path.join(publicDir, 'data', 'summary.json');
+  const summaryPath = dataFile('summary.json');
   if (fs.existsSync(summaryPath)) {
     try {
       const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf-8'));
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
   const payload = municipalities.map((municipality) => ({
     ...municipality,
     total_points: counts.get(municipality.slug) ?? null,
-    url: `/api/v1/municipality/${municipality.slug}`,
+    url: withBase(`/api/v1/municipality/${municipality.slug}`),
   }));
 
   return NextResponse.json(
