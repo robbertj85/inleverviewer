@@ -3,6 +3,8 @@ Data worker for the VPS deployment (replaces .github/workflows/update-data.yml).
 
     python deploy/scheduler.py serve              long-running: weekly run on a schedule
     python deploy/scheduler.py run                one weekly run, now
+    python deploy/scheduler.py analyse [--all]    only the analysis layers, now;
+                                                  --all recomputes every network plan
     python deploy/scheduler.py run-script scripts/suggest_placements.py [args]
                                                   one script, published the same way
     python deploy/scheduler.py seed < data.tar.gz fill missing files from a git archive
@@ -20,6 +22,10 @@ plain open("w"). So a run never touches the live tree: it copies `current` to a
 new release, points INLEVER_PUBLIC_DIR at the copy, and only when every
 required step succeeded swaps the `current` symlink in one rename. A failed
 run leaves the previous dataset live and the half-built release is deleted.
+
+After the points, the weekly run rebuilds the analysis layers for every
+municipality (deploy/analysis_stage.py), recomputing the expensive network
+plans only where a municipality's inputs changed.
 """
 
 from __future__ import annotations
@@ -36,6 +42,8 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
+
+from analysis_stage import AnalysisStage
 
 APP_DIR = Path(__file__).resolve().parent.parent
 SITE_DIR = Path(os.environ.get("INLEVER_SITE_DIR", "/srv/inlever/site"))
@@ -63,6 +71,9 @@ FETCHES = [
     ("scripts/open_fetch_all.py", 30, "StichtingOPEN"),
     ("scripts/droppie_fetch_all.py", 5, "Droppie"),
     ("scripts/statiedrive_fetch_all.py", 5, "StatieDrive"),
+    # Only the network planner's combi mode reads this; a failed download
+    # keeps the previous file.
+    ("scripts/fetch_pakketpunten.py", 5, "Pakketpunten"),
 ]
 GENERATE = [
     ("scripts/batch_generate.py", 30),
@@ -211,6 +222,10 @@ def weekly_run() -> None:
             for script, timeout in GENERATE:
                 if run_step(script, timeout, staging):
                     raise StepFailed(script)
+
+            # Optional: a failure keeps last week's layers and still publishes.
+            analysis_anomalies, commit_analysis = analysis_stage().run(staging)
+            anomalies += analysis_anomalies
         except BaseException as error:
             shutil.rmtree(staging, ignore_errors=True)
             log(f"✗ run aborted ({error}); previous dataset stays live")
@@ -220,12 +235,35 @@ def weekly_run() -> None:
             raise
 
         release = publish(staging)
+        commit_analysis()
         backup_history(release)
         save_state(last_success=started.isoformat(), last_release=release.name, anomalies=anomalies)
         summary = release / "data" / "summary.json"
         if summary.exists():
             data = json.loads(summary.read_text())
             log(f"{data.get('total_points')} points in {data.get('total_municipalities')} municipalities")
+
+
+def analysis_stage() -> AnalysisStage:
+    return AnalysisStage(APP_DIR, DATA_DIR, CURRENT, run_step, log)
+
+
+def analyse(force_all: bool) -> None:
+    """Only the analysis layers, on the live points, published like a run."""
+    with worker_lock():
+        if not CURRENT.exists():
+            raise SystemExit("no published dataset to analyse yet")
+        staging = stage_release()
+        try:
+            anomalies, commit = analysis_stage().run(staging, force_all=force_all)
+        except BaseException:
+            shutil.rmtree(staging, ignore_errors=True)
+            raise
+        if anomalies:
+            shutil.rmtree(staging, ignore_errors=True)
+            raise SystemExit(f"analysis failed ({' '.join(anomalies)}); nothing published")
+        publish(staging)
+        commit()
 
 
 def run_script(script: str, args: list[str]) -> None:
@@ -295,9 +333,9 @@ def overdue() -> bool:
 def serve() -> None:
     log(f"worker up; site {SITE_DIR}, data {DATA_DIR}")
     if not CURRENT.exists():
-        # The analysis layers are not produced by the weekly run, so an empty
-        # volume waits for deploy/seed-data.sh (which runs `seed`) rather than
-        # building a dataset with half its tabs missing.
+        # An empty volume waits for deploy/seed-data.sh (which runs `seed`):
+        # it brings the hand-made inputs along (CBS PC4 tables, polygon cache)
+        # that the analysis stage needs next to the weekly fetches.
         log("no published dataset yet: waiting for deploy/seed-data.sh")
     due = next_run(datetime.now(TZ))
     log(f"next run {due:%a %Y-%m-%d %H:%M %Z}")
@@ -318,6 +356,8 @@ def main(argv: list[str]) -> None:
         serve()
     elif command == "run":
         weekly_run()
+    elif command == "analyse":
+        analyse(force_all="--all" in argv[1:])
     elif command == "run-script" and len(argv) >= 2:
         run_script(argv[1], argv[2:])
     elif command == "seed":

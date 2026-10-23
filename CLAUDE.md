@@ -96,10 +96,14 @@ for returns per inhabitant per year per stream. `CAPACITY_DEFAULTS` in
 number and a list of registers still to consult, and the UI labels it as such.
 Do not quietly promote these to facts.
 
-**Pakketpunten data is a snapshot, not a feed.** `data/pakketpunten_snapshot.geojson`
-is a copy of `nederland.geojson` from `../pakketpunten-analyse`, carrying a
-`snapshot_date` in its metadata. The combi mode of the network planner reads it;
-the UI states the date. Refreshing means copying the file again.
+**Pakketpunten data is fetched weekly, from a static file.**
+`scripts/fetch_pakketpunten.py` downloads `pakketpuntenviewer.nl/data/nederland.geojson`
+(regenerated there every Monday morning) into `data/pakketpunten_snapshot.geojson`.
+Use that static file, never the pakketpuntenviewer's `/api/v1` routes: those
+allow 15 requests/hour. `bezettingsgraad` is dropped on download because the
+source generates it randomly. The combi mode of the network planner reads the
+file; the UI states the source date. The same 20% shrink guard as
+`cache_guard.py` applies (exit 2, old file kept).
 
 **Slugs come from one place.** `utils.slugify`, and for POI bundles straight off
 the `slug` field in the provincial boundary files. The sister project derives

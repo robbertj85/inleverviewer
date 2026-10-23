@@ -9,7 +9,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY *.py ./
 COPY scripts/ scripts/
-COPY deploy/scheduler.py deploy/scheduler.py
+COPY deploy/scheduler.py deploy/analysis_stage.py deploy/
 ENV TZ=Europe/Amsterdam PYTHONUNBUFFERED=1 \
     INLEVER_SITE_DIR=/srv/inlever/site \
     INLEVER_DATA_DIR=/srv/inlever/data

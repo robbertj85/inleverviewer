@@ -94,9 +94,9 @@ test.describe('Analysetabs', () => {
 
     await page.getByRole('button', { name: 'Inleverpunt + pakketpunt' }).click();
 
-    // The snapshot disclaimer is not decoration: the parcel data comes from
-    // another repository and the UI has to say so.
-    await expect(page.getByText(/momentopname/)).toBeVisible();
+    // The provenance note is not decoration: the parcel data comes from
+    // another project, as of a stated date, and the UI has to say so.
+    await expect(page.getByText(/De pakketpuntendata komt uit/)).toBeVisible();
     await expect(page.getByRole('button', { name: /Synergie/ })).toBeVisible();
   });
 });

@@ -13,7 +13,8 @@ NPM (prototype.transportlab.app)
         └─ de rest                                             -> app-inleverpuntenviewer:3000 (Next.js)
                                                                   └─ API's en analysepagina's lezen inlever-site/current
 worker (deploy/scheduler.py)
-  └─ maandag 04:00   grenzen -> 5 bronnen -> GeoJSON -> statistieken -> totalenhistorie
+  └─ maandag 04:00   grenzen -> 5 bronnen + pakketpunten -> GeoJSON -> statistieken
+                     -> totalenhistorie -> analyselagen (alle 342 gemeenten)
                      in een kopie van current; bij succes current in één keer omgezet
 ```
 
@@ -38,6 +39,8 @@ Wat er anders is dan op Vercel:
 | `Dockerfile.web` | Next.js standalone, gebouwd met `NEXT_PUBLIC_BASE_PATH=/inleverpuntenviewer` |
 | `Dockerfile.worker` | Python 3.12 + geopandas, start `scheduler.py serve` |
 | `scheduler.py` | wekelijkse run, losse scripts, seed (zie docstring) |
+| `analysis_stage.py` | analyselagen als stap van de wekelijkse run (zie hieronder) |
+| `push-analysis-inputs.sh` | eenmalig: CBS 100 m-raster naar het data-volume |
 | `seed-data.sh` | eenmalig: data uit git → volumes (incl. analyselagen) |
 | `pull-data.sh` | live dataset → je lokale `webapp/public` |
 | `reload-proxy.sh` | NPM herladen na een redeploy (zie hieronder) |
@@ -91,6 +94,31 @@ de rest is opnieuw te maken. De worker bewaart na elke run een kopie in
    inleverpuntenplanner leest standaard `inleverpuntenviewer.vercel.app`
    (`INLEVERPUNTEN_API`); zet die eerst om.
 
+## Analyselagen
+
+Na de punten bouwt de run de analysetabs (bereik, schatting, plaatsingsadvies,
+netwerkplanner, POI's) voor **alle** gemeenten (`analysis_stage.py`):
+
+- **POI's** (Overpass, ~10 min): maandelijks, of zodra een gemeente geen bundel heeft.
+- **Landelijk** (analysepunten, bereik, PC4-tabel, regressiemodel), ~1,5 min: elke week.
+  Het model wordt landelijk gefit, dus elke gemeente schuift mee.
+- **Plaatsingsadvies** (~5 min): elke week, alle gemeenten.
+- **Netwerkplanner**: alleen gemeenten waarvan iets is veranderd: eigen
+  inleverpunten, pakketpunten binnen de grens, POI-bundel, of gedeelde invoer
+  (code, CBS-raster, grenzen). Vingerafdrukken in `inlever-data/analysis-state.json`.
+  Alles opnieuw: `analyse --all` (~30 s op 7 kernen).
+
+Een fout in deze stap houdt de punten niet tegen: de analysebestanden van de vorige
+release worden teruggezet en de run publiceert gewoon (anomalie `analysis:<stap>`).
+
+Pakketpunten (combi-modus) komen elke week van
+`https://pakketpuntenviewer.nl/data/nederland.geojson` (statisch, geen rate limit;
+`scripts/fetch_pakketpunten.py`). Die wordt daar maandagochtend vernieuwd, na onze
+run van 04:00, dus we lopen een week achter.
+
+Eenmalig nodig, want geen script haalt het op: `./deploy/push-analysis-inputs.sh`
+(CBS 100 m-raster, 85 MB). Zonder dat bestand wordt de stap overgeslagen.
+
 ## Dagelijks gebruik
 
 - Nieuwe code: push naar `main` (Coolify deployt) of *Redeploy* in Coolify. Data-volumes blijven staan.
@@ -100,6 +128,7 @@ de rest is opnieuw te maken. De worker bewaart na elke run een kopie in
 - Logs: Coolify → resource → *Logs* → `worker`, of
   `ssh hetzner docker logs -f worker-inleverpuntenviewer`.
 - Run nu: `docker exec worker-inleverpuntenviewer python deploy/scheduler.py run`.
+- Alleen de analyselagen: `docker exec worker-inleverpuntenviewer python deploy/scheduler.py analyse [--all]`.
 - Eén analysescript opnieuw (ook via een kopie, dus atomair):
   `docker exec worker-inleverpuntenviewer python deploy/scheduler.py run-script scripts/suggest_placements.py`.
   De invoer daarvan (CBS-gpkg, OV-data) is gitignored en staat niet in de seed;

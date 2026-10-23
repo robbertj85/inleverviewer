@@ -141,33 +141,38 @@ Deze draaien op dezelfde GeoJSON's plus drie externe datasets: het CBS
 100 m-vierkantstatistiekraster, de PC4-polygonen en OpenStreetMap-POI's. De
 eerste twee stappen zijn eenmalig en de resultaten worden gecached.
 
+Op de VPS doet de wekelijkse run dit allemaal zelf, voor alle 342 gemeenten
+(`deploy/analysis_stage.py`, zie `deploy/README.md`). Met de hand:
+
 ```bash
 # Eenmalige inputs (groot, gitignored, regenereerbaar)
 python scripts/fetch_pois.py                        # Overpass, ~10 min voor alles
-python scripts/split_pois_by_municipality.py --only pilot
+python scripts/split_pois_by_municipality.py --only all
+python scripts/fetch_pakketpunten.py                # landelijk pakketpuntenbestand
 
 # 1. Analysebestand: de per-gemeente GeoJSON's samengevoegd, mét
 #    gemeenteBeperking (die het landelijke bestand bewust weglaat)
 python scripts/build_analysis_points.py
 
-# 2. Bereik van inwoners (landelijk, ~40 s)
+# 2. Bereik van inwoners (landelijk, ~1,5 min)
 python scripts/compute_population_coverage.py
 
 # 3. PC4-tabel en regressiemodellen (landelijk)
 python scripts/build_pc4_stats.py
 python scripts/fit_pc4_model.py
 
-# 4. Plaatsingsadvies en netwerkplanner (per gemeente)
-python scripts/suggest_placements.py --only pilot
-python scripts/plan_inleverpunt_network.py --only pilot
+# 4. Plaatsingsadvies (alle gemeenten, ~5 min) en netwerkplanner (per gemeente)
+python scripts/suggest_placements.py --only all
+python scripts/plan_inleverpunt_network.py --only all --jobs 7   # ~30 s op 7 kernen
 
-# Landelijk uitrollen: vervang --only pilot door --only all
+# Of alleen de pilotset: --only pilot
 ```
 
-De combi-modus van de netwerkplanner leest
-`data/pakketpunten_snapshot.geojson`, een momentopname van de
-convenant-pakketpuntenviewer. Verversen betekent dat bestand opnieuw kopiëren;
-de datum in de metadata wordt in de UI getoond.
+De combi-modus van de netwerkplanner leest `data/pakketpunten_snapshot.geojson`,
+dat `scripts/fetch_pakketpunten.py` ophaalt van de pakketpuntenviewer
+(`https://pakketpuntenviewer.nl/data/nederland.geojson`, een statisch bestand
+dat elke maandagochtend opnieuw wordt gegenereerd). De datum van de bron staat
+in de UI.
 
 ---
 
@@ -294,8 +299,8 @@ Voor de analyselagen komt daar bij:
   inwoner per jaar per stroom; de UI labelt ze als aanname en noemt de registers
   die nog geraadpleegd moeten worden (Afvalfonds Verpakkingen, Stichting OPEN,
   Stibat).
-- De **pakketpuntendata** in de combi-modus is een momentopname uit een andere
-  repository, geen live koppeling. De datum staat in de UI.
+- De **pakketpuntendata** in de combi-modus komt uit de pakketpuntenviewer en
+  wordt wekelijks opgehaald; de datum van de bron staat in de UI.
 - De **POI's** komen uit OpenStreetMap en zijn dus zo compleet als de
   vrijwilligers in dat gebied. Bus- en tramhaltes staan standaard uit als
   kandidaat: ze vormen veruit het dichtste raster en zouden het greedy-resultaat

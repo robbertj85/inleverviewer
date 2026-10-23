@@ -261,8 +261,9 @@ METHODOLOGY = {
         "die beide fysiek kunnen huisvesten (combi_geschikt)"
     ),
     "combi_databron": (
-        "pakketpunten uit een momentopname van de convenant-pakketpuntenviewer "
-        "(data/pakketpunten_snapshot.geojson) — geen live koppeling"
+        "pakketpunten uit het landelijke bestand van de pakketpuntenviewer "
+        "(pakketpuntenviewer.nl/data/nederland.geojson), wekelijks opgehaald door "
+        "scripts/fetch_pakketpunten.py naar data/pakketpunten_snapshot.geojson"
     ),
 }
 
@@ -317,7 +318,7 @@ def load_existing_points(slugs: set[str]) -> dict:
 
 
 def load_pakketpunten(boundaries: dict) -> dict:
-    """Parcel points per municipality, from the snapshot copied into this repo.
+    """Parcel points per municipality, from scripts/fetch_pakketpunten.py's download.
 
     Attributed by point-in-polygon against the same boundaries the demand grid
     is clipped to, so a parcel point and an inhabitant are assigned to the same

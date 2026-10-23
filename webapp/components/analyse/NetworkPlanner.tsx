@@ -339,7 +339,7 @@ export default function NetworkPlanner({
             {
               value: 'combi',
               label: 'Inleverpunt + pakketpunt',
-              title: 'Combineert deze dataset met een momentopname van de pakketpuntenviewer.',
+              title: 'Combineert deze dataset met de pakketpunten uit de pakketpuntenviewer.',
             },
           ]}
         />
@@ -367,12 +367,12 @@ export default function NetworkPlanner({
         <>
           {mode === 'combi' && payload.pakketpunten_snapshot && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-              De pakketpuntendata is een <strong>momentopname</strong> uit de
-              convenant-pakketpuntenviewer van{' '}
+              De pakketpuntendata komt uit de <strong>pakketpuntenviewer</strong>, stand{' '}
               {payload.pakketpunten_snapshot.snapshot_date ?? 'onbekende datum'} (
               {nlInt(payload.pakketpunten_snapshot.total_points ?? 0)} punten landelijk,{' '}
-              {nlInt(payload.existing_pakketpunten)} in deze gemeente). Geen live
-              koppeling: bij een verversing moet het bestand opnieuw worden gekopieerd.
+              {nlInt(payload.existing_pakketpunten)} in deze gemeente). Wordt wekelijks
+              opnieuw opgehaald; dit netwerk wordt dan herberekend als de punten in deze
+              gemeente zijn veranderd.
             </div>
           )}
 
