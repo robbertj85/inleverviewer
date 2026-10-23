@@ -5,7 +5,8 @@ Nederland** — statiegeld, batterijen, elektrische apparaten en gemeentelijke
 milieustraten — bestaande uit een Python-backend voor dataverzameling en een
 Next.js-webapp voor interactieve kaartvisualisatie.
 
-De data wordt elke maandagnacht automatisch bijgewerkt via GitHub Actions, voor alle
+Draait op https://prototype.transportlab.app/inleverpuntenviewer. De data wordt elke
+maandagnacht automatisch bijgewerkt door een worker op de server, voor alle
 **342 Nederlandse gemeenten**.
 
 **Disclaimer** — Dit project wordt geleverd "as is", zonder garantie. De data is
@@ -245,10 +246,14 @@ Geen sleutel nodig; rate limits staan in de OpenAPI-spec.
 
 ## Wekelijkse update
 
-`.github/workflows/update-data.yml` draait elke maandag om 02:00 UTC, en is ook
-handmatig te starten via *workflow_dispatch*. De workflow haalt elke bron los op,
-rapporteert anomalieën, regenereert alle GeoJSON, berekent de statistieken en commit
-het resultaat naar `main`.
+De worker (`deploy/scheduler.py`) draait elke maandag om 04:00 Nederlandse tijd
+dezelfde stappen als de vroegere GitHub Action: grenzen, de vijf bronnen los
+(een anomalie houdt de vorige cache aan), GeoJSON, statistieken en de
+totalenhistorie. Het resultaat gaat niet meer via git: de worker bouwt een nieuwe
+release op het volume en zet die in één keer live. Zie `deploy/README.md`.
+
+Gegenereerde data staat daarom niet meer in de repo. Lokaal ontwikkelen tegen de
+live data: `./deploy/pull-data.sh`.
 
 ---
 

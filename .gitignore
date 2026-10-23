@@ -31,8 +31,12 @@ blob-report/
 .env.local
 .env*.local
 
-# Large generated artefacts that are rebuilt from cache
-webapp/public/data/nederland-boundaries.geojson
+# Generated data. Since the move to the VPS the worker writes it straight to a
+# volume (deploy/README.md); it no longer goes through git. Locally:
+# ./deploy/pull-data.sh, or run the pipeline.
+/data/
+webapp/public/data/
+webapp/public/municipalities.json
 
 # Analysis inputs: large raw downloads, all regenerable via their fetch script.
 # The derived per-PC4 / per-municipality artefacts they feed ARE committed.

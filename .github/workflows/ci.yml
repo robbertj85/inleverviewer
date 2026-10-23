@@ -4,12 +4,6 @@ on:
   push:
     branches: [main]
   pull_request:
-  # The weekly data run rewrites every GeoJSON file, so the data-integrity
-  # tests are worth running against the result rather than only against code
-  # changes.
-  workflow_run:
-    workflows: ['Update inleverpunten data']
-    types: [completed]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -25,6 +19,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The data is no longer tracked (the VPS worker writes it to a
+          # volume), but the API and data-integrity tests need a dataset: use
+          # the last one that was committed, from history.
+          fetch-depth: 0
+
+      - name: Restore last committed dataset
+        working-directory: .
+        run: |
+          rev=$(git log -1 --format=%H --diff-filter=AM -- webapp/public/data/summary.json)
+          echo "dataset from $(git log -1 --format='%h %cs' "$rev")"
+          git archive "$rev" webapp/public/data webapp/public/municipalities.json | tar -x
 
       - uses: actions/setup-node@v7
         with:

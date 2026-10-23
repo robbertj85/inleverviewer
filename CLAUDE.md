@@ -138,7 +138,7 @@ is there to catch. PDOK serves no dark topographic style, so "BRT donker" is the
 grijs style put through an inverting CSS filter rather than its own URL.
 
 **`cache_guard.safe_save` exits 2, not 1.** That is the "anomaly, previous cache
-kept" signal the workflow treats as a warning. Do not convert it into a hard failure.
+kept" signal the worker (`deploy/scheduler.py`) treats as a warning. Do not convert it into a hard failure.
 
 **Municipal recycling centres need both sweeps.** The Stichting OPEN endpoint does
 not bbox-filter `municipalityServicePoint` records — it returns the handful
@@ -170,16 +170,39 @@ are normal (a shop with two bins) and are left alone.
 
 ## Deployment
 
-Vercel. The project's **Root Directory must be `webapp`** — the repo root holds the
-Python pipeline and has no `package.json`, so a project left at the default root
-fails the build with "No Next.js version detected". This is a project setting in
-Vercel, not something `vercel.json` can express.
+Coolify on the Hetzner VPS, served at `prototype.transportlab.app/inleverpuntenviewer`
+behind Nginx Proxy Manager. Root `docker-compose.yaml` + `deploy/` (README there).
+`web` (nginx) serves `/data/*` and `municipalities.json` straight off the site
+volume; everything else goes to the Next standalone `app`; `worker` runs the weekly
+pipeline. Generated data is not in git any more.
 
-`next.config.ts` declares `outputFileTracingIncludes` for the data files —
-without it the dynamic API routes 404 in production while working locally, because
-the tracer cannot see reads whose filename comes from a request parameter. The
-four analysis pages that read a dataset server-side have their own entries there
-for the same reason.
+**Server code reads data through `lib/dataPaths.ts`, never `process.cwd()`.** The
+volume is at `INLEVER_PUBLIC_DIR`, and the `/*turbopackIgnore: true*/` hints are
+load-bearing: without them the tracer copies the whole ~90 MB data tree into the
+standalone bundle (196 MB instead of 52 MB).
 
-`NEXT_PUBLIC_SITE_URL` drives canonical URLs, OG tags and embed snippets. Set it
-when a custom domain is attached.
+**Pages that read data server-side are `force-dynamic`.** On Vercel they were
+prerendered and every data commit redeployed. Now the data changes under a running
+server and the Docker build has none, so a prerendered page would be empty forever.
+
+**Every absolute URL goes through `withBase()`** (`lib/basePath.ts`): fetch, plain
+`<a href>`, Redoc's `spec-url`, the `url` fields in API JSON, share/embed links.
+`next/link` does it itself. `openapi.yaml` uses `servers: [{url: ./}]` so it
+resolves under the prefix too.
+
+**Under a basePath, `/((?!embed).*)` no longer matches the bare root**, which is why
+`next.config.ts` adds an explicit `/` header entry when a basePath is set. Without
+it the home page ships with no CSP.
+
+**The worker never writes the live tree.** Each run copies `current` to a new
+release, runs the scripts against it, and swaps the `current` symlink only if
+every required step succeeded. Python paths come from `INLEVER_PUBLIC_DIR` and
+`INLEVER_DATA_DIR` (`utils.py`); never `relative_to` the repo root in a print,
+because on the server the output is outside it.
+
+**The API rate limit is now real.** `lib/rateLimit.ts` is in-memory; on Vercel
+instances recycled and reset it, on one long-lived container they do not. Limits
+were raised to 120/h (municipality) and 240/h (list) for that reason.
+
+`NEXT_PUBLIC_SITE_URL` drives canonical URLs, OG tags and embed snippets; it is a
+build arg in the compose file.
