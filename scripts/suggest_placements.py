@@ -553,7 +553,7 @@ def main() -> int:
         "by_stream": results,
     }
     OUT_PATH.write_text(json.dumps(out, separators=(",", ":"), allow_nan=False))
-    print(f"\n✅ {OUT_PATH.relative_to(Path(__file__).parent.parent)} "
+    print(f"\n✅ {OUT_PATH} "
           f"({OUT_PATH.stat().st_size / 1024:.0f} KB)")
     return 0
 

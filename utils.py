@@ -31,8 +31,14 @@ from shapely import wkt
 from shapely.geometry import shape
 
 PROJECT_ROOT = Path(__file__).parent
-DATA_DIR = PROJECT_ROOT / "data"
-WEBAPP_DATA_DIR = PROJECT_ROOT / "webapp" / "public" / "data"
+# Source caches and analysis inputs (not web-served). On the server this is a
+# volume; see deploy/.
+DATA_DIR = Path(os.environ.get("INLEVER_DATA_DIR") or PROJECT_ROOT / "data")
+# What the webapp serves: municipalities.json at the root, the rest under data/.
+WEBAPP_PUBLIC_DIR = Path(
+    os.environ.get("INLEVER_PUBLIC_DIR") or PROJECT_ROOT / "webapp" / "public"
+)
+WEBAPP_DATA_DIR = WEBAPP_PUBLIC_DIR / "data"
 
 POLYGON_CACHE_FILE = DATA_DIR / "municipality_polygon_cache.json"
 MUNICIPALITIES_FILE = DATA_DIR / "municipalities_all.json"

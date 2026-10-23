@@ -552,7 +552,7 @@ def main() -> int:
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(payload, separators=(",", ":")))
-    print(f"\n✓ {OUTPUT.relative_to(Path(__file__).parent.parent)} "
+    print(f"\n✓ {OUTPUT} "
           f"({OUTPUT.stat().st_size / 1e6:.2f} MB) in {time.time() - t0:.1f}s")
     for subset in SUBSETS:
         print(f"  {subset:<13} 400 m landelijk: "

@@ -28,7 +28,11 @@ from typing import Iterable
 import requests
 
 ROOT = Path(__file__).parent.parent
-OUT_DIR = ROOT / "webapp" / "public" / "data" / "poi"
+sys.path.insert(0, str(ROOT))
+
+from utils import WEBAPP_DATA_DIR  # noqa: E402
+
+OUT_DIR = WEBAPP_DATA_DIR / "poi"
 
 # South, west, north, east — the whole country including the Wadden and
 # Zeeland. Cheaper than an `[area:...]` filter and accurate enough; stray
@@ -412,7 +416,7 @@ def rebuild_index() -> None:
         json.dump({"categories": entries}, handle, indent=2, ensure_ascii=False)
     total = sum(e["count"] for e in entries)
     print(f"✓ index met {len(entries)} categorieën, {total:,} punten "
-          f"→ {(OUT_DIR / 'index.json').relative_to(ROOT)}")
+          f"→ {OUT_DIR / 'index.json'}")
 
 
 def main() -> int:

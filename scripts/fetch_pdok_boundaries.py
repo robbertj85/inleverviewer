@@ -31,7 +31,7 @@ from shapely.geometry import shape
 from utils import (  # noqa: E402
     DATA_DIR,
     MUNICIPALITIES_FILE,
-    PROJECT_ROOT,
+    WEBAPP_PUBLIC_DIR,
     cache_needs_refresh,
     fetch_json,
     load_polygon_cache,
@@ -54,7 +54,7 @@ CBS_BASE = "https://opendata.cbs.nl/ODataApi/odata/37230ned"
 CBS_PERIODS_URL = f"{CBS_BASE}/Perioden"
 CBS_POPULATION_URL = f"{CBS_BASE}/TypedDataSet"
 
-WEBAPP_PUBLIC = PROJECT_ROOT / "webapp" / "public"
+WEBAPP_PUBLIC = WEBAPP_PUBLIC_DIR
 
 
 def fetch_pdok_municipalities(session) -> list[dict]:
@@ -212,7 +212,7 @@ def write_indexes() -> None:
     WEBAPP_PUBLIC.mkdir(parents=True, exist_ok=True)
     with open(WEBAPP_PUBLIC / "municipalities.json", "w", encoding="utf-8") as handle:
         json.dump(webapp_index, handle, ensure_ascii=False, indent=2)
-    print(f"  💾 webapp/public/municipalities.json: {len(webapp_index)} entries")
+    print(f"  💾 {WEBAPP_PUBLIC / 'municipalities.json'}: {len(webapp_index)} entries")
 
 
 def main() -> int:
