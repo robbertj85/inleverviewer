@@ -78,7 +78,7 @@ test.describe('Kaartpagina', () => {
   });
 
   /**
-   * One host per basemap, and every one of them has to be in `img-src`.
+   * One host per raster basemap, and every one of them has to be in `img-src`.
    *
    * Asserted on `naturalWidth` rather than on visibility: a tile the CSP
    * refused is still an <img> of the right size in the DOM, so it looks
@@ -93,9 +93,6 @@ test.describe('Kaartpagina', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
 
     const basemaps = [
-      { label: 'Voyager', host: 'basemaps.cartocdn.com' },
-      { label: 'Licht', host: 'basemaps.cartocdn.com' },
-      { label: 'Donker', host: 'basemaps.cartocdn.com' },
       { label: 'OpenStreetMap', host: 'tile.openstreetmap.org' },
       { label: 'BRT topografisch', host: 'service.pdok.nl' },
       { label: 'BRT donker', host: 'service.pdok.nl' },
@@ -117,6 +114,40 @@ test.describe('Kaartpagina', () => {
     }
 
     expect(blocked, `CSP blokkeerde tegels:\n${blocked.join('\n')}`).toEqual([]);
+  });
+
+  /**
+   * The CARTO styles are MapLibre vector maps, so there is no <img> to check.
+   * Wait for an actual vector tile instead: CARTO's raster endpoint answers a
+   * missing API key with a 200 PNG that says so, which an image-size check
+   * happily accepts.
+   */
+  test('elke vectorkaart laadt vectortegels', async ({ page }) => {
+    const blocked: string[] = [];
+    page.on('console', (message) => {
+      if (/Content Security Policy/i.test(message.text())) blocked.push(message.text());
+    });
+
+    await page.goto('/', { waitUntil: 'networkidle' });
+
+    // Voyager last: it is the default, and re-picking the active style loads
+    // nothing new. Each switch re-creates the GL map, so tiles are fetched.
+    for (const label of ['Licht', 'Donker', 'Voyager']) {
+      const tile = page.waitForResponse(
+        (response) =>
+          /basemaps\.cartocdn\.com\/.*\.mvt/.test(response.url()) &&
+          response.status() === 200 &&
+          /protobuf/.test(response.headers()['content-type'] ?? ''),
+        { timeout: 20_000 }
+      );
+      await page.getByRole('button', { name: /^Achtergrondkaart:/ }).click();
+      await page.getByRole('radio', { name: label, exact: true }).click();
+      await tile;
+      await expect(page.locator('.leaflet-tile-pane canvas.maplibregl-canvas')).toHaveCount(1);
+      await expect(page.locator('.leaflet-control-attribution')).toContainText('CARTO');
+    }
+
+    expect(blocked, `CSP blokkeerde de vectorkaart:\n${blocked.join('\n')}`).toEqual([]);
   });
 });
 

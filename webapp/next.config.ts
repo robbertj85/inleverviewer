@@ -20,8 +20,11 @@ const nextConfig: NextConfig = {
     /*
      * Every origin the app actually talks to, and nothing else:
      *  - cdn.redoc.ly    the API docs bundle (script only, /api/v1/docs)
-     *  - cartocdn.com, tile.openstreetmap.org, service.pdok.nl
-     *                    basemap tiles, one host per entry in lib/basemaps.ts;
+     *  - basemaps.cartocdn.com and its tiles. subdomain: the CARTO vector
+     *                    styles, fetched by MapLibre (connect-src), whose worker
+     *                    is served same-origin (worker-src 'self')
+     *  - tile.openstreetmap.org, service.pdok.nl
+     *                    raster basemap tiles (img-src);
      *                    markers are divIcons, so no icon CDN
      *  - the Umami origin, only when NEXT_PUBLIC_UMAMI_SRC is set
      * The OpenAPI spec and the fonts are same-origin (next/font self-hosts).
@@ -34,10 +37,10 @@ const nextConfig: NextConfig = {
     const sharedCsp = [
       "default-src 'self'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://tile.openstreetmap.org https://service.pdok.nl",
+      "img-src 'self' data: blob: https://tile.openstreetmap.org https://service.pdok.nl",
       "font-src 'self' data:",
-      `connect-src 'self' ${UMAMI_ORIGIN}`,
-      // Redoc runs its search indexer in a blob worker.
+      `connect-src 'self' https://basemaps.cartocdn.com https://*.basemaps.cartocdn.com ${UMAMI_ORIGIN}`,
+      // Redoc runs its search indexer in a blob worker; MapLibre's is same-origin.
       "worker-src 'self' blob:",
       "child-src 'self' blob:",
       "base-uri 'self'",

@@ -131,11 +131,24 @@ opening hours and payout fields (`"reduced": true` in its metadata). Full detail
 lives in the per-municipality files.
 
 **A new basemap needs its host in the CSP.** `webapp/lib/basemaps.ts` lists the
-background maps; `img-src` in `next.config.ts` lists the hosts they may load from.
+background maps; `img-src` (raster tiles) or `connect-src` (vector styles, their
+tiles, glyphs and sprite) in `next.config.ts` lists the hosts they may load from.
 Add one without the other and the map goes blank with a console-only complaint —
-which is what the "elke achtergrondkaart laadt tegels" test in `tests/smoke.spec.ts`
-is there to catch. PDOK serves no dark topographic style, so "BRT donker" is the
-grijs style put through an inverting CSS filter rather than its own URL.
+which is what the "elke achtergrondkaart/vectorkaart laadt …" tests in
+`tests/smoke.spec.ts` are there to catch. PDOK serves no dark topographic style, so
+"BRT donker" is the grijs style put through an inverting CSS filter rather than its
+own URL.
+
+**The CARTO maps are vector, and must stay that way.** CARTO's raster tiles
+(`{s}.basemaps.cartocdn.com/{style}/…png`) now return a 200 PNG reading "API KEY
+REQUIRED" — nothing errors, and an image-size check passes. The GL styles
+(`basemaps.cartocdn.com/gl/<style>-gl-style/style.json`) are keyless, so Voyager,
+Licht and Donker render through MapLibre inside Leaflet
+(`components/BasemapLayer.tsx`, `@maplibre/maplibre-gl-leaflet`). MapLibre 6 needs
+its worker same-origin: `predev`/`prebuild` copy it to `public/`, and
+`deploy/Dockerfile.web` ships it, since the image otherwise takes only
+`openapi.yaml` from `public/`. Credit goes through `attributionControl.customAttribution`;
+the binding ignores Leaflet's `attribution` option.
 
 **`cache_guard.safe_save` exits 2, not 1.** That is the "anomaly, previous cache
 kept" signal the worker (`deploy/scheduler.py`) treats as a warning. Do not convert it into a hard failure.

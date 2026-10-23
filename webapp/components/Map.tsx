@@ -23,7 +23,6 @@ import {
   MapContainer,
   Marker,
   Popup,
-  TileLayer,
   useMap,
 } from 'react-leaflet';
 import L from 'leaflet';
@@ -45,8 +44,8 @@ import {
   getPointColor,
   isInleverpunt,
 } from '@/types/inleverpunten';
+import BasemapLayer from '@/components/BasemapLayer';
 import { DEFAULT_BASEMAP_ID, MAX_ZOOM, getBasemap } from '@/lib/basemaps';
-import { cn } from '@/lib/utils';
 
 // Above this many points a merged coverage union costs more than it is worth,
 // so we fall back to per-point circles (or nothing, in simple mode).
@@ -532,17 +531,7 @@ export default function MapView({
       preferCanvas={simple}
       scrollWheelZoom
     >
-      {/* Keyed on the id so switching replaces the layer outright: Leaflet
-          reads url, subdomains and className once, at construction. */}
-      <TileLayer
-        key={basemap.id}
-        attribution={basemap.attribution}
-        url={basemap.url}
-        subdomains={basemap.subdomains ?? 'abc'}
-        maxZoom={MAX_ZOOM}
-        maxNativeZoom={basemap.maxNativeZoom}
-        className={cn(basemap.inverted && 'basemap-inverted')}
-      />
+      <BasemapLayer basemap={basemap} />
 
       <DarkContainer dark={Boolean(basemap.dark)} />
       <FitBounds data={data} />

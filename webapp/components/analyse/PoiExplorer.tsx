@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
-import { CircleMarker, MapContainer, Pane, Popup, TileLayer } from 'react-leaflet';
+import { CircleMarker, MapContainer, Pane, Popup } from 'react-leaflet';
 import L from 'leaflet';
+
+import BasemapLayer from '@/components/BasemapLayer';
 
 import { AnalyseBasemapSwitcher, FitBounds } from '@/components/analyse/MapChrome';
 
@@ -417,14 +419,7 @@ export default function PoiExplorer() {
             scrollWheelZoom
             className="size-full"
           >
-            <TileLayer
-              url={basemap.url}
-              attribution={basemap.attribution}
-              maxNativeZoom={basemap.maxNativeZoom}
-              maxZoom={MAX_ZOOM}
-              subdomains={basemap.subdomains ?? 'abc'}
-              className={basemap.inverted ? 'basemap-inverted' : undefined}
-            />
+            <BasemapLayer basemap={basemap} />
             <FitBounds bounds={mapBounds} padding={[30, 30]} />
 
             {/* Existing points sit under the candidates: they are context. */}

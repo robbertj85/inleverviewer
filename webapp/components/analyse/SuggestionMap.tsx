@@ -1,8 +1,10 @@
 'use client';
 
 import { Fragment, useMemo, useSyncExternalStore } from 'react';
-import { Circle, CircleMarker, MapContainer, Popup, TileLayer } from 'react-leaflet';
+import { Circle, CircleMarker, MapContainer, Popup } from 'react-leaflet';
 import L from 'leaflet';
+
+import BasemapLayer from '@/components/BasemapLayer';
 
 import { AnalyseBasemapSwitcher, FitBounds } from '@/components/analyse/MapChrome';
 
@@ -60,14 +62,7 @@ export default function SuggestionMap({
         scrollWheelZoom
         className="size-full"
       >
-      <TileLayer
-        url={basemap.url}
-        attribution={basemap.attribution}
-        maxNativeZoom={basemap.maxNativeZoom}
-        maxZoom={MAX_ZOOM}
-        subdomains={basemap.subdomains ?? 'abc'}
-        className={basemap.inverted ? 'basemap-inverted' : undefined}
-      />
+      <BasemapLayer basemap={basemap} />
       <FitBounds bounds={bounds} padding={[60, 60]} maxZoom={15} />
 
       {existing.map((point, i) => (

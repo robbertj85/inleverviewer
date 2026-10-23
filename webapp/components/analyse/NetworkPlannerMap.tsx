@@ -1,8 +1,10 @@
 'use client';
 
 import { useMemo, useSyncExternalStore } from 'react';
-import { CircleMarker, MapContainer, Pane, Popup, TileLayer } from 'react-leaflet';
+import { CircleMarker, MapContainer, Pane, Popup } from 'react-leaflet';
 import L from 'leaflet';
+
+import BasemapLayer from '@/components/BasemapLayer';
 
 import { AnalyseBasemapSwitcher, FitBounds } from '@/components/analyse/MapChrome';
 
@@ -112,14 +114,7 @@ export default function NetworkPlannerMap({
         scrollWheelZoom
         className="size-full"
       >
-      <TileLayer
-        url={basemap.url}
-        attribution={basemap.attribution}
-        maxNativeZoom={basemap.maxNativeZoom}
-        maxZoom={MAX_ZOOM}
-        subdomains={basemap.subdomains ?? 'abc'}
-        className={basemap.inverted ? 'basemap-inverted' : undefined}
-      />
+      <BasemapLayer basemap={basemap} />
       <FitBounds bounds={bounds} padding={[24, 24]} />
 
       {/* Demand grid, bottom of the stack. */}

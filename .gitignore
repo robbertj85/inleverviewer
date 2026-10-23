@@ -51,3 +51,6 @@ data/analysis_points.geojson
 # 40 MB, of which bushaltes alone is 20 MB. The per-municipality bundles the
 # webapp actually loads are committed, as is poi/index.json.
 webapp/public/data/poi/*.geojson
+
+# Copied from node_modules by predev/prebuild (MapLibre 6 worker).
+webapp/public/maplibre-gl-worker.mjs

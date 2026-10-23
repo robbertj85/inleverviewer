@@ -23,8 +23,9 @@ ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0 \
     INLEVER_PUBLIC_DIR=/srv/inlever/site/current
 COPY --from=build --chown=node:node /app/webapp/.next/standalone ./
 COPY --from=build --chown=node:node /app/webapp/.next/static ./.next/static
-# Only the hand-written public files (openapi.yaml, icons); data comes from the volume.
-COPY --from=build --chown=node:node /app/webapp/public/openapi.yaml ./public/openapi.yaml
+# Only the hand-written public files plus MapLibre's worker (copied in by
+# prebuild); data comes from the volume.
+COPY --from=build --chown=node:node /app/webapp/public/openapi.yaml /app/webapp/public/maplibre-gl-worker.mjs ./public/
 RUN mkdir -p /srv/inlever/site && chown node:node /srv/inlever/site
 USER node
 EXPOSE 3000
