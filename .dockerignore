@@ -1,0 +1,19 @@
+# The repo carries ~90 MB of generated data in its history and a local venv;
+# none of it belongs in a build context. Data reaches the server through the
+# worker and deploy/seed-data.sh, never through an image.
+.git
+**/node_modules
+**/.next
+**/__pycache__
+venv
+.venv
+data
+webapp/public/data
+webapp/public/municipalities.json
+webapp/test-results
+webapp/playwright-report
+**/.DS_Store
+*.log
+# Playwright needs the data and imports it at type-check time; tests run in CI.
+webapp/tests
+webapp/playwright.config.ts

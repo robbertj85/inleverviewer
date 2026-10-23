@@ -1,0 +1,31 @@
+# Next.js app (UI + /api/*) as a standalone Node server.
+# The data is NOT baked in: server code reads it from INLEVER_PUBLIC_DIR (the
+# site volume) and nginx (deploy/nginx.conf) serves /data/* from the same volume.
+FROM node:24-bookworm-slim AS build
+WORKDIR /app/webapp
+COPY webapp/package.json webapp/package-lock.json ./
+RUN npm ci
+COPY webapp/ ./
+ARG NEXT_PUBLIC_BASE_PATH=/inleverpuntenviewer
+ARG NEXT_PUBLIC_SITE_URL=https://prototype.transportlab.app/inleverpuntenviewer
+ARG NEXT_PUBLIC_UMAMI_SRC=
+ARG NEXT_PUBLIC_UMAMI_WEBSITE_ID=
+ENV NEXT_PUBLIC_BASE_PATH=$NEXT_PUBLIC_BASE_PATH \
+    NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
+    NEXT_PUBLIC_UMAMI_SRC=$NEXT_PUBLIC_UMAMI_SRC \
+    NEXT_PUBLIC_UMAMI_WEBSITE_ID=$NEXT_PUBLIC_UMAMI_WEBSITE_ID \
+    NEXT_TELEMETRY_DISABLED=1
+RUN npm run build
+
+FROM node:24-bookworm-slim
+WORKDIR /app
+ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0 \
+    INLEVER_PUBLIC_DIR=/srv/inlever/site/current
+COPY --from=build --chown=node:node /app/webapp/.next/standalone ./
+COPY --from=build --chown=node:node /app/webapp/.next/static ./.next/static
+# Only the hand-written public files (openapi.yaml, icons); data comes from the volume.
+COPY --from=build --chown=node:node /app/webapp/public/openapi.yaml ./public/openapi.yaml
+RUN mkdir -p /srv/inlever/site && chown node:node /srv/inlever/site
+USER node
+EXPOSE 3000
+CMD ["node", "server.js"]

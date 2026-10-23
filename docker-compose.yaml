@@ -1,0 +1,76 @@
+# Coolify "Docker Compose" resource for prototype.transportlab.app/inleverpuntenviewer.
+# Optional settings in the Coolify UI (Environment Variables):
+# NEXT_PUBLIC_UMAMI_SRC, NEXT_PUBLIC_UMAMI_WEBSITE_ID.
+# Nginx Proxy Manager: proxy host prototype.transportlab.app, custom location
+# /inleverpuntenviewer -> http://inleverpuntenviewer:80 on the shared `coolify`
+# network (no URI rewrite). See deploy/README.md.
+#
+#   web     nginx: data files from the volume + proxy to app
+#   app     Next.js server (UI, /api/*)
+#   worker  weekly fetch + generate (deploy/scheduler.py)
+services:
+  web:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.nginx
+    restart: unless-stopped
+    volumes:
+      - inlever-site:/srv/inlever/site:ro
+    expose:
+      - "80"
+    networks:
+      default:
+      coolify:
+        aliases:
+          - inleverpuntenviewer
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    # worker first: it creates the volumes' directories with the right owner
+    depends_on:
+      - worker
+      - app
+
+  app:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.web
+      args:
+        - NEXT_PUBLIC_BASE_PATH=/inleverpuntenviewer
+        - NEXT_PUBLIC_SITE_URL=https://prototype.transportlab.app/inleverpuntenviewer
+        - NEXT_PUBLIC_UMAMI_SRC=${NEXT_PUBLIC_UMAMI_SRC:-}
+        - NEXT_PUBLIC_UMAMI_WEBSITE_ID=${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}
+    restart: unless-stopped
+    volumes:
+      - inlever-site:/srv/inlever/site:ro
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/inleverpuntenviewer').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      - worker
+
+  worker:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.worker
+    restart: unless-stopped
+    init: true
+    volumes:
+      - inlever-site:/srv/inlever/site
+      - inlever-data:/srv/inlever/data
+    # geopandas over ~34k points and 342 polygons; the Action ran on 7 GB.
+    mem_limit: 6g
+
+volumes:
+  inlever-site:   # web-served: releases/<stamp>/{municipalities.json,data/} + current symlink
+  inlever-data:   # source caches, analysis inputs, totals_history backups, worker state
+
+networks:
+  coolify:
+    external: true
