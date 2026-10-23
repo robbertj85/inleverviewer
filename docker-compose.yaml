@@ -5,7 +5,11 @@
 # /inleverpuntenviewer -> http://inleverpuntenviewer:80 on the shared `coolify`
 # network (no URI rewrite). See deploy/README.md.
 #
-#   web     nginx: data files from the volume + proxy to app
+# Coolify resource setting (Advanced): Consistent Container Names on, Custom
+# Internal Name `inleverpuntenviewer`. Containers are then <service>-inleverpuntenviewer,
+# which nginx and deploy/lib.sh rely on.
+#
+#   web     nginx: data files from the volume + proxy to app-inleverpuntenviewer
 #   app     Next.js server (UI, /api/*)
 #   worker  weekly fetch + generate (deploy/scheduler.py)
 services:

@@ -10,7 +10,7 @@ NPM (prototype.transportlab.app)
   └─ location /inleverpuntenviewer/  ->  http://inleverpuntenviewer:80   (alias van service `web`, geen URI-rewrite)
         web (nginx)
         ├─ /inleverpuntenviewer/data/*, /municipalities.json  -> volume inlever-site/current (live)
-        └─ de rest                                             -> app:3000 (Next.js)
+        └─ de rest                                             -> app-inleverpuntenviewer:3000 (Next.js)
                                                                   └─ API's en analysepagina's lezen inlever-site/current
 worker (deploy/scheduler.py)
   └─ maandag 04:00   grenzen -> 5 bronnen -> GeoJSON -> statistieken -> totalenhistorie
@@ -64,6 +64,11 @@ de rest is opnieuw te maken. De worker bewaart na elke run een kopie in
    - branch **`vps-migration`** (tot stap 6; `main` krijgt tot dan nog bot-commits)
    - Build Pack: **Docker Compose**, Docker Compose Location `/docker-compose.yaml`
    - geen domein invullen (NPM regelt dat)
+   - *Advanced*: **Consistent Container Names** aan, Custom Internal Name
+     `inleverpuntenviewer`. Containers heten dan `web-`, `app-` en
+     `worker-inleverpuntenviewer`; nginx proxyt naar `app-inleverpuntenviewer`
+     (niet naar `app`: op het gedeelde `coolify`-netwerk antwoordt de `app` van
+     een andere applicatie ook op die naam). Zonder deze instelling geeft de site 502.
    - Environment Variables (optioneel): `NEXT_PUBLIC_UMAMI_SRC`, `NEXT_PUBLIC_UMAMI_WEBSITE_ID`
    - Deploy. De worker ziet een leeg volume en wacht op de seed.
 
@@ -93,13 +98,13 @@ de rest is opnieuw te maken. De worker bewaart na elke run een kopie in
   zoekt de alias maar één keer op, bij het laden van zijn config; de nieuwe
   container krijgt een ander IP en NPM geeft 502 tot hij herlaadt.
 - Logs: Coolify → resource → *Logs* → `worker`, of
-  `ssh hetzner docker logs -f $(source deploy/lib.sh; inlever_container worker)`.
-- Run nu: `docker exec <worker> python deploy/scheduler.py run`.
+  `ssh hetzner docker logs -f worker-inleverpuntenviewer`.
+- Run nu: `docker exec worker-inleverpuntenviewer python deploy/scheduler.py run`.
 - Eén analysescript opnieuw (ook via een kopie, dus atomair):
-  `docker exec <worker> python deploy/scheduler.py run-script scripts/suggest_placements.py`.
+  `docker exec worker-inleverpuntenviewer python deploy/scheduler.py run-script scripts/suggest_placements.py`.
   De invoer daarvan (CBS-gpkg, OV-data) is gitignored en staat niet in de seed;
   draai eerst het bijbehorende fetch-script op dezelfde manier.
-- Terug naar de vorige release: `docker exec <worker> python deploy/scheduler.py rollback`
+- Terug naar de vorige release: `docker exec worker-inleverpuntenviewer python deploy/scheduler.py rollback`
   (de volgende run bouwt weer verder op wat dan live staat).
 - Instelbaar in de worker: `INLEVER_WEEKDAY` (0 = maandag), `INLEVER_RUN_AT` (`04:00`),
   `INLEVER_BACKUP_KEEP` (14).

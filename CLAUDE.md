@@ -174,7 +174,9 @@ Coolify on the Hetzner VPS, served at `prototype.transportlab.app/inleverpuntenv
 behind Nginx Proxy Manager. Root `docker-compose.yaml` + `deploy/` (README there).
 `web` (nginx) serves `/data/*` and `municipalities.json` straight off the site
 volume; everything else goes to the Next standalone `app`; `worker` runs the weekly
-pipeline. Generated data is not in git any more.
+pipeline. nginx proxies to the static container name `app-inleverpuntenviewer`
+(Coolify "consistent container names"), never the bare `app`: `web` is also on the
+shared `coolify` network, where another stack's `app` answers to that name. Generated data is not in git any more.
 
 **Server code reads data through `lib/dataPaths.ts`, never `process.cwd()`.** The
 volume is at `INLEVER_PUBLIC_DIR`, and the `/*turbopackIgnore: true*/` hints are
