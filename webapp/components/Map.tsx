@@ -6,16 +6,19 @@
  * Renders up to ~34.000 points, so it adapts to dataset size rather than
  * drawing everything the same way:
  *
- *  - Simple mode (auto-enabled nationally) draws CircleMarkers on a canvas
- *    layer, which is roughly an order of magnitude faster than DOM markers.
+ *  - Simple mode (auto-enabled nationally) draws plain dots straight onto one
+ *    canvas with Leaflet, bypassing React (see `SimplePoints`).
  *  - Detailed mode draws divIcon pins with a category glyph.
  *  - Overlapping points are spread in a ring at high zoom, so two brands at
  *    the same supermarket are both clickable.
- *  - Coverage rings at 300/400/500 m are computed live with Turf, merged into
- *    a union below a point threshold and drawn per-point above it.
+ *  - Coverage rings at 300/400/500 m are computed live with Turf in a Web
+ *    Worker, merged into a union below a point threshold and drawn per-point
+ *    above it.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
+import { createRoot, type Root } from 'react-dom/client';
 import {
   Circle,
   CircleMarker,
@@ -26,9 +29,6 @@ import {
   useMap,
 } from 'react-leaflet';
 import L from 'leaflet';
-import buffer from '@turf/buffer';
-import union from '@turf/union';
-import { featureCollection, point as turfPoint } from '@turf/helpers';
 import type { Feature, MultiPolygon, Polygon } from 'geojson';
 
 import {
@@ -311,60 +311,147 @@ function PointPopup({ props }: { props: InleverpuntProperties }) {
 // --------------------------------------------------------------------------
 
 /**
- * Union a list of buffered polygons pairwise.
+ * The merged coverage ring for a set of points, computed in a Web Worker.
  *
- * Turf's union takes a FeatureCollection, but folding thousands of polygons in
- * one call is slow and prone to topology errors. Halving the list each round
- * keeps the individual unions small.
+ * Returns null until the worker answers, and whenever the answer belongs to an
+ * older point set: a ring that trails a filter change by a second is fine, one
+ * that shows the previous filter's coverage is not. `id` changes with every
+ * result, because react-leaflet's <GeoJSON> reads its data once at mount and
+ * has to be re-keyed to pick up a new shape.
  */
-function pairwiseUnion(
-  features: Feature<Polygon | MultiPolygon>[]
-): Feature<Polygon | MultiPolygon> | null {
-  if (features.length === 0) return null;
-
-  let current = features;
-  while (current.length > 1) {
-    const next: Feature<Polygon | MultiPolygon>[] = [];
-    for (let i = 0; i < current.length; i += 2) {
-      if (i + 1 >= current.length) {
-        next.push(current[i]);
-        continue;
-      }
-      try {
-        const merged = union(featureCollection([current[i], current[i + 1]]));
-        next.push(merged ?? current[i]);
-      } catch {
-        // A self-intersecting pair should not kill the whole overlay.
-        next.push(current[i]);
-      }
-    }
-    current = next;
-  }
-
-  return current[0] ?? null;
-}
-
 function useMergedBuffer(
   points: InleverpuntFeature[],
   enabled: boolean,
   radiusKm: number
-): Feature<Polygon | MultiPolygon> | null {
-  return useMemo(() => {
-    if (!enabled || points.length === 0 || points.length > MERGE_THRESHOLD) return null;
+): { feature: Feature<Polygon | MultiPolygon>; id: number } | null {
+  const [result, setResult] = useState<{
+    points: InleverpuntFeature[];
+    feature: Feature<Polygon | MultiPolygon> | null;
+    id: number;
+  } | null>(null);
 
-    try {
-      const collection = featureCollection(
-        points.map((feature) => turfPoint(feature.geometry.coordinates as [number, number]))
-      );
-      // steps:4 gives an octagon per point — indistinguishable from a circle
-      // once merged, and far cheaper to union.
-      const buffered = buffer(collection, radiusKm, { units: 'kilometers', steps: 4 });
-      if (!buffered || buffered.features.length === 0) return null;
-      return pairwiseUnion(buffered.features as Feature<Polygon | MultiPolygon>[]);
-    } catch {
-      return null;
-    }
+  useEffect(() => {
+    if (!enabled || points.length === 0 || points.length > MERGE_THRESHOLD) return;
+
+    // One worker per request, terminated when the input changes: a stale
+    // union is abandoned mid-way instead of queueing ahead of the new one.
+    const worker = new Worker(new URL('./coverageUnion.worker.ts', import.meta.url), {
+      type: 'module',
+    });
+    worker.onmessage = (event: MessageEvent<Feature<Polygon | MultiPolygon> | null>) => {
+      setResult((previous) => ({ points, feature: event.data, id: (previous?.id ?? 0) + 1 }));
+      worker.terminate();
+    };
+    worker.onerror = () => worker.terminate();
+    worker.postMessage({
+      coordinates: points.map((feature) => feature.geometry.coordinates as [number, number]),
+      radiusKm,
+    });
+    return () => worker.terminate();
   }, [points, enabled, radiusKm]);
+
+  if (!enabled || !result || result.points !== points || !result.feature) return null;
+  return { feature: result.feature, id: result.id };
+}
+
+// --------------------------------------------------------------------------
+// Simple markers
+// --------------------------------------------------------------------------
+
+interface PositionedPoint {
+  feature: InleverpuntFeature;
+  lat: number;
+  lon: number;
+  spread: boolean;
+}
+
+/**
+ * Plain dots drawn straight onto one canvas, outside React.
+ *
+ * Nationally that is ~34.000 points. As <CircleMarker>s, each with its own
+ * <Popup>, they were ~68.000 React components and froze the page for 6.5 s
+ * before the first dot appeared; built directly in Leaflet the same dots take
+ * ~50 ms. One popup is shared and filled on click, so PointPopup renders only
+ * for the point someone actually opens.
+ */
+function SimplePoints({
+  positioned,
+  dotRadius,
+  highlightedPoints,
+}: {
+  positioned: PositionedPoint[];
+  dotRadius: number;
+  highlightedPoints?: Set<string> | null;
+}) {
+  const map = useMap();
+  const renderer = useMemo(() => L.canvas(), []);
+
+  // The shared popup and the React root inside it, for the map's lifetime.
+  const popupRef = useRef<{ popup: L.Popup; root: Root | null } | null>(null);
+  useEffect(() => {
+    const state: { popup: L.Popup; root: Root | null } = { popup: L.popup(), root: null };
+    state.popup.on('remove', () => {
+      // Unmounting synchronously inside Leaflet's handler is fine: the root is
+      // ours alone and nothing else renders into it.
+      state.root?.unmount();
+      state.root = null;
+    });
+    popupRef.current = state;
+    return () => {
+      state.popup.remove();
+      popupRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const propsOf = new WeakMap<L.Layer, InleverpuntProperties>();
+    // Built off-map and added in one go; adding 34k layers to a group that is
+    // already on the map redraws per layer.
+    const group = L.featureGroup();
+    const highlighted: L.CircleMarker[] = [];
+
+    for (const { feature, lat, lon } of positioned) {
+      const props = feature.properties as InleverpuntProperties;
+      const isHighlighted = highlightedPoints?.has(pointKey(props)) ?? false;
+      const marker = L.circleMarker([lat, lon], {
+        renderer,
+        radius: isHighlighted ? dotRadius + 2 : dotRadius,
+        color: isHighlighted ? '#f2a413' : '#ffffff',
+        weight: isHighlighted ? 2 : 0.75,
+        fillColor: getPointColor(props),
+        fillOpacity: 0.95,
+      });
+      propsOf.set(marker, props);
+      if (isHighlighted) highlighted.push(marker);
+      else group.addLayer(marker);
+    }
+    // Highlighted last, so they are drawn on top.
+    for (const marker of highlighted) group.addLayer(marker);
+
+    group.on('click', (event: L.LeafletMouseEvent) => {
+      const props = propsOf.get(event.layer as L.Layer);
+      const state = popupRef.current;
+      if (!props || !state) return;
+
+      state.root?.unmount();
+      const container = document.createElement('div');
+      state.root = createRoot(container);
+      // Leaflet measures the content when it opens the popup, so it must be
+      // rendered by then.
+      flushSync(() => state.root?.render(<PointPopup props={props} />));
+      state.popup
+        .setLatLng((event.layer as L.CircleMarker).getLatLng())
+        .setContent(container)
+        .openOn(map);
+    });
+
+    group.addTo(map);
+    return () => {
+      group.remove();
+    };
+  }, [map, renderer, positioned, dotRadius, highlightedPoints]);
+
+  return null;
 }
 
 // --------------------------------------------------------------------------
@@ -464,7 +551,7 @@ export default function MapView({
 
   // ---- Spiderfy coincident markers ------------------------------------
   const positioned = useMemo(() => {
-    const result: { feature: InleverpuntFeature; lat: number; lon: number; spread: boolean }[] = [];
+    const result: PositionedPoint[] = [];
 
     if (zoom < SPIDERFY_ZOOM) {
       for (const feature of drawOrdered) {
@@ -543,8 +630,8 @@ export default function MapView({
       {filters.showBuffer500 &&
         (filters.bufferMerged && merged500 ? (
           <GeoJSON
-            key={`b500-${slug}-${visiblePoints.length}-${filters.showBufferFill}`}
-            data={merged500}
+            key={`b500-${merged500.id}-${filters.showBufferFill}`}
+            data={merged500.feature}
             style={{
               color: BUFFER_STYLES[500].color,
               weight: BUFFER_STYLES[500].weight,
@@ -572,8 +659,8 @@ export default function MapView({
       {filters.showBuffer400 &&
         (filters.bufferMerged && merged400 ? (
           <GeoJSON
-            key={`b400-${slug}-${visiblePoints.length}-${filters.showBufferFill}`}
-            data={merged400}
+            key={`b400-${merged400.id}-${filters.showBufferFill}`}
+            data={merged400.feature}
             style={{
               color: BUFFER_STYLES[400].color,
               weight: BUFFER_STYLES[400].weight,
@@ -601,8 +688,8 @@ export default function MapView({
       {filters.showBuffer300 &&
         (filters.bufferMerged && merged300 ? (
           <GeoJSON
-            key={`b300-${slug}-${visiblePoints.length}-${filters.showBufferFill}`}
-            data={merged300}
+            key={`b300-${merged300.id}-${filters.showBufferFill}`}
+            data={merged300.feature}
             style={{
               color: BUFFER_STYLES[300].color,
               weight: BUFFER_STYLES[300].weight,
@@ -643,30 +730,17 @@ export default function MapView({
         ))}
 
       {/* Points */}
-      {positioned.map(({ feature, lat, lon, spread }, index) => {
+      {simple && (
+        <SimplePoints
+          positioned={positioned}
+          dotRadius={dotRadius}
+          highlightedPoints={highlightedPoints}
+        />
+      )}
+      {!simple && positioned.map(({ feature, lat, lon, spread }, index) => {
         const props = feature.properties as InleverpuntProperties;
         const key = pointKey(props);
         const highlighted = highlightedPoints?.has(key) ?? false;
-
-        if (simple) {
-          return (
-            <CircleMarker
-              key={`p-${key}-${index}`}
-              center={[lat, lon]}
-              radius={highlighted ? dotRadius + 2 : dotRadius}
-              pathOptions={{
-                color: highlighted ? '#f2a413' : '#ffffff',
-                weight: highlighted ? 2 : 0.75,
-                fillColor: getPointColor(props),
-                fillOpacity: 0.95,
-              }}
-            >
-              <Popup>
-                <PointPopup props={props} />
-              </Popup>
-            </CircleMarker>
-          );
-        }
 
         return (
           <Marker

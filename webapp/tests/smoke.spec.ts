@@ -151,6 +151,64 @@ test.describe('Kaartpagina', () => {
   });
 });
 
+test.describe('Landelijk overzicht', () => {
+  /**
+   * ~34.000 points. They used to be React <CircleMarker>s with a <Popup> each,
+   * which blocked the main thread for 6.5 s before the first dot; they are now
+   * drawn on one canvas outside React with a single shared popup. The budget
+   * is loose on purpose (CI is slow); the old path did not come close.
+   */
+  test('tekent alle punten snel en opent een popup', async ({ page }) => {
+    await page.addInitScript(() => {
+      const w = window as unknown as { __longest: number };
+      w.__longest = 0;
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) w.__longest = Math.max(w.__longest, entry.duration);
+      }).observe({ type: 'longtask', buffered: true });
+    });
+
+    await page.goto('/?gemeente=alle-gemeenten', { waitUntil: 'networkidle' });
+    // FitBounds animates to the Netherlands; a dot found mid-flight moves away.
+    await page.waitForTimeout(1500);
+
+    // A dot centre: an opaque, non-white pixel whose neighbours are too (an
+    // anti-aliased edge pixel can fall just outside Leaflet's hit area).
+    const dot = await page.waitForFunction(
+      () => {
+        for (const canvas of document.querySelectorAll<HTMLCanvasElement>('.leaflet-overlay-pane canvas')) {
+          const ctx = canvas.getContext('2d');
+          if (!ctx || canvas.width === 0) continue;
+          const box = canvas.getBoundingClientRect();
+          const scale = canvas.width / box.width;
+          const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          for (let y = Math.floor(canvas.height * 0.3); y < canvas.height * 0.7; y += 3) {
+            for (let x = Math.floor(canvas.width * 0.3); x < canvas.width * 0.7; x += 3) {
+              const solid = [0, 2, -2].every((dx) =>
+                [0, 2, -2].every((dy) => {
+                  const i = ((y + dy) * canvas.width + (x + dx)) * 4;
+                  const white = data[i] > 240 && data[i + 1] > 240 && data[i + 2] > 240;
+                  return data[i + 3] > 200 && !white;
+                })
+              );
+              if (solid) return { x: box.left + x / scale, y: box.top + y / scale };
+            }
+          }
+        }
+        return null;
+      },
+      null,
+      { timeout: 15_000 }
+    );
+    const { x, y } = (await dot.jsonValue())!;
+
+    const longest = await page.evaluate(() => (window as unknown as { __longest: number }).__longest);
+    expect(longest, 'langste blokkade van de main thread (ms)').toBeLessThan(3000);
+
+    await page.mouse.click(x, y);
+    await expect(page.locator('.leaflet-popup-content')).not.toBeEmpty();
+  });
+});
+
 test.describe('Adreszoeker', () => {
   test('toont PDOK-suggesties en selecteert een gemeente', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });

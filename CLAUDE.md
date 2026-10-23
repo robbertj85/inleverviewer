@@ -139,6 +139,14 @@ which is what the "elke achtergrondkaart/vectorkaart laadt …" tests in
 "BRT donker" is the grijs style put through an inverting CSS filter rather than its
 own URL.
 
+**Never render the national point set as React components.** ~34.000
+`<CircleMarker>`s, each with a `<Popup>`, blocked the main thread for 6.5 s before
+the first dot. Simple mode (`SimplePoints` in `components/Map.tsx`) builds the dots
+directly in Leaflet on one canvas (~50 ms) and fills one shared popup on click.
+Likewise the merged coverage ring runs in `components/coverageUnion.worker.ts`:
+Turf's union over Amsterdam's ~1.400 buffers takes 2-3 s, and done in render it
+held back every marker. The "Landelijk overzicht" smoke test guards both paths.
+
 **The CARTO maps are vector, and must stay that way.** CARTO's raster tiles
 (`{s}.basemaps.cartocdn.com/{style}/…png`) now return a 200 PNG reading "API KEY
 REQUIRED" — nothing errors, and an image-size check passes. The GL styles
