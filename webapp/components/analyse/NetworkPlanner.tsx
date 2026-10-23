@@ -16,6 +16,10 @@ import {
   COMBI_RULE_HINTS,
   COMBI_RULE_LABELS,
   CombiRule,
+  EIGENDOM_COLOURS,
+  EIGENDOM_LABELS,
+  EigendomChoice,
+  EigendomVariantPayload,
   FLAG_LABELS,
   NetworkIndexEntry,
   NetworkPayload,
@@ -92,7 +96,13 @@ export default function NetworkPlanner({
   const [distance, setDistance] = useState(400);
   const [start, setStart] = useState('alle-punten');
   const [combiRule, setCombiRule] = useState<CombiRule>('synergie');
-  const [rawN, setN] = useState(0);
+  // Null until the user moves the slider: then the default (10, or fewer
+  // when the scenario is shorter) applies to every scenario.
+  const [rawN, setN] = useState<number | null>(null);
+  const [eigendom, setEigendom] = useState<EigendomChoice>('mix');
+  // The publiek/privaat side files, keyed `${slug}|${variant}`, loaded on
+  // first use; they are the same size again as the main file's scenarios.
+  const [variants, setVariants] = useState<Record<string, EigendomVariantPayload | 'error'>>({});
   const [stream, setStream] = useState('statiegeld');
   const [participation, setParticipation] = useState(60);
 
@@ -148,6 +158,35 @@ export default function NetworkPlanner({
   }, [slug]);
 
   const payload = loaded?.slug === slug ? loaded.payload : null;
+
+  const hasVariants = Boolean(payload?.eigendom_variants?.length);
+  const choice: EigendomChoice = hasVariants ? eigendom : 'mix';
+  const variantKey = `${slug}|${choice}`;
+  const variant = choice === 'mix' ? null : variants[variantKey];
+
+  useEffect(() => {
+    if (choice === 'mix' || variants[variantKey]) return;
+    let cancelled = false;
+    fetch(withBase(`/data/inleverpunt_network/${slug}.${choice}.json`))
+      .then((r) => {
+        if (!r.ok) throw new Error('variant');
+        return r.json();
+      })
+      .then((data: EigendomVariantPayload) => {
+        if (!cancelled) setVariants((current) => ({ ...current, [variantKey]: data }));
+      })
+      .catch(() => {
+        if (!cancelled) setVariants((current) => ({ ...current, [variantKey]: 'error' }));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [choice, slug, variantKey, variants]);
+
+  // Where the scenarios come from: the main file for the mix, a side file otherwise.
+  const source =
+    choice === 'mix' ? payload : variant && variant !== 'error' ? variant : null;
+  const variantLoading = choice !== 'mix' && !variant;
   const existing = useMemo(
     () => (loaded?.slug === slug ? loaded.existing : []),
     [loaded, slug]
@@ -155,11 +194,11 @@ export default function NetworkPlanner({
   const loading = !payload && !error;
 
   // ---- Current scenario ----
-  const scenario = payload
-    ? payload.scenarios[scenarioKey(distance, start)] ?? null
+  const scenario = source
+    ? source.scenarios[scenarioKey(distance, start)] ?? null
     : null;
-  const combi = payload
-    ? payload.combi_scenarios[combiKey(distance, combiRule)] ?? null
+  const combi = source
+    ? source.combi_scenarios[combiKey(distance, combiRule)] ?? null
     : null;
 
   const active = mode === 'combi' ? combi : scenario;
@@ -172,7 +211,7 @@ export default function NetworkPlanner({
   // The slider position is clamped on read rather than reset from an effect,
   // so switching scenario keeps the count where it was when the new scenario
   // is long enough to hold it.
-  const n = Math.min(rawN, maxPicks);
+  const n = Math.min(rawN ?? 10, maxPicks);
 
   const picks: PickMarker[] = useMemo(() => {
     if (!payload) return [];
@@ -263,8 +302,8 @@ export default function NetworkPlanner({
     if (!payload) return;
     const header =
       mode === 'combi'
-        ? ['rang', 'type', 'naam', 'lat', 'lon', 'winst_inleveren', 'winst_pakketten', 'synergie', 'kenmerken']
-        : ['rang', 'type', 'naam', 'lat', 'lon', 'winst_inwoners', 'cumulatief', 'kenmerken'];
+        ? ['rang', 'type', 'naam', 'lat', 'lon', 'terrein', 'terrein_bron', 'winst_inleveren', 'winst_pakketten', 'synergie', 'kenmerken']
+        : ['rang', 'type', 'naam', 'lat', 'lon', 'terrein', 'terrein_bron', 'winst_inwoners', 'cumulatief', 'kenmerken'];
     const rows: (string | number)[][] = [header];
     picks.slice(0, n || picks.length).forEach((pick, i) => {
       const meta = payload.type_meta[pick.candidate.type];
@@ -274,6 +313,8 @@ export default function NetworkPlanner({
         pick.candidate.naam,
         pick.candidate.lat,
         pick.candidate.lon,
+        pick.candidate.eigendom ?? '',
+        pick.candidate.eigendom_bron ?? '',
       ];
       if (mode === 'combi') {
         rows.push([
@@ -292,7 +333,7 @@ export default function NetworkPlanner({
         ]);
       }
     });
-    downloadCsv(`netwerkplanner-${slug}-${mode}-${distance}m.csv`, rows);
+    downloadCsv(`netwerkplanner-${slug}-${mode}-${choice}-${distance}m.csv`, rows);
   }
 
   return (
@@ -343,6 +384,30 @@ export default function NetworkPlanner({
             },
           ]}
         />
+        {payload && hasVariants && (
+          <SegControl
+            label="Locaties"
+            value={choice}
+            onChange={setEigendom}
+            options={[
+              {
+                value: 'mix',
+                label: 'Publiek + privaat',
+                title: 'Alle kandidaat-locaties, ongeacht wie erover beslist.',
+              },
+              {
+                value: 'publiek',
+                label: `Publiek terrein (${nlInt(payload.eigendom_counts?.publiek ?? 0)})`,
+                title: 'Openbare ruimte en overheidsvoorzieningen: de gemeente beslist zelf.',
+              },
+              {
+                value: 'privaat',
+                label: `Privaat terrein (${nlInt(payload.eigendom_counts?.privaat ?? 0)})`,
+                title: 'Winkels, gebouwen en erven: de eigenaar beslist, de gemeente kan alleen vragen.',
+              },
+            ]}
+          />
+        )}
         {municipalities.length < 20 && (
           <p className="text-xs text-muted-foreground">
             {municipalities.length} gemeenten gepland (pilotset). Draai{' '}
@@ -351,6 +416,20 @@ export default function NetworkPlanner({
           </p>
         )}
       </div>
+
+      {payload && hasVariants && (
+        <p className="-mt-2 text-xs text-muted-foreground">
+          Publiek of privaat gaat over het terrein onder de locatie (OSM-tags, het
+          type locatie of het BGT-object op die plek), niet over juridisch eigendom:
+          dat staat niet open in het Kadaster.
+          {(payload.eigendom_counts?.onbekend ?? 0) > 0 && (
+            <>
+              {' '}{nlInt(payload.eigendom_counts?.onbekend ?? 0)} kandidaten zijn niet in te
+              delen; die tellen alleen mee in &lsquo;publiek + privaat&rsquo;.
+            </>
+          )}
+        </p>
+      )}
 
       {loading && (
         <div className="rounded-lg border border-border bg-card p-8 text-center text-sm text-muted-foreground">
@@ -363,7 +442,18 @@ export default function NetworkPlanner({
         </div>
       )}
 
-      {payload && active && (
+      {payload && choice !== 'mix' && variant === 'error' && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          Geen {EIGENDOM_LABELS[choice]}-variant voor deze gemeente.
+        </div>
+      )}
+      {payload && variantLoading && (
+        <div className="rounded-lg border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          Variant laden…
+        </div>
+      )}
+
+      {payload && source && active && (
         <>
           {mode === 'combi' && payload.pakketpunten_snapshot && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
@@ -467,8 +557,16 @@ export default function NetworkPlanner({
               )}
               <StatTile
                 label="Kandidaat-locaties"
-                value={nlInt(payload.candidates.length)}
-                hint={`${payload.params.kandidaat_types.length} types`}
+                value={nlInt(
+                  choice === 'mix'
+                    ? payload.candidates.length
+                    : payload.eigendom_counts?.[choice] ?? 0
+                )}
+                hint={
+                  choice === 'mix'
+                    ? `${payload.params.kandidaat_types.length} types`
+                    : `alleen ${EIGENDOM_LABELS[choice]}`
+                }
               />
             </div>
 
@@ -499,6 +597,7 @@ export default function NetworkPlanner({
                   })
                 )}
                 showPakketpunten={mode === 'combi' && showPakketpunten}
+                candidateFilter={choice === 'mix' ? null : choice}
               />
             </div>
 
@@ -566,6 +665,18 @@ export default function NetworkPlanner({
                             {pick.rank}. {pick.candidate.naam || meta?.label}
                           </div>
                           <div className="text-xs text-muted-foreground">
+                            {pick.candidate.eigendom && (
+                              <span
+                                className="mr-1 inline-block rounded px-1 text-[10px] font-semibold uppercase tracking-wide"
+                                style={{
+                                  color: EIGENDOM_COLOURS[pick.candidate.eigendom],
+                                  border: `1px solid ${EIGENDOM_COLOURS[pick.candidate.eigendom]}`,
+                                }}
+                                title={pick.candidate.eigendom_bron}
+                              >
+                                {pick.candidate.eigendom}
+                              </span>
+                            )}
                             {meta?.label}
                             {mode === 'combi' ? (
                               <>

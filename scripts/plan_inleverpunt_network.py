@@ -260,6 +260,14 @@ METHODOLOGY = {
         "als hij er maar één dient. De synergie-regel selecteert alleen types "
         "die beide fysiek kunnen huisvesten (combi_geschikt)"
     ),
+    "eigendom": (
+        "elke kandidaat is ingedeeld als publiek terrein (openbare ruimte of "
+        "overheidsvoorziening: de gemeente beslist) of privaat terrein (gebouw, "
+        "erf of winkel: de eigenaar beslist), via OSM-tags, het type locatie of "
+        "het BGT-object onder het punt (scripts/classify_poi_ownership.py). Het is "
+        "een terreinclassificatie, geen juridisch eigendom: dat staat niet open in "
+        "de BRK. De varianten publiek en privaat plannen met alleen die kandidaten"
+    ),
     "combi_databron": (
         "pakketpunten uit het landelijke bestand van de pakketpuntenviewer "
         "(pakketpuntenviewer.nl/data/nederland.geojson), wekelijks opgehaald door "
@@ -379,6 +387,8 @@ def load_candidates(slug: str, allowed_types: set[str]) -> list[dict]:
         raw.append({
             "type": category,
             "naam": str(props.get("name") or ""),
+            "eigendom": props.get("eigendom") or "onbekend",
+            "eigendom_bron": props.get("eigendom_bron") or "",
             "lat": round(float(coords[1]), 6),
             "lon": round(float(coords[0]), 6),
             "prio": TYPE_META[category]["prioriteit"],
@@ -498,12 +508,17 @@ def cover_index(cx, cy, cand_x, cand_y, radius: float) -> list[np.ndarray]:
 
 
 def greedy_single(cpop, cover_idx, start_covered, cand_x, cand_y, cand_prio,
-                  max_picks: int, min_gain: int, min_spacing: int) -> dict:
-    """Plain greedy set-cover on one coverage state."""
+                  max_picks: int, min_gain: int, min_spacing: int,
+                  allowed: np.ndarray | None = None) -> dict:
+    """Plain greedy set-cover on one coverage state.
+
+    `allowed` restricts the candidates (the eigendom variants); indices in
+    the picks still refer to the full candidate list.
+    """
     n_cand = len(cover_idx)
     covered = start_covered.copy()
     cell_rank = np.where(start_covered, 0, -1).astype(int)
-    active = np.ones(n_cand, dtype=bool)
+    active = np.ones(n_cand, dtype=bool) if allowed is None else allowed.copy()
     picks: list[dict] = []
     cumulative = float(cpop[start_covered].sum())
     total = float(cpop.sum())
@@ -548,7 +563,8 @@ def greedy_single(cpop, cover_idx, start_covered, cand_x, cand_y, cand_prio,
 
 def greedy_combi(cpop, cover_idx, covered_i0, covered_p0, cand_x, cand_y, cand_prio,
                  combi_ok, rule: str, alpha: float,
-                 max_picks: int, min_gain: int, min_spacing: int) -> dict:
+                 max_picks: int, min_gain: int, min_spacing: int,
+                 allowed: np.ndarray | None = None) -> dict:
     """Greedy set-cover over two coverage states at once.
 
     `rule` is 'gewogen' (α·gain_i + (1−α)·gain_p) or 'synergie'
@@ -559,7 +575,7 @@ def greedy_combi(cpop, cover_idx, covered_i0, covered_p0, cand_x, cand_y, cand_p
     covered_p = covered_p0.copy()
     rank_i = np.where(covered_i0, 0, -1).astype(int)
     rank_p = np.where(covered_p0, 0, -1).astype(int)
-    active = np.ones(n_cand, dtype=bool)
+    active = np.ones(n_cand, dtype=bool) if allowed is None else allowed.copy()
     if rule == "synergie":
         active &= combi_ok
     picks: list[dict] = []
@@ -658,41 +674,57 @@ def process_municipality(muni: dict) -> tuple[str, str]:
     # Cap picks by population: a village does not need 300 collection points.
     max_picks = min(args.max_picks, max(20, math.ceil(population_total / 2000)))
 
-    scenarios: dict[str, dict] = {}
-    combi_scenarios: dict[str, dict] = {}
+    # One set of scenarios per eigendom choice: all candidates ("mix"), only
+    # those on public ground, only those on private ground. Mix goes in the
+    # main file; the other two in small side files the tab loads on demand.
+    eigendom = np.asarray([c["eigendom"] for c in candidates])
+    variants: dict[str, np.ndarray | None] = {
+        "mix": None,
+        "publiek": eigendom == "publiek",
+        "privaat": eigendom == "privaat",
+    }
+    results = {name: ({}, {}) for name in variants}
 
     for radius in args.distances:
         cover_idx = cover_index(cx, cy, cand_x, cand_y, radius)
 
+        starts: dict[str, np.ndarray] = {}
         if args.mode in ("single", "both"):
             for start in args.starts:
                 subset = START_SUBSETS[start]
                 if subset is None:
-                    start_covered = np.zeros(cx.shape[0], dtype=bool)
+                    starts[start] = np.zeros(cx.shape[0], dtype=bool)
                 else:
                     px, py = existing.get(subset, (np.empty(0), np.empty(0)))
-                    start_covered = covered_mask(cx, cy, px, py, radius)
-                scenarios[f"{radius}|{start}"] = greedy_single(
-                    cpop, cover_idx, start_covered, cand_x, cand_y, cand_prio,
-                    max_picks, args.min_gain, args.min_spacing,
-                )
-
+                    starts[start] = covered_mask(cx, cy, px, py, radius)
         if args.mode in ("combi", "both"):
             ix, iy = existing.get("alles", (np.empty(0), np.empty(0)))
             covered_i0 = covered_mask(cx, cy, ix, iy, radius)
             covered_p0 = covered_mask(cx, cy, pakket_x, pakket_y, radius)
-            for rule in ("gewogen", "synergie"):
-                combi_scenarios[f"{radius}|combi-{rule}"] = greedy_combi(
-                    cpop, cover_idx, covered_i0, covered_p0, cand_x, cand_y,
-                    cand_prio, combi_ok, rule, args.alpha,
-                    max_picks, args.min_gain, args.min_spacing,
+
+        for name, allowed in variants.items():
+            single_out, combi_out = results[name]
+            for start, start_covered in starts.items():
+                single_out[f"{radius}|{start}"] = greedy_single(
+                    cpop, cover_idx, start_covered, cand_x, cand_y, cand_prio,
+                    max_picks, args.min_gain, args.min_spacing, allowed,
                 )
+            if args.mode in ("combi", "both"):
+                for rule in ("gewogen", "synergie"):
+                    combi_out[f"{radius}|combi-{rule}"] = greedy_combi(
+                        cpop, cover_idx, covered_i0, covered_p0, cand_x, cand_y,
+                        cand_prio, combi_ok, rule, args.alpha,
+                        max_picks, args.min_gain, args.min_spacing, allowed,
+                    )
+
+    scenarios, combi_scenarios = results["mix"]
 
     n_cells = int(cell_idx.size)
-    for key, scenario in {**scenarios, **combi_scenarios}.items():
-        for field in ("cell_rank", "cell_rank_i", "cell_rank_p"):
-            if field in scenario:
-                assert len(scenario[field]) == n_cells, f"{field} mismatch in {slug} {key}"
+    for single_out, combi_out in results.values():
+        for key, scenario in {**single_out, **combi_out}.items():
+            for field in ("cell_rank", "cell_rank_i", "cell_rank_p"):
+                if field in scenario:
+                    assert len(scenario[field]) == n_cells, f"{field} mismatch in {slug} {key}"
 
     out = {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -723,9 +755,15 @@ def process_municipality(muni: dict) -> tuple[str, str]:
             {
                 "lat": c["lat"], "lon": c["lon"], "type": c["type"],
                 "naam": c["naam"], "flags": c["flags"],
+                "eigendom": c["eigendom"], "eigendom_bron": c["eigendom_bron"],
             }
             for c in candidates
         ],
+        "eigendom_counts": {
+            name: int((eigendom == name).sum()) for name in ("publiek", "privaat", "onbekend")
+        },
+        # Side files with the same scenario keys, restricted to one eigendom.
+        "eigendom_variants": ["publiek", "privaat"],
         "existing": {
             subset: int(coords[0].size) for subset, coords in existing.items()
         },
@@ -743,6 +781,14 @@ def process_municipality(muni: dict) -> tuple[str, str]:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     out_path = OUT_DIR / f"{slug}.json"
     out_path.write_text(json.dumps(out, separators=(",", ":"), allow_nan=False))
+    for name in ("publiek", "privaat"):
+        single_out, combi_out = results[name]
+        (OUT_DIR / f"{slug}.{name}.json").write_text(json.dumps({
+            "slug": slug,
+            "eigendom": name,
+            "scenarios": single_out,
+            "combi_scenarios": combi_out,
+        }, separators=(",", ":"), allow_nan=False))
 
     kb = out_path.stat().st_size / 1024
     reference = scenarios.get("400|alle-punten") or next(iter(scenarios.values()), None)
@@ -855,7 +901,8 @@ def main() -> int:
     if OUT_DIR.exists():
         index = {}
         for path in sorted(OUT_DIR.glob("*.json")):
-            if path.name == "index.json":
+            # Skip the index and the eigendom side files (<slug>.publiek.json).
+            if path.name == "index.json" or "." in path.stem:
                 continue
             payload = json.loads(path.read_text())
             index[payload["slug"]] = {

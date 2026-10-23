@@ -15,7 +15,7 @@ import {
   subscribeBasemap,
 } from '@/lib/basemapStore';
 import type { NetworkCandidate, NetworkPayload, TypeMeta } from '@/lib/inleverpuntNetwork';
-import { FLAG_LABELS } from '@/lib/inleverpuntNetwork';
+import { EIGENDOM_LABELS, FLAG_LABELS } from '@/lib/inleverpuntNetwork';
 import { nlInt } from '@/types/analyse';
 
 export interface PickMarker {
@@ -43,6 +43,21 @@ interface Props {
   /** Combi mode draws the parcel-point layer too. */
   pakketpunten?: { lat: number; lon: number }[];
   showPakketpunten?: boolean;
+  /** Only draw unused candidates on this terrain (the planner's eigendom choice). */
+  candidateFilter?: 'publiek' | 'privaat' | null;
+}
+
+function TerrainLine({ candidate }: { candidate: NetworkCandidate }) {
+  if (!candidate.eigendom) return null;
+  return (
+    <>
+      <br />
+      <span style={{ fontSize: '0.85em' }}>
+        {EIGENDOM_LABELS[candidate.eigendom]}
+        {candidate.eigendom_bron ? ` (${candidate.eigendom_bron})` : ''}
+      </span>
+    </>
+  );
 }
 
 /**
@@ -70,6 +85,7 @@ export default function NetworkPlannerMap({
   existing = [],
   pakketpunten = [],
   showPakketpunten = false,
+  candidateFilter = null,
 }: Props) {
   const basemapId = useSyncExternalStore(
     subscribeBasemap,
@@ -170,6 +186,7 @@ export default function NetworkPlannerMap({
         {showCandidates &&
           candidates.map((candidate, i) => {
             if (placed.has(candidate)) return null;
+            if (candidateFilter && candidate.eigendom !== candidateFilter) return null;
             const meta: TypeMeta | undefined = typeMeta[candidate.type];
             return (
               <CircleMarker
@@ -187,6 +204,7 @@ export default function NetworkPlannerMap({
                   <strong>{candidate.naam || meta?.label}</strong>
                   <br />
                   {meta?.label} — niet geselecteerd
+                  <TerrainLine candidate={candidate} />
                 </Popup>
               </CircleMarker>
             );
@@ -215,6 +233,7 @@ export default function NetworkPlannerMap({
                 </strong>
                 <br />
                 {meta?.label}
+                <TerrainLine candidate={pick.candidate} />
                 <br />
                 {pick.gainPakket == null ? (
                   <>+{nlInt(pick.gain)} inwoners bereikt</>

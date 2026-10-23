@@ -21,6 +21,35 @@ setWorkerUrl(withBase('/maplibre-gl-worker.mjs'));
  * rebuild than to diff.
  */
 export default function BasemapLayer({ basemap }: { basemap: Basemap }) {
+  return (
+    <>
+      <ContainerResizeWatcher />
+      <BasemapLayerInner basemap={basemap} />
+    </>
+  );
+}
+
+/**
+ * Tell Leaflet when its container changes size.
+ *
+ * Leaflet only notices window resizes. A map that mounts while its grid cell
+ * is still narrow (the netwerkplanner's map did) keeps the old size: raster
+ * tiles leave a blank strip, and the MapLibre canvas draws the wrong area.
+ * invalidateSize fires Leaflet's `resize`, which the GL binding follows.
+ */
+function ContainerResizeWatcher() {
+  const map = useMap();
+
+  useEffect(() => {
+    const observer = new ResizeObserver(() => map.invalidateSize({ pan: false }));
+    observer.observe(map.getContainer());
+    return () => observer.disconnect();
+  }, [map]);
+
+  return null;
+}
+
+function BasemapLayerInner({ basemap }: { basemap: Basemap }) {
   if (basemap.kind === 'vector') {
     return <VectorBasemapLayer key={basemap.id} basemap={basemap} />;
   }

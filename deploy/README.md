@@ -99,7 +99,10 @@ de rest is opnieuw te maken. De worker bewaart na elke run een kopie in
 Na de punten bouwt de run de analysetabs (bereik, schatting, plaatsingsadvies,
 netwerkplanner, POI's) voor **alle** gemeenten (`analysis_stage.py`):
 
-- **POI's** (Overpass, ~10 min): maandelijks, of zodra een gemeente geen bundel heeft.
+- **POI's** (Overpass, 10–35 min): maandelijks, of zodra een gemeente geen bundel heeft.
+  Elke week daarna: publiek/privaat terrein per POI (`classify_poi_ownership.py`,
+  BGT via PDOK, gecachet per POI: alleen nieuwe POI's kosten een opzoeking) en
+  de bundels per gemeente opnieuw.
 - **Landelijk** (analysepunten, bereik, PC4-tabel, regressiemodel), ~1,5 min: elke week.
   Het model wordt landelijk gefit, dus elke gemeente schuift mee.
 - **Plaatsingsadvies** (~5 min): elke week, alle gemeenten.

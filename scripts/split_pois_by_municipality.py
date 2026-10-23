@@ -99,6 +99,8 @@ def main() -> int:
                 "name": f["properties"].get("name", ""),
                 "operator": f["properties"].get("operator", ""),
                 "osm_id": f["properties"].get("osm_id", ""),
+                "eigendom": f["properties"].get("eigendom", "onbekend"),
+                "eigendom_bron": f["properties"].get("eigendom_bron", ""),
             }
             for f in features
             if f.get("geometry", {}).get("type") == "Point"
@@ -136,6 +138,8 @@ def main() -> int:
                     "name": row["name"] or "",
                     "operator": row["operator"] or "",
                     "osm_id": row["osm_id"] or "",
+                    "eigendom": row["eigendom"],
+                    "eigendom_bron": row["eigendom_bron"],
                 },
             })
         print(f"  {slug:>22} : {len(joined):>6} punten → "

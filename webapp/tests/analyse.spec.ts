@@ -99,6 +99,67 @@ test.describe('Analysetabs', () => {
     await expect(page.getByText(/De pakketpuntendata komt uit/)).toBeVisible();
     await expect(page.getByRole('button', { name: /Synergie/ })).toBeVisible();
   });
+
+  test('netwerkplanner plant met alleen publiek of privaat terrein', async ({ page }) => {
+    await page.goto('/data-export/netwerkplanner', { waitUntil: 'networkidle' });
+
+    const publiek = page.getByRole('button', { name: /^Publiek terrein/ });
+    // Network files from before the eigendom split have no switch; the CI
+    // dataset is one of those.
+    test.skip((await publiek.count()) === 0, 'netwerkdata zonder eigendomsvarianten');
+
+    await publiek.click();
+    const list = page.locator('ol').filter({ has: page.locator('li') }).last();
+    await expect(list.locator('li').first()).toContainText('publiek');
+    await expect(list).not.toContainText('privaat');
+
+    await page.getByRole('button', { name: /^Privaat terrein/ }).click();
+    await expect(list.locator('li').first()).toContainText('privaat');
+    await expect(list).not.toContainText('publiek');
+  });
+
+  test('netwerkplanner tekent grafiek en kaart op ware grootte', async ({ page }) => {
+    await page.goto('/data-export/netwerkplanner', { waitUntil: 'networkidle' });
+
+    // Axis labels stay readable: the chart is drawn at the column's pixel
+    // width instead of a scaled viewBox (which made them 24 px or 6 px).
+    const label = page.locator('svg[aria-label^="Dekking"] text').first();
+    const size = await label.evaluate((el) => el.getBoundingClientRect().height);
+    expect(size).toBeGreaterThan(8);
+    expect(size).toBeLessThan(18);
+
+    // The basemap fills the map. It used to cover only a strip on the left:
+    // Leaflet (and the MapLibre canvas following it) kept the size the
+    // container had at mount. Element sizes looked right throughout, so this
+    // checks pixels: the right third of the map must not be one flat colour.
+    const container = page.locator('.leaflet-container').first();
+    await page.getByRole('checkbox', { name: 'Bewoonde cellen' }).uncheck();
+    await expect
+      .poll(
+        async () => {
+          const png = (await container.screenshot()).toString('base64');
+          return page.evaluate(async (data) => {
+            const image = new Image();
+            image.src = `data:image/png;base64,${data}`;
+            await image.decode();
+            const canvas = document.createElement('canvas');
+            canvas.width = image.width;
+            canvas.height = image.height;
+            const ctx = canvas.getContext('2d')!;
+            ctx.drawImage(image, 0, 0);
+            const x0 = Math.floor((image.width * 2) / 3);
+            const { data: px } = ctx.getImageData(x0, 0, image.width - x0, image.height);
+            const colours = new Set<number>();
+            for (let i = 0; i < px.length; i += 4 * 37) {
+              colours.add((px[i] >> 3) * 1024 + (px[i + 1] >> 3) * 32 + (px[i + 2] >> 3));
+            }
+            return colours.size;
+          }, png);
+        },
+        { timeout: 20_000, message: 'rechterdeel van de kaart blijft leeg' }
+      )
+      .toBeGreaterThan(20);
+  });
 });
 
 // ---------------------------------------------------------------------------

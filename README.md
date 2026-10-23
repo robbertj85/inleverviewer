@@ -147,6 +147,7 @@ Op de VPS doet de wekelijkse run dit allemaal zelf, voor alle 342 gemeenten
 ```bash
 # Eenmalige inputs (groot, gitignored, regenereerbaar)
 python scripts/fetch_pois.py                        # Overpass, ~10 min voor alles
+python scripts/classify_poi_ownership.py            # publiek/privaat terrein (BGT), ~11 min de eerste keer
 python scripts/split_pois_by_municipality.py --only all
 python scripts/fetch_pakketpunten.py                # landelijk pakketpuntenbestand
 

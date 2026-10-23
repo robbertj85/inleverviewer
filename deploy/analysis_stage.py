@@ -4,9 +4,11 @@ as a stage of the weekly run, for every municipality.
 
 Order, and what each step costs on the VPS-sized data (measured locally):
 
-    POIs        fetch_pois.py + split_pois_by_municipality.py --only all
-                Overpass, ~10 min. Monthly, or as soon as a municipality has no
-                bundle (suggestions and the planner refuse to run without one).
+    POIs        fetch_pois.py (Overpass, 10-40 min; 35 on the first VPS run): monthly, or as soon as a
+                municipality has no bundle. Then every week:
+                classify_poi_ownership.py (publiek/privaat terrein; BGT lookups
+                cached per POI, so only new POIs cost a request) and
+                split_pois_by_municipality.py --only all.
     national    build_analysis_points → compute_population_coverage →
                 build_pc4_stats → fit_pc4_model, ~1.5 min together. Always
                 rerun: the regression refits on the whole country, so every
@@ -77,6 +79,7 @@ JOBS = int(os.environ.get("INLEVER_ANALYSIS_JOBS", "6"))
 # and POI bundle. Code is included so a change to the planner recomputes all.
 SHARED_CODE = [
     "scripts/plan_inleverpunt_network.py",
+    "scripts/classify_poi_ownership.py",
     "analysis.py",
     "normalize.py",
     "utils.py",
@@ -278,10 +281,21 @@ class AnalysisStage:
         return [], commit
 
     def _pois(self, staging: Path, slugs: list[str], state: dict) -> bool:
-        """Refresh the POI layer when it is old or a municipality lacks a bundle.
+        """Refresh the POI layer when it is old or a municipality lacks a bundle,
+        then classify publiek/privaat and rebuild the bundles.
 
         Returns whether a fresh download happened (and its date should be saved).
         """
+        fetched_ok = self._fetch_pois(staging, slugs, state)
+        # Weekly even without a download: cached lookups make it cheap, and it
+        # retries the BGT lookups that failed last time.
+        if self.run_step("scripts/classify_poi_ownership.py", 240, staging, []):
+            raise RuntimeError("classify_poi_ownership")
+        if self.run_step("scripts/split_pois_by_municipality.py", 30, staging, ["--only", "all"]):
+            raise RuntimeError("split_pois_by_municipality")
+        return fetched_ok
+
+    def _fetch_pois(self, staging: Path, slugs: list[str], state: dict) -> bool:
         bundles = staging / "data" / "poi" / "by-municipality"
         missing = [s for s in slugs if not (bundles / f"{s}.geojson").exists()]
         fetched = state.get("pois_fetched_at")
@@ -290,13 +304,12 @@ class AnalysisStage:
             return False
 
         self.log(f"POIs: {'stale' if stale else 'fresh'}, {len(missing)} municipalities without a bundle")
-        fetched_ok = self.run_step("scripts/fetch_pois.py", 45, staging, []) == 0
+        # Overpass rate-limits: the first full download took 35 min.
+        fetched_ok = self.run_step("scripts/fetch_pois.py", 75, staging, []) == 0
         if not fetched_ok:
             # Overpass is flaky; the previous download still makes usable
             # bundles, and the next run tries the fetch again.
             if not (staging / "data" / "poi" / "index.json").exists():
                 raise RuntimeError("fetch_pois")
             self.log("⚠ fetch_pois failed; splitting the previous POI download")
-        if self.run_step("scripts/split_pois_by_municipality.py", 30, staging, ["--only", "all"]):
-            raise RuntimeError("split_pois_by_municipality")
         return fetched_ok

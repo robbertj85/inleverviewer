@@ -356,6 +356,9 @@ def _to_features(elements: Iterable[dict], cat: dict) -> list[dict]:
                 "category": cat["slug"],
                 "name": tags.get("name") or tags.get("ref") or "",
                 "operator": tags.get("operator", ""),
+                # Read by classify_poi_ownership.py (publiek/privaat terrein).
+                "ownership": tags.get("ownership", ""),
+                "operator_type": tags.get("operator:type", ""),
             },
         })
     return features

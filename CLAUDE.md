@@ -96,6 +96,19 @@ for returns per inhabitant per year per stream. `CAPACITY_DEFAULTS` in
 number and a list of registers still to consult, and the UI labels it as such.
 Do not quietly promote these to facts.
 
+**Publiek/privaat is terrain, not legal ownership.** Owners are not open data
+(the Kadaster sells them per object), so `scripts/classify_poi_ownership.py` tags
+every POI by the ground it stands on: OSM ownership/operator tags first, then the
+category where it settles it (bus stop, glass bank → publiek; shop, school,
+hospital → privaat), then the BGT object under the point via PDOK's OGC API
+(pand/erf/inrit → privaat; road, verharding, groenvoorziening → publiek). A
+building is not proof of private ownership: Zwolle's municipal car parks are
+buildings, which is why an operator named "Gemeente …" wins first. Lookups are
+cached per POI in `data/poi_ownership_cache.json` (~45/s with 8 workers, ~29k
+lookups the first time). The network planner computes the `publiek` and
+`privaat` variants into `<slug>.publiek.json` / `<slug>.privaat.json`; the tab
+loads them only when chosen, and `index.json` skips them (dotted stem).
+
 **Pakketpunten data is fetched weekly, from a static file.**
 `scripts/fetch_pakketpunten.py` downloads `pakketpuntenviewer.nl/data/nederland.geojson`
 (regenerated there every Monday morning) into `data/pakketpunten_snapshot.geojson`.

@@ -37,12 +37,17 @@ export interface CapacityDefaults {
   legingen_per_week_max: number;
 }
 
+export type Eigendom = 'publiek' | 'privaat' | 'onbekend';
+
 export interface NetworkCandidate {
   lat: number;
   lon: number;
   type: string;
   naam: string;
   flags: string[];
+  /** Terrain under the candidate (scripts/classify_poi_ownership.py). */
+  eigendom?: Eigendom;
+  eigendom_bron?: string;
 }
 
 export interface NetworkPick {
@@ -115,7 +120,33 @@ export interface NetworkPayload {
   } | null;
   scenarios: Record<string, NetworkScenario>;
   combi_scenarios: Record<string, CombiScenario>;
+  /** Candidates per terrain class. Absent in files from before the split. */
+  eigendom_counts?: Record<Eigendom, number>;
+  /** Side files `<slug>.<variant>.json` with the same scenario keys. */
+  eigendom_variants?: ('publiek' | 'privaat')[];
 }
+
+/** The scenarios of one eigendom side file. */
+export interface EigendomVariantPayload {
+  slug: string;
+  eigendom: 'publiek' | 'privaat';
+  scenarios: Record<string, NetworkScenario>;
+  combi_scenarios: Record<string, CombiScenario>;
+}
+
+export type EigendomChoice = 'mix' | 'publiek' | 'privaat';
+
+export const EIGENDOM_LABELS: Record<Eigendom, string> = {
+  publiek: 'publiek terrein',
+  privaat: 'privaat terrein',
+  onbekend: 'terrein onbekend',
+};
+
+export const EIGENDOM_COLOURS: Record<Eigendom, string> = {
+  publiek: '#2a78d6',
+  privaat: '#b45309',
+  onbekend: '#7a7f75',
+};
 
 export interface NetworkIndexEntry {
   gemeente: string;
