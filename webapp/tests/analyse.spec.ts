@@ -44,6 +44,19 @@ function exists(...segments: string[]): boolean {
   return fs.existsSync(path.join(DATA_DIR, ...segments));
 }
 
+/**
+ * The data tests walk every municipality's files, which on the full national
+ * dataset means hundreds of thousands of individual checks. One Playwright
+ * `expect()` per check took the suite past ten minutes, so these collect
+ * violations with plain comparisons and assert once — which also reports
+ * every failure instead of only the first.
+ */
+function expectNoProblems(problems: string[]) {
+  const shown = problems.slice(0, 50);
+  const more = problems.length > shown.length ? `\n… en nog ${problems.length - shown.length}` : '';
+  expect(problems, `${problems.length} problemen:\n${shown.join('\n')}${more}`).toEqual([]);
+}
+
 // ---------------------------------------------------------------------------
 // Pages
 // ---------------------------------------------------------------------------
@@ -248,6 +261,7 @@ test.describe('Analysedata', () => {
 
   test('cell_rank heeft precies één waarde per cel in elk scenario', () => {
     const index = readJson<Record<string, unknown>>('inleverpunt_network', 'index.json');
+    const problems: string[] = [];
     for (const slug of Object.keys(index)) {
       const payload = readJson<{
         cells: { pop: number[] };
@@ -257,17 +271,24 @@ test.describe('Analysedata', () => {
       const n = payload.cells.pop.length;
 
       for (const [key, scenario] of Object.entries(payload.scenarios)) {
-        expect(scenario.cell_rank.length, `${slug} ${key}`).toBe(n);
+        if (scenario.cell_rank.length !== n) {
+          problems.push(`${slug} ${key}: ${scenario.cell_rank.length} rangen voor ${n} cellen`);
+        }
       }
       for (const [key, scenario] of Object.entries(payload.combi_scenarios)) {
-        expect(scenario.cell_rank_i.length, `${slug} ${key} (inleveren)`).toBe(n);
-        expect(scenario.cell_rank_p.length, `${slug} ${key} (pakketten)`).toBe(n);
+        if (scenario.cell_rank_i.length !== n || scenario.cell_rank_p.length !== n) {
+          problems.push(
+            `${slug} ${key}: ${scenario.cell_rank_i.length}/${scenario.cell_rank_p.length} rangen voor ${n} cellen`
+          );
+        }
       }
     }
+    expectNoProblems(problems);
   });
 
   test('de synergie-index klopt met de twee winsten', () => {
     const index = readJson<Record<string, unknown>>('inleverpunt_network', 'index.json');
+    const problems: string[] = [];
     for (const slug of Object.keys(index)) {
       const payload = readJson<{
         combi_scenarios: Record<
@@ -284,17 +305,18 @@ test.describe('Analysedata', () => {
           // Stored rounded to three decimals, so anything within half a unit
           // of the last decimal is exact. toBeCloseTo(x, 3) is tighter than
           // that and trips on values that sit on the rounding boundary.
-          expect(
-            Math.abs(pick.synergie - expected),
-            `${slug} ${key}: synergie ${pick.synergie} vs ${expected}`
-          ).toBeLessThanOrEqual(0.0005 + 1e-9);
+          if (Math.abs(pick.synergie - expected) > 0.0005 + 1e-9) {
+            problems.push(`${slug} ${key}: synergie ${pick.synergie} vs ${expected}`);
+          }
         }
       }
     }
+    expectNoProblems(problems);
   });
 
   test('de synergie-regel kiest alleen locaties die beide functies aankunnen', () => {
     const index = readJson<Record<string, unknown>>('inleverpunt_network', 'index.json');
+    const problems: string[] = [];
     for (const slug of Object.keys(index)) {
       const payload = readJson<{
         type_meta: Record<string, { combi_geschikt: boolean }>;
@@ -306,13 +328,13 @@ test.describe('Analysedata', () => {
         if (scenario.rule !== 'synergie') continue;
         for (const pick of scenario.picks) {
           const type = payload.candidates[pick.c].type;
-          expect(
-            payload.type_meta[type].combi_geschikt,
-            `${slug} ${key} koos ${type}, dat geen pakketpunt kan huisvesten`
-          ).toBe(true);
+          if (!payload.type_meta[type].combi_geschikt) {
+            problems.push(`${slug} ${key} koos ${type}, dat geen pakketpunt kan huisvesten`);
+          }
         }
       }
     }
+    expectNoProblems(problems);
   });
 
   test('elk plaatsingsadvies verwijst naar een bestaand PC4 met een gastheer of een reden', () => {
@@ -332,6 +354,7 @@ test.describe('Analysedata', () => {
     const slugs = Object.keys(index.municipalities);
     expect(slugs.length).toBeGreaterThan(0);
 
+    const problems: string[] = [];
     for (const slug of slugs) {
       const payload = readJson<{
         variants: Record<
@@ -358,33 +381,43 @@ test.describe('Analysedata', () => {
 
       for (const [key, block] of Object.entries(payload.variants)) {
         for (const record of block.pc4s) {
-          expect(record.pc4).toMatch(/^\d{4}$/);
+          if (!/^\d{4}$/.test(record.pc4)) problems.push(`${slug}/${key}: PC4 ${record.pc4}`);
           for (const [terrain, spots] of Object.entries(record.suggestions)) {
             for (const suggestion of spots) {
               const where = `${slug}/${key}/${terrain}/${record.pc4}`;
               // Inside the Netherlands, roughly.
-              expect(suggestion.lat).toBeGreaterThan(50.5);
-              expect(suggestion.lat).toBeLessThan(53.8);
-              expect(suggestion.lon).toBeGreaterThan(3.2);
-              expect(suggestion.lon).toBeLessThan(7.3);
+              if (
+                !(suggestion.lat > 50.5 && suggestion.lat < 53.8) ||
+                !(suggestion.lon > 3.2 && suggestion.lon < 7.3)
+              ) {
+                problems.push(`${where}: buiten Nederland (${suggestion.lat}, ${suggestion.lon})`);
+              }
               // A snapped suggestion sits on a real host within the walking
               // threshold; an unsnapped one must not claim it does.
-              if (suggestion.snapped) {
-                expect(suggestion.poi_distance_m, `${where} gesnapt zonder gastheer`).not.toBeNull();
-                expect(suggestion.poi_distance_m!).toBeLessThanOrEqual(index.poi_snap_max_m);
+              if (
+                suggestion.snapped &&
+                (suggestion.poi_distance_m == null ||
+                  suggestion.poi_distance_m > index.poi_snap_max_m)
+              ) {
+                problems.push(`${where}: gesnapt op ${suggestion.poi_distance_m} m`);
               }
               // A terrain choice only ever lands on that terrain.
-              if (terrain !== 'mix' && suggestion.poi_category) {
-                expect(suggestion.poi_eigendom, where).toBe(terrain);
+              if (terrain !== 'mix' && suggestion.poi_category && suggestion.poi_eigendom !== terrain) {
+                problems.push(`${where}: gastheer op ${suggestion.poi_eigendom} terrein`);
               }
               // With parcel points, the host must be able to take one too.
-              if (block.layers.includes('pakket') && suggestion.poi_category) {
-                expect(index.pakket_hosts, where).toContain(suggestion.poi_category);
+              if (
+                block.layers.includes('pakket') &&
+                suggestion.poi_category &&
+                !index.pakket_hosts.includes(suggestion.poi_category)
+              ) {
+                problems.push(`${where}: ${suggestion.poi_category} kan geen pakketpunt huisvesten`);
               }
             }
           }
         }
       }
     }
+    expectNoProblems(problems);
   });
 });
