@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 
 import PlacementSuggestionsReport, {
-  type PlacementSuggestionsPayload,
+  type PlacementSuggestionsIndex,
 } from '@/components/analyse/PlacementSuggestionsReport';
 import { dataFile } from '@/lib/dataPaths';
 
@@ -15,22 +15,24 @@ export const metadata = {
     'Welke postcodegebieden verdienen als eerste een extra inleverpunt, en waar precies?',
 };
 
-async function getPayload(): Promise<PlacementSuggestionsPayload | null> {
+// Only the index: the advice itself is one file per municipality, fetched by
+// the client, so the page does not ship every municipality's variants.
+async function getIndex(): Promise<PlacementSuggestionsIndex | null> {
   try {
-    const file = dataFile('placement_suggestions.json');
-    return JSON.parse(await fs.readFile(file, 'utf-8')) as PlacementSuggestionsPayload;
+    const file = dataFile('placement_suggestions', 'index.json');
+    return JSON.parse(await fs.readFile(file, 'utf-8')) as PlacementSuggestionsIndex;
   } catch {
     return null;
   }
 }
 
 export default async function SuggestiesPage() {
-  const payload = await getPayload();
+  const index = await getIndex();
 
-  if (!payload) {
+  if (!index) {
     return (
       <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-amber-900">
-        <h2 className="mb-2 font-semibold">placement_suggestions.json ontbreekt</h2>
+        <h2 className="mb-2 font-semibold">placement_suggestions/index.json ontbreekt</h2>
         <p className="text-sm">
           Genereer de dataset met{' '}
           <code className="rounded bg-amber-100 px-1 font-mono">
@@ -48,5 +50,5 @@ export default async function SuggestiesPage() {
     );
   }
 
-  return <PlacementSuggestionsReport payload={payload} />;
+  return <PlacementSuggestionsReport index={index} />;
 }

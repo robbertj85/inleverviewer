@@ -17,6 +17,11 @@ import {
   setStoredMunicipality,
   subscribeMunicipality,
 } from '@/lib/municipalityStore';
+import {
+  EIGENDOM_COLOURS,
+  EIGENDOM_LABELS,
+  type Eigendom,
+} from '@/lib/inleverpuntNetwork';
 import { nlInt, nlNum, nlPct } from '@/types/analyse';
 import { withBase } from '@/lib/basePath';
 
@@ -41,7 +46,13 @@ export interface Suggestion {
   poi_category: string | null;
   poi_naam: string | null;
   poi_distance_m: number | null;
+  poi_eigendom: Eigendom | null;
+  poi_eigendom_bron: string | null;
+  /** Newly reached inhabitants per network, unweighted. */
+  gain_by_layer: Record<string, number>;
 }
+
+export type Terrain = 'mix' | 'publiek' | 'privaat';
 
 export interface Pc4Record {
   pc4: string;
@@ -58,20 +69,31 @@ export interface Pc4Record {
   z_uncovered_pop: number;
   z_density: number;
   z_overlap_penalty: number;
-  suggestions: Suggestion[];
+  /** The PC4 ranking does not depend on the terrain choice; the spots do. */
+  suggestions: Record<Terrain, Suggestion[]>;
 }
 
-export interface MunicipalityBlock {
-  gemeente: string;
+/** One stream (or all streams), with or without parcel points. */
+export interface VariantBlock {
+  layers: string[];
   pc4_count_evaluated: number;
-  existing_points: number;
+  existing: Record<string, number>;
   pc4s: Pc4Record[];
 }
 
-export interface PlacementSuggestionsPayload {
+export interface MunicipalitySuggestions {
+  slug: string;
+  gemeente: string;
+  hosts_by_eigendom: Record<Eigendom, number>;
+  /** Keyed `<stream>` or `<stream>+pakket`. */
+  variants: Record<string, VariantBlock>;
+}
+
+export interface PlacementSuggestionsIndex {
   generated_at: string;
   weights: Record<WeightKey, number>;
   streams: string[];
+  terrains: Terrain[];
   top_n_per_municipality: number;
   suggestions_per_pc4: number;
   buffer_m: number;
@@ -79,10 +101,10 @@ export interface PlacementSuggestionsPayload {
   poi_snap_max_m: number;
   poi_report_radius_m: number;
   poi_snap_tiers: Record<string, Record<string, number>>;
+  pakket_hosts: string[];
   min_pc4_population: number;
-  min_white_spot_area_m2: number;
   methodology: Record<string, string>;
-  by_stream: Record<string, Record<string, MunicipalityBlock>>;
+  municipalities: Record<string, { gemeente: string; variants: string[] }>;
 }
 
 type WeightKey = 'underservice' | 'uncovered_pop' | 'density' | 'overlap_penalty';
@@ -114,6 +136,21 @@ const STREAM_LABELS: Record<string, string> = {
   statiegeld: 'Statiegeld',
   batterijen: 'Batterijen & lampen',
   elektro: 'Elektrische apparaten',
+  alle: 'Alle stromen',
+};
+
+/** Short names for the networks a variant counts, in gain breakdowns. */
+const LAYER_LABELS: Record<string, string> = {
+  statiegeld: 'statiegeld',
+  batterijen: 'batterijen',
+  elektro: 'elektro',
+  pakket: 'pakketpunt',
+};
+
+const TERRAIN_HINTS: Record<Terrain, string> = {
+  mix: 'Elke geschikte gastheer, ongeacht wie erover beslist.',
+  publiek: 'Alleen gastheren op openbare grond of van de overheid: de gemeente beslist zelf.',
+  privaat: 'Alleen gastheren op privaat terrein: de eigenaar beslist, de gemeente kan alleen vragen.',
 };
 
 const POI_LABELS: Record<string, string> = {
@@ -131,6 +168,9 @@ const POI_LABELS: Record<string, string> = {
   glasbak: 'Glas-/textielcontainer',
 };
 
+const variantKey = (stream: string, pakket: boolean) =>
+  pakket ? `${stream}+pakket` : stream;
+
 function poiLabel(suggestion: Suggestion): string | null {
   if (!suggestion.poi_category) return null;
   const type = POI_LABELS[suggestion.poi_category] ?? suggestion.poi_category;
@@ -138,14 +178,22 @@ function poiLabel(suggestion: Suggestion): string | null {
 }
 
 export default function PlacementSuggestionsReport({
-  payload,
+  index,
 }: {
-  payload: PlacementSuggestionsPayload;
+  index: PlacementSuggestionsIndex;
 }) {
-  const [stream, setStream] = useState(payload.streams[0] ?? 'statiegeld');
-  const slugsForStream = useMemo(
-    () => Object.keys(payload.by_stream[stream] ?? {}).sort(),
-    [payload.by_stream, stream]
+  const [stream, setStream] = useState(index.streams[0] ?? 'statiegeld');
+  const [pakket, setPakket] = useState(false);
+  const [terrain, setTerrain] = useState<Terrain>('mix');
+  const key = variantKey(stream, pakket);
+
+  const slugs = useMemo(
+    () =>
+      Object.entries(index.municipalities)
+        .filter(([, entry]) => entry.variants.includes(key))
+        .sort(([, a], [, b]) => a.gemeente.localeCompare(b.gemeente, 'nl'))
+        .map(([slug]) => slug),
+    [index.municipalities, key]
   );
 
   const storedSlug = useSyncExternalStore(
@@ -155,19 +203,20 @@ export default function PlacementSuggestionsReport({
   );
   const [chosenSlug, setChosenSlug] = useState<string | null>(null);
   // Explicit choice wins, then the shared sticky selection, then the first
-  // municipality that has advice for this stream. Derived, so switching
-  // stream cannot leave the select pointing at a municipality that is missing
-  // from the new stream.
+  // municipality that has advice for this variant. Derived, so switching
+  // variant cannot leave the select pointing at a municipality without one.
   const slug =
-    (chosenSlug && slugsForStream.includes(chosenSlug) && chosenSlug) ||
-    (storedSlug && slugsForStream.includes(storedSlug) && storedSlug) ||
-    slugsForStream[0] ||
+    (chosenSlug && slugs.includes(chosenSlug) && chosenSlug) ||
+    (storedSlug && slugs.includes(storedSlug) && storedSlug) ||
+    slugs[0] ||
     '';
 
-  const [weights, setWeights] = useState<Record<WeightKey, number>>(payload.weights);
+  const [weights, setWeights] = useState<Record<WeightKey, number>>(index.weights);
   const [selectedPc4, setSelectedPc4] = useState<string | null>(null);
-  const [loadedExisting, setLoadedExisting] = useState<{
+  // Keyed by slug so a stale response can be told apart from the current one.
+  const [loaded, setLoaded] = useState<{
     slug: string;
+    data: MunicipalitySuggestions | null;
     points: { lat: number; lon: number; naam: string }[];
   } | null>(null);
 
@@ -175,35 +224,35 @@ export default function PlacementSuggestionsReport({
     if (!slug) return;
     setStoredMunicipality(slug);
     let cancelled = false;
-    fetch(withBase(`/data/${slug}.geojson`))
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (cancelled) return;
-        const points: { lat: number; lon: number; naam: string }[] = [];
-        for (const feature of data?.features ?? []) {
-          if (feature.properties?.type !== 'inleverpunt') continue;
-          points.push({
-            lat: feature.geometry.coordinates[1],
-            lon: feature.geometry.coordinates[0],
-            naam: feature.properties.locatieNaam,
-          });
-        }
-        setLoadedExisting({ slug, points });
-      })
-      .catch(() => {
-        if (!cancelled) setLoadedExisting({ slug, points: [] });
-      });
+    Promise.all([
+      fetch(withBase(`/data/placement_suggestions/${slug}.json`))
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+      fetch(withBase(`/data/${slug}.geojson`))
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+    ]).then(([data, geojson]) => {
+      if (cancelled) return;
+      const points: { lat: number; lon: number; naam: string }[] = [];
+      for (const feature of geojson?.features ?? []) {
+        if (feature.properties?.type !== 'inleverpunt') continue;
+        points.push({
+          lat: feature.geometry.coordinates[1],
+          lon: feature.geometry.coordinates[0],
+          naam: feature.properties.locatieNaam,
+        });
+      }
+      setLoaded({ slug, data, points });
+    });
     return () => {
       cancelled = true;
     };
   }, [slug]);
 
-  const existing = useMemo(
-    () => (loadedExisting?.slug === slug ? loadedExisting.points : []),
-    [loadedExisting, slug]
-  );
-
-  const block = payload.by_stream[stream]?.[slug] ?? null;
+  const current = loaded?.slug === slug ? loaded : null;
+  const existing = useMemo(() => current?.points ?? [], [current]);
+  const block = current?.data?.variants[key] ?? null;
+  const loading = Boolean(slug) && !current;
 
   /**
    * Recompute priority from the shipped z-scores. Because those were
@@ -216,6 +265,7 @@ export default function PlacementSuggestionsReport({
     return [...block.pc4s]
       .map((record) => ({
         ...record,
+        spots: record.suggestions[terrain] ?? [],
         score:
           weights.underservice * record.z_underservice +
           weights.uncovered_pop * record.z_uncovered_pop +
@@ -223,7 +273,7 @@ export default function PlacementSuggestionsReport({
           weights.overlap_penalty * record.z_overlap_penalty,
       }))
       .sort((a, b) => b.score - a.score);
-  }, [block, weights]);
+  }, [block, weights, terrain]);
 
   const active = useMemo(
     () => ranked.find((r) => r.pc4 === selectedPc4) ?? ranked[0] ?? null,
@@ -232,7 +282,7 @@ export default function PlacementSuggestionsReport({
 
   const markers: SuggestionMarker[] = useMemo(
     () =>
-      (active?.suggestions ?? []).map((suggestion) => ({
+      (active?.spots ?? []).map((suggestion) => ({
         rank: suggestion.rank,
         lat: suggestion.lat,
         lon: suggestion.lon,
@@ -241,13 +291,14 @@ export default function PlacementSuggestionsReport({
         snapped: suggestion.snapped,
         poiLabel: poiLabel(suggestion),
         poiDistance: suggestion.poi_distance_m,
+        terrain: suggestion.poi_eigendom ? EIGENDOM_LABELS[suggestion.poi_eigendom] : null,
         estNewPop: suggestion.est_new_pop_within_400m,
       })),
     [active]
   );
 
   const totals = useMemo(() => {
-    const suggestions = ranked.flatMap((r) => r.suggestions);
+    const suggestions = ranked.flatMap((r) => r.spots);
     return {
       spots: suggestions.length,
       snapped: suggestions.filter((s) => s.snapped).length,
@@ -255,29 +306,35 @@ export default function PlacementSuggestionsReport({
     };
   }, [ranked]);
 
+  const layers = block?.layers ?? [];
+
   function exportCsv() {
     const rows: (string | number | null)[][] = [
       [
         'gemeente', 'stroom', 'pc4', 'prioriteit', 'inwoners', 'werkelijk',
         'voorspeld', 'onderbediening', 'inwoners_buiten_bereik', 'dichtheid',
         'dekking_400m_pct', 'plek', 'lat', 'lon', 'nieuw_bereikte_inwoners',
-        'gesnapt', 'gastheer', 'gastheer_afstand_m',
+        'gesnapt', 'gastheer', 'gastheer_afstand_m', 'gastheer_terrein',
+        'gastheer_terrein_bron', 'variant', 'terreinkeuze',
+        ...layers.map((layer) => `nieuw_${layer}`),
       ],
     ];
     for (const record of ranked) {
-      for (const suggestion of record.suggestions) {
+      for (const suggestion of record.spots) {
         rows.push([
-          block?.gemeente ?? slug, stream, record.pc4,
+          current?.data?.gemeente ?? slug, stream, record.pc4,
           Number(record.score.toFixed(3)), record.population, record.actual,
           record.predicted, record.underservice, record.uncovered_pop,
           record.density, record.coverage_pct_400m, suggestion.rank,
           suggestion.lat, suggestion.lon, suggestion.est_new_pop_within_400m,
           suggestion.snapped ? 'ja' : 'nee', poiLabel(suggestion),
-          suggestion.poi_distance_m,
+          suggestion.poi_distance_m, suggestion.poi_eigendom,
+          suggestion.poi_eigendom_bron, key, terrain,
+          ...layers.map((layer) => suggestion.gain_by_layer?.[layer] ?? null),
         ]);
       }
     }
-    downloadCsv(`plaatsingsadvies-${slug}-${stream}.csv`, rows);
+    downloadCsv(`plaatsingsadvies-${slug}-${key.replace('+', '-')}-${terrain}.csv`, rows);
   }
 
   return (
@@ -289,20 +346,61 @@ export default function PlacementSuggestionsReport({
           dat gebied precies? De ranking combineert onderbediening ten opzichte van het
           regressiemodel, inwoners buiten loopafstand, adressendichtheid en een
           strafterm voor gebied dat al gedekt is. Per gebied worden tot{' '}
-          {payload.suggestions_per_pc4} concrete plekken afgeleid uit de bewoonde witte
-          vlekken.
+          {index.suggestions_per_pc4} concrete plekken afgeleid uit de bewoonde witte
+          vlekken. Kies één stroom of een locatie voor alle stromen tegelijk, eventueel
+          gecombineerd met een pakketpunt.
         </p>
       </div>
 
-      <div className="flex flex-wrap items-end gap-4 rounded-lg border border-border bg-card p-4">
+      <div className="flex flex-wrap items-end gap-x-6 gap-y-3 rounded-lg border border-border bg-card p-4">
         <SegControl
           label="Stroom"
           value={stream}
           onChange={setStream}
-          options={payload.streams.map((s) => ({
+          options={index.streams.map((s) => ({
             value: s,
             label: STREAM_LABELS[s] ?? s,
+            title:
+              s === 'alle'
+                ? 'Eén locatie die statiegeld, batterijen en elektro tegelijk inneemt.'
+                : undefined,
           }))}
+        />
+        <SegControl
+          label="Pakketpunten"
+          value={pakket ? 'ja' : 'nee'}
+          onChange={(v) => setPakket(v === 'ja')}
+          options={[
+            { value: 'nee', label: 'Alleen inleveren' },
+            {
+              value: 'ja',
+              label: 'Inleverpunt + pakketpunt',
+              title:
+                'Telt ook inwoners zonder pakketpunt binnen loopafstand, en kiest alleen gastheren die ook een pakketbalie of -kluis kunnen huisvesten.',
+            },
+          ]}
+        />
+        <SegControl
+          label="Locaties"
+          value={terrain}
+          onChange={setTerrain}
+          options={[
+            { value: 'mix', label: 'Publiek + privaat', title: TERRAIN_HINTS.mix },
+            {
+              value: 'publiek',
+              label: current?.data
+                ? `Publiek terrein (${nlInt(current.data.hosts_by_eigendom.publiek ?? 0)})`
+                : 'Publiek terrein',
+              title: TERRAIN_HINTS.publiek,
+            },
+            {
+              value: 'privaat',
+              label: current?.data
+                ? `Privaat terrein (${nlInt(current.data.hosts_by_eigendom.privaat ?? 0)})`
+                : 'Privaat terrein',
+              title: TERRAIN_HINTS.privaat,
+            },
+          ]}
         />
         <div>
           <label
@@ -320,9 +418,9 @@ export default function PlacementSuggestionsReport({
             }}
             className="min-h-10 rounded-md border border-border bg-card px-2 text-sm"
           >
-            {slugsForStream.map((s) => (
+            {slugs.map((s) => (
               <option key={s} value={s}>
-                {payload.by_stream[stream][s].gemeente}
+                {index.municipalities[s].gemeente}
               </option>
             ))}
           </select>
@@ -330,7 +428,24 @@ export default function PlacementSuggestionsReport({
         <CsvButton onClick={exportCsv} label="CSV" />
       </div>
 
-      {!block ? (
+      <p className="-mt-2 text-xs text-muted-foreground">
+        {TERRAIN_HINTS[terrain]} Publiek of privaat gaat over het terrein onder de
+        gastheer (OSM-tags, het type locatie of het BGT-object op die plek), niet over
+        juridisch eigendom. De ranking van de PC4&apos;s verandert er niet door, alleen
+        waar de plekken landen.
+        {pakket && (
+          <>
+            {' '}Pakketpunten komen uit de pakketpuntenviewer en worden wekelijks
+            opgehaald; die tellen ook over de gemeentegrens.
+          </>
+        )}
+      </p>
+
+      {loading ? (
+        <div className="rounded-lg border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          Advies laden…
+        </div>
+      ) : !block ? (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
           Geen advies voor deze combinatie.
         </div>
@@ -340,18 +455,28 @@ export default function PlacementSuggestionsReport({
             <StatTile
               label="PC4's beoordeeld"
               value={nlInt(block.pc4_count_evaluated)}
-              hint={`top ${payload.top_n_per_municipality} uitgewerkt`}
+              hint={`top ${index.top_n_per_municipality} uitgewerkt`}
             />
             <StatTile
               label="Bestaande punten"
-              value={nlInt(block.existing_points)}
-              hint={STREAM_LABELS[stream] ?? stream}
+              value={nlInt(
+                layers
+                  .filter((layer) => layer !== 'pakket')
+                  .reduce((sum, layer) => sum + (block.existing[layer] ?? 0), 0)
+              )}
+              hint={layers
+                .map((layer) => `${nlInt(block.existing[layer] ?? 0)} ${LAYER_LABELS[layer] ?? layer}`)
+                .join(' · ')}
             />
             <StatTile label="Voorgestelde plekken" value={nlInt(totals.spots)} hint={`${nlInt(totals.snapped)} gesnapt naar een gastheer`} />
             <StatTile
               label="Nieuw bereik samen"
               value={nlInt(totals.newPop)}
-              hint={`inwoners binnen ${payload.buffer_m} m`}
+              hint={
+                layers.length > 1
+                  ? `gewogen over ${layers.length} netwerken, binnen ${index.buffer_m} m`
+                  : `inwoners binnen ${index.buffer_m} m`
+              }
             />
           </div>
 
@@ -363,7 +488,7 @@ export default function PlacementSuggestionsReport({
               </h3>
               <button
                 type="button"
-                onClick={() => setWeights(payload.weights)}
+                onClick={() => setWeights(index.weights)}
                 className="text-xs text-muted-foreground hover:text-foreground"
               >
                 Terug naar standaard
@@ -450,7 +575,7 @@ export default function PlacementSuggestionsReport({
                           {nlPct(record.coverage_pct_400m)}%
                         </td>
                         <td className="px-2 py-1.5 text-right tabular-nums">
-                          {record.suggestions.length}
+                          {record.spots.length}
                         </td>
                       </tr>
                     ))}
@@ -468,7 +593,7 @@ export default function PlacementSuggestionsReport({
                 <SuggestionMap
                   markers={markers}
                   existing={existing}
-                  bufferM={payload.buffer_m}
+                  bufferM={index.buffer_m}
                 />
               </div>
               {active && (
@@ -491,7 +616,7 @@ export default function PlacementSuggestionsReport({
                     </dd>
                   </dl>
                   <ol className="mt-2 space-y-2 text-sm">
-                    {active.suggestions.map((suggestion) => (
+                    {active.spots.map((suggestion) => (
                       <li key={suggestion.rank} className="rounded border border-border p-2">
                         <div className="flex items-baseline justify-between gap-2">
                           <span className="font-medium">Plek {suggestion.rank}</span>
@@ -499,16 +624,32 @@ export default function PlacementSuggestionsReport({
                             +{nlInt(suggestion.est_new_pop_within_400m)} inwoners
                           </span>
                         </div>
+                        {layers.length > 1 && (
+                          <p className="mt-0.5 text-[11px] text-muted-foreground">
+                            {layers
+                              .map(
+                                (layer) =>
+                                  `${LAYER_LABELS[layer] ?? layer} +${nlInt(suggestion.gain_by_layer?.[layer] ?? 0)}`
+                              )
+                              .join(' · ')}
+                          </p>
+                        )}
                         <p className="mt-0.5 text-xs text-muted-foreground">
                           {suggestion.snapped ? (
                             <>
                               Gesnapt naar{' '}
                               <span className="text-foreground">{poiLabel(suggestion)}</span>{' '}
                               ({suggestion.poi_distance_m} m)
+                              {suggestion.poi_eigendom && (
+                                <TerrainBadge
+                                  eigendom={suggestion.poi_eigendom}
+                                  bron={suggestion.poi_eigendom_bron}
+                                />
+                              )}
                             </>
                           ) : suggestion.poi_category ? (
                             <>
-                              Geen gastheer binnen {payload.poi_snap_max_m} m —
+                              Geen {terrain === 'mix' ? '' : `${EIGENDOM_LABELS[terrain]}-`}gastheer binnen {index.poi_snap_max_m} m —
                               dichtstbij: {poiLabel(suggestion)} op{' '}
                               {suggestion.poi_distance_m} m. Dit vraagt om een
                               zelfstandige unit.
@@ -522,7 +663,7 @@ export default function PlacementSuggestionsReport({
                         </p>
                       </li>
                     ))}
-                    {active.suggestions.length === 0 && (
+                    {active.spots.length === 0 && (
                       <li className="text-xs text-muted-foreground">
                         Geen bewoonde witte vlek gevonden in dit PC4.
                       </li>
@@ -534,17 +675,17 @@ export default function PlacementSuggestionsReport({
           </div>
 
           <MethodologyNote>
-            {Object.entries(payload.methodology).map(([key, value]) => (
-              <p key={key}>
+            {Object.entries(index.methodology).map(([name, value]) => (
+              <p key={name}>
                 <span className="font-medium text-foreground">
-                  {key.replace(/_/g, ' ')}:
+                  {name.replace(/_/g, ' ')}:
                 </span>{' '}
                 {value}
               </p>
             ))}
             <p>
               Gegenereerd op{' '}
-              {new Date(payload.generated_at).toLocaleString('nl-NL', {
+              {new Date(index.generated_at).toLocaleString('nl-NL', {
                 dateStyle: 'long',
                 timeStyle: 'short',
               })}
@@ -554,5 +695,20 @@ export default function PlacementSuggestionsReport({
         </>
       )}
     </div>
+  );
+}
+
+function TerrainBadge({ eigendom, bron }: { eigendom: Eigendom; bron: string | null }) {
+  return (
+    <span
+      className="ml-1 inline-block rounded px-1 text-[10px] font-semibold uppercase tracking-wide"
+      style={{
+        color: EIGENDOM_COLOURS[eigendom],
+        border: `1px solid ${EIGENDOM_COLOURS[eigendom]}`,
+      }}
+      title={bron ?? undefined}
+    >
+      {eigendom}
+    </span>
   );
 }

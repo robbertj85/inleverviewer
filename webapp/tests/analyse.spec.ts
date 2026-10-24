@@ -306,50 +306,66 @@ test.describe('Analysedata', () => {
   });
 
   test('elk plaatsingsadvies verwijst naar een bestaand PC4 met een gastheer of een reden', () => {
-    const payload = readJson<{
+    const index = readJson<{
       streams: string[];
       poi_snap_max_m: number;
-      by_stream: Record<
-        string,
-        Record<
+      pakket_hosts: string[];
+      municipalities: Record<string, { variants: string[] }>;
+    }>('placement_suggestions', 'index.json');
+
+    expect(index.streams).toContain('alle');
+    const slugs = Object.keys(index.municipalities);
+    expect(slugs.length).toBeGreaterThan(0);
+
+    for (const slug of slugs) {
+      const payload = readJson<{
+        variants: Record<
           string,
           {
+            layers: string[];
             pc4s: {
               pc4: string;
-              suggestions: {
-                snapped: boolean;
-                poi_distance_m: number | null;
-                lat: number;
-                lon: number;
-              }[];
+              suggestions: Record<
+                string,
+                {
+                  snapped: boolean;
+                  poi_category: string | null;
+                  poi_distance_m: number | null;
+                  poi_eigendom: string | null;
+                  lat: number;
+                  lon: number;
+                }[]
+              >;
             }[];
           }
-        >
-      >;
-    }>('placement_suggestions.json');
+        >;
+      }>('placement_suggestions', `${slug}.json`);
 
-    expect(payload.streams.length).toBeGreaterThan(0);
-
-    for (const [stream, munis] of Object.entries(payload.by_stream)) {
-      for (const [slug, block] of Object.entries(munis)) {
+      for (const [key, block] of Object.entries(payload.variants)) {
         for (const record of block.pc4s) {
           expect(record.pc4).toMatch(/^\d{4}$/);
-          for (const suggestion of record.suggestions) {
-            // Inside the Netherlands, roughly.
-            expect(suggestion.lat).toBeGreaterThan(50.5);
-            expect(suggestion.lat).toBeLessThan(53.8);
-            expect(suggestion.lon).toBeGreaterThan(3.2);
-            expect(suggestion.lon).toBeLessThan(7.3);
-            // A snapped suggestion sits on a real host within the walking
-            // threshold; an unsnapped one must not claim it does.
-            if (suggestion.snapped) {
-              expect(
-                suggestion.poi_distance_m,
-                `${stream}/${slug}/${record.pc4} gesnapt zonder gastheer`
-              ).not.toBeNull();
-              expect(suggestion.poi_distance_m!).toBeLessThanOrEqual(
-                payload.poi_snap_max_m
-              );
+          for (const [terrain, spots] of Object.entries(record.suggestions)) {
+            for (const suggestion of spots) {
+              const where = `${slug}/${key}/${terrain}/${record.pc4}`;
+              // Inside the Netherlands, roughly.
+              expect(suggestion.lat).toBeGreaterThan(50.5);
+              expect(suggestion.lat).toBeLessThan(53.8);
+              expect(suggestion.lon).toBeGreaterThan(3.2);
+              expect(suggestion.lon).toBeLessThan(7.3);
+              // A snapped suggestion sits on a real host within the walking
+              // threshold; an unsnapped one must not claim it does.
+              if (suggestion.snapped) {
+                expect(suggestion.poi_distance_m, `${where} gesnapt zonder gastheer`).not.toBeNull();
+                expect(suggestion.poi_distance_m!).toBeLessThanOrEqual(index.poi_snap_max_m);
+              }
+              // A terrain choice only ever lands on that terrain.
+              if (terrain !== 'mix' && suggestion.poi_category) {
+                expect(suggestion.poi_eigendom, where).toBe(terrain);
+              }
+              // With parcel points, the host must be able to take one too.
+              if (block.layers.includes('pakket') && suggestion.poi_category) {
+                expect(index.pakket_hosts, where).toContain(suggestion.poi_category);
+              }
             }
           }
         }

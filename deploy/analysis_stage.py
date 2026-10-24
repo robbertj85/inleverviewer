@@ -14,8 +14,9 @@ Order, and what each step costs on the VPS-sized data (measured locally):
                 rerun: the regression refits on the whole country, so every
                 municipality's prediction moves when any point changes.
     suggest_placements --only all
-                One national file, rewritten whole; seconds per municipality.
-                Always rerun, for the same reason.
+                One file per municipality with every variant (stream or all
+                streams, with or without parcel points, terrain choice); about
+                a second per municipality. Always rerun, for the same reason.
     plan_inleverpunt_network --only <changed>
                 The expensive one: 4-25 s per municipality. It reads only that
                 municipality's own points (load_existing_points filters on
@@ -60,7 +61,7 @@ REQUIRED_SITE_INPUTS = ["data/pc4.geojson"]
 OUTPUTS = [
     "data/population_coverage.json",
     "data/pc4_stats.json",
-    "data/placement_suggestions.json",
+    "data/placement_suggestions",
     "data/inleverpunt_network",
     "data/poi",
 ]
@@ -239,7 +240,8 @@ class AnalysisStage:
             for script, timeout in NATIONAL:
                 if self.run_step(script, timeout, staging, []):
                     raise RuntimeError(script)
-            if self.run_step("scripts/suggest_placements.py", 60, staging, ["--only", "all"]):
+            if self.run_step("scripts/suggest_placements.py", 60, staging,
+                             ["--only", "all", "--jobs", str(JOBS)]):
                 raise RuntimeError("suggest_placements")
 
             prints = self.fingerprints(staging, slugs)

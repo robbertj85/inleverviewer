@@ -32,7 +32,7 @@ python scripts/build_analysis_points.py             # consolidates the per-muni 
 python scripts/compute_population_coverage.py       # → population_coverage.json (~40 s)
 python scripts/build_pc4_stats.py                   # → pc4_stats.json
 python scripts/fit_pc4_model.py                     # adds predictions + model metadata
-python scripts/suggest_placements.py --only pilot   # → placement_suggestions.json
+python scripts/suggest_placements.py --only pilot   # → placement_suggestions/<slug>.json + index.json
 python scripts/plan_inleverpunt_network.py --only pilot   # → inleverpunt_network/
 
 # One-off inputs (slow, cached, gitignored)
@@ -108,6 +108,17 @@ cached per POI in `data/poi_ownership_cache.json` (~45/s with 8 workers, ~29k
 lookups the first time). The network planner computes the `publiek` and
 `privaat` variants into `<slug>.publiek.json` / `<slug>.privaat.json`; the tab
 loads them only when chosen, and `index.json` skips them (dotted stem).
+
+**Plaatsingsadvies is one file per municipality, holding every variant.**
+`placement_suggestions/<slug>.json` has eight variants (each stream plus `alle`,
+each with and without `+pakket`), and every PC4 row carries spots per terrain
+choice (`mix`/`publiek`/`privaat`): the ranking does not depend on the terrain,
+only where the spots snap. The page server-reads just `index.json`; the old
+national file was 7 MB passed through the RSC payload on every request. Spots
+are placed on the 100 m CBS raster at the cell with the most need-weighted
+inhabitants within 400 m (need = share of the variant's networks missing). On
+identical inputs the single-stream PC4 ranking matches the old polygon method
+exactly, and the spots reach 10–35% more inhabitants. Whole country: ~15 s.
 
 **Pakketpunten data is fetched weekly, from a static file.**
 `scripts/fetch_pakketpunten.py` downloads `pakketpuntenviewer.nl/data/nederland.geojson`

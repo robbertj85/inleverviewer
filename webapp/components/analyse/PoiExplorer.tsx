@@ -6,6 +6,7 @@ import L from 'leaflet';
 
 import BasemapLayer from '@/components/BasemapLayer';
 
+import { SegControl } from '@/components/analyse/AnalyseUI';
 import { AnalyseBasemapSwitcher, FitBounds } from '@/components/analyse/MapChrome';
 
 import { MAX_ZOOM, getBasemap } from '@/lib/basemaps';
@@ -20,6 +21,11 @@ import {
   setStoredMunicipality,
   subscribeMunicipality,
 } from '@/lib/municipalityStore';
+import {
+  EIGENDOM_COLOURS,
+  EIGENDOM_LABELS,
+  type Eigendom,
+} from '@/lib/inleverpuntNetwork';
 import { cn } from '@/lib/utils';
 import { MERK_COLORS, type Merk } from '@/types/inleverpunten';
 import { nlInt } from '@/types/analyse';
@@ -37,7 +43,15 @@ interface CategoryMeta {
 interface PoiFeature {
   type: 'Feature';
   geometry: { type: 'Point'; coordinates: [number, number] };
-  properties: { category: string; name: string; operator: string; osm_id?: string };
+  properties: {
+    category: string;
+    name: string;
+    operator: string;
+    osm_id?: string;
+    /** From classify_poi_ownership.py; absent in bundles split before it ran. */
+    eigendom?: Eigendom;
+    eigendom_bron?: string;
+  };
 }
 
 interface Bundle {
@@ -81,6 +95,10 @@ const GROUP_ORDER = ['afval', 'voorzieningen', 'ov', 'publiek', 'onderwijs'];
  */
 const DEFAULT_CATEGORIES = ['supermarkt', 'winkelcentrum', 'milieustraat', 'bouwmarkt'];
 
+type TerrainFilter = 'alle' | Eigendom;
+
+const TERRAINS: Eigendom[] = ['publiek', 'privaat', 'onbekend'];
+
 /** Any inleverpunt within this distance of a POI counts as "already served". */
 const SERVED_RADIUS_M = 100;
 
@@ -122,6 +140,8 @@ export default function PoiExplorer() {
   const [active, setActive] = useState<Set<string>>(new Set(DEFAULT_CATEGORIES));
   const [showExisting, setShowExisting] = useState(true);
   const [onlyUnserved, setOnlyUnserved] = useState(false);
+  const [terrain, setTerrain] = useState<TerrainFilter>('alle');
+  const [colourBy, setColourBy] = useState<'categorie' | 'terrein'>('categorie');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -255,8 +275,19 @@ export default function PoiExplorer() {
     [bundle]
   );
 
-  const shown = onlyUnserved ? visible.filter((v) => v.nearest > SERVED_RADIUS_M) : visible;
-  const servedCount = visible.filter((v) => v.nearest <= SERVED_RADIUS_M).length;
+  /** Selected-category POIs per terrain, before the terrain filter applies. */
+  const terrainCounts = useMemo(() => {
+    const counts: Record<Eigendom, number> = { publiek: 0, privaat: 0, onbekend: 0 };
+    for (const { feature } of visible) counts[feature.properties.eigendom ?? 'onbekend'] += 1;
+    return counts;
+  }, [visible]);
+
+  const onTerrain =
+    terrain === 'alle'
+      ? visible
+      : visible.filter((v) => (v.feature.properties.eigendom ?? 'onbekend') === terrain);
+  const shown = onlyUnserved ? onTerrain.filter((v) => v.nearest > SERVED_RADIUS_M) : onTerrain;
+  const servedCount = onTerrain.filter((v) => v.nearest <= SERVED_RADIUS_M).length;
 
   const groups = useMemo(() => {
     const byGroup = new Map<string, CategoryMeta[]>();
@@ -345,9 +376,44 @@ export default function PoiExplorer() {
               Alleen POI&apos;s zonder inleverpunt
             </label>
             <p className="text-xs text-muted-foreground">
-              {nlInt(servedCount)} van {nlInt(visible.length)}{' '}
+              {nlInt(servedCount)} van {nlInt(onTerrain.length)}{' '}
               getoonde POI&apos;s heeft
               al een inleverpunt binnen {SERVED_RADIUS_M} m.
+            </p>
+          </div>
+
+          <div className="space-y-2 rounded-lg border border-border bg-card p-3">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Terrein
+            </span>
+            <SegControl
+              size="sm"
+              value={terrain}
+              onChange={setTerrain}
+              options={[
+                { value: 'alle', label: `Alle (${nlInt(visible.length)})` },
+                ...TERRAINS.map((t) => ({
+                  value: t,
+                  label: `${t[0].toUpperCase()}${t.slice(1)} (${nlInt(terrainCounts[t])})`,
+                  title: EIGENDOM_LABELS[t],
+                })),
+              ]}
+            />
+            <SegControl
+              size="sm"
+              label="Kleur"
+              value={colourBy}
+              onChange={setColourBy}
+              options={[
+                { value: 'categorie', label: 'Categorie' },
+                { value: 'terrein', label: 'Terrein' },
+              ]}
+            />
+            <p className="text-xs text-muted-foreground">
+              Publiek terrein is openbare ruimte of overheidsvoorziening: daar beslist de
+              gemeente zelf. Op privaat terrein beslist de eigenaar. Afgeleid uit
+              OSM-tags, de beheerder, het type locatie en anders het BGT-object onder het
+              punt — het terrein, niet het juridisch eigendom.
             </p>
           </div>
 
@@ -449,16 +515,21 @@ export default function PoiExplorer() {
               {shown.map(({ feature, lat, lon, nearest }, i) => {
                 const meta = categoryBySlug.get(feature.properties.category);
                 const served = nearest <= SERVED_RADIUS_M;
+                const eigendom = feature.properties.eigendom ?? 'onbekend';
+                const colour =
+                  colourBy === 'terrein'
+                    ? EIGENDOM_COLOURS[eigendom]
+                    : meta?.color ?? '#475569';
                 return (
                   <CircleMarker
                     key={`${feature.properties.osm_id || i}`}
                     center={[lat, lon]}
                     radius={5}
                     pathOptions={{
-                      color: meta?.color ?? '#475569',
+                      color: colour,
                       // A filled ring means "already has an inleverpunt"; the
                       // hollow ones are the opportunity.
-                      fillColor: served ? meta?.color ?? '#475569' : '#ffffff',
+                      fillColor: served ? colour : '#ffffff',
                       weight: 2,
                       fillOpacity: served ? 0.85 : 0.9,
                     }}
@@ -468,6 +539,15 @@ export default function PoiExplorer() {
                       <br />
                       {meta?.label}
                       {feature.properties.operator && ` · ${feature.properties.operator}`}
+                      <br />
+                      <span style={{ color: EIGENDOM_COLOURS[eigendom], fontWeight: 600 }}>
+                        {EIGENDOM_LABELS[eigendom]}
+                      </span>
+                      {feature.properties.eigendom_bron && (
+                        <span className="text-muted-foreground">
+                          {' '}({feature.properties.eigendom_bron})
+                        </span>
+                      )}
                       <br />
                       {served
                         ? `Inleverpunt op ${Math.round(nearest)} m`
@@ -490,11 +570,21 @@ export default function PoiExplorer() {
           <span className="inline-block size-3 rounded-full border-2 border-[var(--green-700)] bg-[var(--green-700)]" />
           POI met inleverpunt binnen {SERVED_RADIUS_M} m
         </span>
+        {colourBy === 'terrein' &&
+          TERRAINS.map((t) => (
+            <span key={t} className="flex items-center gap-1.5">
+              <span
+                className="inline-block size-3 rounded-full border-2 bg-white"
+                style={{ borderColor: EIGENDOM_COLOURS[t] }}
+              />
+              {EIGENDOM_LABELS[t]}
+            </span>
+          ))}
         <span className="flex items-center gap-1.5">
           <span className="inline-block size-2 rounded-full bg-[var(--merk-statiegeld)]" />
           bestaand inleverpunt (kleur = merk)
         </span>
-        <span className="ml-auto">Bron: OpenStreetMap via Overpass API</span>
+        <span className="ml-auto">Bron: OpenStreetMap via Overpass API; terrein uit OSM en de BGT (PDOK)</span>
       </div>
     </div>
   );

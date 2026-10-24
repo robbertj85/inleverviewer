@@ -25,6 +25,8 @@ export interface SuggestionMarker {
   snapped: boolean;
   poiLabel: string | null;
   poiDistance: number | null;
+  /** e.g. "publiek terrein"; null when there is no host. */
+  terrain: string | null;
   estNewPop: number;
 }
 
@@ -127,6 +129,12 @@ export default function SuggestionMap({
                 : marker.poiLabel
                   ? `Geen gastheer binnen loopafstand — dichtstbij: ${marker.poiLabel} op ${marker.poiDistance} m`
                   : 'Geen geschikte gastheer in de buurt'}
+              {marker.poiLabel && marker.terrain && (
+                <>
+                  <br />
+                  Gastheer op {marker.terrain}
+                </>
+              )}
             </Popup>
           </CircleMarker>
         </Fragment>
