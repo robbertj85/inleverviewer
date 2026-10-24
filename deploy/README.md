@@ -87,8 +87,7 @@ de rest is opnieuw te maken. De worker bewaart na elke run een kopie in
    `gh workflow disable "Update inleverpunten data" -R robbertj85/inleverviewer`
 
 6. **Mergen naar `main`** en in Coolify de branch op `main` zetten. Dit verwijdert
-   de workflow en de gegenereerde data uit de repo (de git-historie blijft; CI
-   test tegen de laatste gecommitte dataset).
+   de workflow en de gegenereerde data uit de repo (de git-historie blijft).
 
 7. **Vercel**: redirect naar de nieuwe URL of verwijderen. Let op: de
    inleverpuntenplanner leest standaard `inleverpuntenviewer.vercel.app`

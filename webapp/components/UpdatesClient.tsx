@@ -91,7 +91,7 @@ export default function UpdatesClient({ summary, history }: UpdatesPayload) {
         <CardHeader>
           <CardTitle>Updatestatus</CardTitle>
           <p className="text-xs text-muted-foreground">
-            De data wordt elke maandag om 02:00 UTC automatisch ververst via GitHub Actions.
+            De data wordt elke maandag om 04:00 (Nederlandse tijd) automatisch ververst op de server.
           </p>
         </CardHeader>
         <CardContent>

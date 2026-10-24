@@ -197,7 +197,7 @@ alle ~33.700 punten in plaats van 342 keer per gemeente.
 
 **Robuustheid.** Elke bron schrijft via `scripts/cache_guard.py`. Levert een fetch
 niets op, of meer dan 20% minder dan de bestaande cache, dan blijft de oude cache
-staan en eindigt het script met exitcode 2. De workflow logt dat als waarschuwing en
+staan en eindigt het script met exitcode 2. De wekelijkse run op de server logt dat als waarschuwing en
 gaat verder — één kapotte bron sleept de rest van de dataset niet mee.
 
 ---

@@ -68,8 +68,8 @@ const TABS = [
   {
     path: '/data-export/suggesties',
     heading: /Plaatsingsadvies/,
-    // Per-municipality advice only exists in data built on the VPS; the CI
-    // dataset predates it.
+    // Per-municipality advice only exists in data built since 2026-10-24;
+    // an older dataset predates it.
     needs: ['placement_suggestions', 'index.json'],
   },
   { path: '/data-export/netwerkplanner', heading: /Netwerkplanner/ },
@@ -127,8 +127,7 @@ test.describe('Analysetabs', () => {
     await page.goto('/data-export/netwerkplanner', { waitUntil: 'networkidle' });
 
     const publiek = page.getByRole('button', { name: /^Publiek terrein/ });
-    // Network files from before the eigendom split have no switch; the CI
-    // dataset is one of those.
+    // Network files from before the eigendom split have no switch.
     test.skip((await publiek.count()) === 0, 'netwerkdata zonder eigendomsvarianten');
 
     await publiek.click();
@@ -338,7 +337,7 @@ test.describe('Analysedata', () => {
   });
 
   test('elk plaatsingsadvies verwijst naar een bestaand PC4 met een gastheer of een reden', () => {
-    // Built on the VPS; the CI dataset is from before the per-municipality files.
+    // Older datasets predate the per-municipality files.
     test.skip(
       !exists('placement_suggestions', 'index.json'),
       'dataset zonder plaatsingsadvies per gemeente'

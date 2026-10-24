@@ -3,8 +3,8 @@ Guard against silently wiping a good cache with a bad fetch.
 
 Every source fetcher writes through `safe_save`. If a fetch returns zero
 results, or more than 20% fewer than the cache it would replace, the existing
-cache is left untouched and the process exits with code 2. The GitHub Actions
-workflow treats that exit code as a warning rather than a failure, so one
+cache is left untouched and the process exits with code 2. The weekly run
+(deploy/scheduler.py) treats that exit code as a warning rather than a failure, so one
 broken source degrades the dataset instead of breaking the whole run.
 
 Exit codes:

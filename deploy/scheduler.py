@@ -54,7 +54,7 @@ STATE_FILE = DATA_DIR / "worker-state.json"
 LOCK_FILE = DATA_DIR / ".worker.lock"
 
 TZ = ZoneInfo("Europe/Amsterdam")
-# Same slot as the GitHub Action (Mon 02:00 UTC), in local time.
+# Monday 04:00 Amsterdam time, the slot the old GitHub Action ran in.
 WEEKDAY = int(os.environ.get("INLEVER_WEEKDAY", "0"))  # 0 = Monday
 RUN_AT = os.environ.get("INLEVER_RUN_AT", "04:00")
 # A run that was missed (worker down on Monday) is caught up on start.

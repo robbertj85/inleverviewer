@@ -44,7 +44,7 @@ cd webapp
 npm run dev
 npm run build     # runs TypeScript; must be clean
 npm run lint      # must be clean
-npm test          # Playwright; must be clean
+npm test          # Playwright, ~35 s on national data; must be clean
 ```
 
 ## Things that will bite you
@@ -226,6 +226,13 @@ volume; everything else goes to the Next standalone `app`; `worker` runs the wee
 pipeline. nginx proxies to the static container name `app-inleverpuntenviewer`
 (Coolify "consistent container names"), never the bare `app`: `web` is also on the
 shared `coolify` network, where another stack's `app` answers to that name. Generated data is not in git any more.
+
+**There is no CI: every push to `main` deploys.** Coolify auto-deploys `main`
+without running tests, the same as every other app on the VPS. A failing build
+stops the deploy, nothing else does, so run `npm run lint` and `npm test` before
+pushing. The tests run against the real national data in `webapp/public/data`.
+The old `ci.yml` was removed because it tested against the last dataset committed
+to git, in parallel with a deploy it could not block.
 
 **Server code reads data through `lib/dataPaths.ts`, never `process.cwd()`.** The
 volume is at `INLEVER_PUBLIC_DIR`, and the `/*turbopackIgnore: true*/` hints are
