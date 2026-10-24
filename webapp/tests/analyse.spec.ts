@@ -52,13 +52,23 @@ const TABS = [
   { path: '/data-export/schatting', heading: /Schatting inleverpunten per PC4/ },
   { path: '/data-export/bereik', heading: /Bereik van inwoners/ },
   { path: '/data-export/pois', heading: /Publieke POI/ },
-  { path: '/data-export/suggesties', heading: /Plaatsingsadvies/ },
+  {
+    path: '/data-export/suggesties',
+    heading: /Plaatsingsadvies/,
+    // Per-municipality advice only exists in data built on the VPS; the CI
+    // dataset predates it.
+    needs: ['placement_suggestions', 'index.json'],
+  },
   { path: '/data-export/netwerkplanner', heading: /Netwerkplanner/ },
 ];
 
 test.describe('Analysetabs', () => {
   for (const tab of TABS) {
     test(`${tab.path} laadt zonder console-fouten`, async ({ page }) => {
+      test.skip(
+        'needs' in tab && !exists(...(tab.needs as string[])),
+        'dataset zonder deze laag'
+      );
       const errors = collectErrors(page);
       await page.goto(tab.path, { waitUntil: 'networkidle' });
 
@@ -306,6 +316,11 @@ test.describe('Analysedata', () => {
   });
 
   test('elk plaatsingsadvies verwijst naar een bestaand PC4 met een gastheer of een reden', () => {
+    // Built on the VPS; the CI dataset is from before the per-municipality files.
+    test.skip(
+      !exists('placement_suggestions', 'index.json'),
+      'dataset zonder plaatsingsadvies per gemeente'
+    );
     const index = readJson<{
       streams: string[];
       poi_snap_max_m: number;
