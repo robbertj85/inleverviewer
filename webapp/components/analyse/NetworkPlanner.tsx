@@ -509,100 +509,105 @@ export default function NetworkPlanner({
             </p>
           )}
 
-          {/* Slider */}
-          <div className="space-y-3 rounded-lg border border-border bg-card p-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <label htmlFor="np-count" className="text-sm font-medium">
-                Aantal nieuwe punten
-              </label>
-              <input
-                id="np-count"
-                type="range"
-                min={0}
-                max={maxPicks}
-                value={n}
-                onChange={(e) => setN(Number(e.target.value))}
-                className="min-w-40 flex-1 accent-[var(--green-600)]"
-              />
-              <span className="w-12 text-right text-lg font-bold tabular-nums text-[var(--green-900)]">
-                {n}
-              </span>
-              <span className="text-xs text-muted-foreground">van {maxPicks}</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <StatTile
-                label="Inwoners in gemeente"
-                value={nlInt(total)}
-                hint="CBS 100 m-raster"
-              />
-              <StatTile
-                label={`Bereikt binnen ${distance} m`}
-                value={`${nlPct(total ? (coveredNow / total) * 100 : 0)}%`}
-                hint={`${nlInt(coveredNow)} inwoners`}
-              />
-              {coveredPakket != null ? (
-                <StatTile
-                  label="Pakketpunt binnen bereik"
-                  value={`${nlPct(total ? (coveredPakket / total) * 100 : 0)}%`}
-                  hint={`${nlInt(coveredPakket)} inwoners`}
-                  tone={COLOUR_PAKKETTEN}
+          {/*
+            Controls, map and list side by side: the slider is only useful
+            while you can watch the map respond, so on wide screens it sits
+            in a compact sticky column next to the map instead of above it.
+          */}
+          <div className="grid gap-4 lg:grid-cols-[19rem_minmax(0,1fr)] xl:grid-cols-[19rem_minmax(0,1fr)_20rem]">
+            {/*
+              Below lg the aside dissolves (`contents`) so its cards become
+              grid items: the slider card sits straight above the map and
+              sticks to the top while the map scrolls under it, and the stats
+              and layer toggles drop below the map.
+            */}
+            <aside className="space-y-3 max-lg:contents lg:sticky lg:top-4 lg:self-start">
+              <div className="rounded-lg border border-border bg-card p-3 shadow-sm max-lg:sticky max-lg:top-0 max-lg:z-[1001]">
+                <div className="flex items-baseline justify-between gap-2">
+                  <label htmlFor="np-count" className="text-sm font-medium">
+                    Aantal nieuwe punten
+                  </label>
+                  <span className="text-xs text-muted-foreground">
+                    <span className="text-lg font-bold tabular-nums text-[var(--green-900)]">{n}</span>{' '}
+                    van {maxPicks}
+                  </span>
+                </div>
+                <input
+                  id="np-count"
+                  type="range"
+                  min={0}
+                  max={maxPicks}
+                  value={n}
+                  onChange={(e) => setN(Number(e.target.value))}
+                  className="mt-1 w-full accent-[var(--green-600)]"
                 />
-              ) : (
-                <StatTile
-                  label="Bestaande punten"
-                  value={nlInt(payload.existing.alles ?? 0)}
-                  hint={`${nlInt(payload.existing.automaat ?? 0)} automaten`}
+                <p className="text-xs text-muted-foreground lg:hidden">
+                  Bereikt binnen {distance} m:{' '}
+                  <span className="font-semibold tabular-nums text-foreground">
+                    {nlPct(total ? (coveredNow / total) * 100 : 0)}%
+                  </span>
+                  {coveredPakket != null && (
+                    <>
+                      {' '}· pakketpunt:{' '}
+                      <span className="font-semibold tabular-nums text-foreground">
+                        {nlPct(total ? (coveredPakket / total) * 100 : 0)}%
+                      </span>
+                    </>
+                  )}
+                </p>
+              </div>
+
+              <div className="space-y-3 rounded-lg border border-border bg-card p-3 max-lg:order-1">
+                <div className="grid grid-cols-2 gap-2">
+                  <MiniStat
+                    label="Inwoners in gemeente"
+                    value={nlInt(total)}
+                    hint="CBS 100 m-raster"
+                  />
+                  <MiniStat
+                    label={`Bereikt binnen ${distance} m`}
+                    value={`${nlPct(total ? (coveredNow / total) * 100 : 0)}%`}
+                    hint={`${nlInt(coveredNow)} inwoners`}
+                  />
+                  {coveredPakket != null ? (
+                    <MiniStat
+                      label="Pakketpunt binnen bereik"
+                      value={`${nlPct(total ? (coveredPakket / total) * 100 : 0)}%`}
+                      hint={`${nlInt(coveredPakket)} inwoners`}
+                      tone={COLOUR_PAKKETTEN}
+                    />
+                  ) : (
+                    <MiniStat
+                      label="Bestaande punten"
+                      value={nlInt(payload.existing.alles ?? 0)}
+                      hint={`${nlInt(payload.existing.automaat ?? 0)} automaten`}
+                    />
+                  )}
+                  <MiniStat
+                    label="Kandidaat-locaties"
+                    value={nlInt(
+                      choice === 'mix'
+                        ? payload.candidates.length
+                        : payload.eigendom_counts?.[choice] ?? 0
+                    )}
+                    hint={
+                      choice === 'mix'
+                        ? `${payload.params.kandidaat_types.length} types`
+                        : `alleen ${EIGENDOM_LABELS[choice]}`
+                    }
+                  />
+                </div>
+
+                <NetworkCoverageChart
+                  series={chartSeries}
+                  total={total}
+                  n={n}
+                  maxPicks={maxPicks}
+                  height={130}
                 />
-              )}
-              <StatTile
-                label="Kandidaat-locaties"
-                value={nlInt(
-                  choice === 'mix'
-                    ? payload.candidates.length
-                    : payload.eigendom_counts?.[choice] ?? 0
-                )}
-                hint={
-                  choice === 'mix'
-                    ? `${payload.params.kandidaat_types.length} types`
-                    : `alleen ${EIGENDOM_LABELS[choice]}`
-                }
-              />
-            </div>
+              </div>
 
-            <NetworkCoverageChart
-              series={chartSeries}
-              total={total}
-              n={n}
-              maxPicks={maxPicks}
-            />
-          </div>
-
-          {/* Map + list */}
-          <div className="grid gap-4 xl:grid-cols-[1fr_22rem]">
-            <div className="relative h-[30rem] overflow-hidden rounded-lg border border-border xl:h-[40rem]">
-              <NetworkPlannerMap
-                payload={payload}
-                cellRank={cellRank}
-                n={n}
-                picks={picks}
-                showCells={showCells}
-                showCandidates={showCandidates}
-                showExisting={showExisting}
-                existing={existing}
-                pakketpunten={(payload.pakketpunten?.lat ?? []).map(
-                  (lat: number, i: number) => ({
-                    lat,
-                    lon: payload.pakketpunten.lon[i],
-                  })
-                )}
-                showPakketpunten={mode === 'combi' && showPakketpunten}
-                candidateFilter={choice === 'mix' ? null : choice}
-              />
-            </div>
-
-            <div className="space-y-3">
-              <div className="space-y-1.5 rounded-lg border border-border bg-card p-3 text-sm">
+              <div className="space-y-1.5 rounded-lg border border-border bg-card p-3 text-sm max-lg:order-1">
                 <label className="flex cursor-pointer items-center gap-2">
                   <input type="checkbox" checked={showCells} onChange={(e) => setShowCells(e.target.checked)} className="size-3.5 accent-[var(--green-600)]" />
                   Bewoonde cellen
@@ -627,8 +632,31 @@ export default function NetworkPlanner({
                   <span className="flex items-center gap-1"><span className="inline-block size-2.5 rounded-full bg-[#b9bdb4]" />witte vlek</span>
                 </div>
               </div>
+            </aside>
 
-              <div className="overflow-hidden rounded-lg border border-border bg-card">
+            <div className="relative h-[30rem] overflow-hidden rounded-lg border border-border lg:h-[40rem]">
+              <NetworkPlannerMap
+                payload={payload}
+                cellRank={cellRank}
+                n={n}
+                picks={picks}
+                showCells={showCells}
+                showCandidates={showCandidates}
+                showExisting={showExisting}
+                existing={existing}
+                pakketpunten={(payload.pakketpunten?.lat ?? []).map(
+                  (lat: number, i: number) => ({
+                    lat,
+                    lon: payload.pakketpunten.lon[i],
+                  })
+                )}
+                showPakketpunten={mode === 'combi' && showPakketpunten}
+                candidateFilter={choice === 'mix' ? null : choice}
+              />
+            </div>
+
+            <div className="max-lg:order-2 lg:col-span-2 xl:col-span-1">
+              <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-card xl:h-[40rem]">
                 <div className="border-b border-border px-3 py-2">
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="text-sm font-semibold text-[var(--green-900)]">
@@ -647,7 +675,7 @@ export default function NetworkPlanner({
                       : 'Op volgorde van plaatsing: elke stap voegt de meeste nog-onbereikte inwoners toe.'}
                   </p>
                 </div>
-                <ol className="max-h-[26rem] divide-y divide-border overflow-y-auto text-sm">
+                <ol className="max-h-[26rem] divide-y divide-border overflow-y-auto text-sm xl:max-h-none xl:flex-1">
                   {picks.slice(0, Math.max(n, 10)).map((pick) => {
                     const meta = payload.type_meta[pick.candidate.type];
                     const placed = pick.rank <= n;
@@ -809,6 +837,34 @@ export default function NetworkPlanner({
           </MethodologyNote>
         </>
       )}
+    </div>
+  );
+}
+
+/** StatTile's content at a size that fits two across in the control column. */
+function MiniStat({
+  label,
+  value,
+  hint,
+  tone,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  tone?: string;
+}) {
+  return (
+    <div className="min-w-0 rounded-md border border-border px-2 py-1.5">
+      <div className="truncate text-[11px] text-muted-foreground" title={label}>
+        {label}
+      </div>
+      <div
+        className="text-base font-bold leading-tight tabular-nums"
+        style={{ color: tone ?? 'var(--green-900)' }}
+      >
+        {value}
+      </div>
+      {hint && <div className="truncate text-[11px] text-muted-foreground">{hint}</div>}
     </div>
   );
 }

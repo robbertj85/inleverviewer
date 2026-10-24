@@ -28,26 +28,29 @@ export default function NetworkCoverageChart({
   total,
   n,
   maxPicks,
+  height: fixedHeight,
 }: {
   series: CoverageSeries[];
   total: number;
   n: number;
   maxPicks: number;
+  /** Plot height in px; defaults to 180 on narrow and 220 on wide containers. */
+  height?: number;
 }) {
   const wrapper = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(520);
+  const [width, setWidth] = useState(280);
   useEffect(() => {
     const element = wrapper.current;
     if (!element) return;
     const observer = new ResizeObserver(([entry]) => {
-      setWidth(Math.max(240, Math.round(entry.contentRect.width)));
+      setWidth(Math.max(200, Math.round(entry.contentRect.width)));
     });
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
 
-  const height = width < 480 ? 180 : 220;
-  const padLeft = 40;
+  const height = fixedHeight ?? (width < 480 ? 180 : 220);
+  const padLeft = 36;
   const padBottom = 24;
   const padTop = 10;
   const padRight = 10;
@@ -148,7 +151,7 @@ export default function NetworkCoverageChart({
 
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
         {paths.map((p) => (
-          <span key={p.label} className="flex items-center gap-1.5">
+          <span key={p.label} className="flex items-center gap-1.5 whitespace-nowrap">
             <span
               className="inline-block h-0.5 w-4"
               style={{ background: p.colour }}
@@ -162,9 +165,7 @@ export default function NetworkCoverageChart({
             </span>
           </span>
         ))}
-        <span className="ml-auto text-muted-foreground">
-          x-as: aantal geplaatste punten
-        </span>
+        <span className="text-muted-foreground">x-as: aantal geplaatste punten</span>
       </div>
     </div>
   );
